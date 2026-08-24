@@ -1,0 +1,12 @@
+# Vercel
+.vercel
+
+# Build artifact backups
+frontend.zip
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db

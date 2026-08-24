@@ -1,0 +1,26 @@
+import { Link } from "react-router-dom";
+import { bgField, logoShield, playIcon } from "../assets/images";
+import NavHeader from "../components/NavHeader";
+import "./Landing.css";
+
+export default function Landing() {
+  return (
+    <div className="landing" style={{ backgroundImage: `url(${bgField})` }}>
+      <NavHeader />
+      <main className="landing__main">
+        <div className="landing__panel">
+          <img src={logoShield} alt="SPORTSBOOKING" className="landing__logo" />
+          <h1 className="landing__heading">
+            จองสนามกีฬาง่ายๆ กับเรา
+            <br />
+            SPORTSBOOKING.com
+          </h1>
+          <Link to="/login" className="landing__cta">
+            <img src={playIcon} alt="" className="landing__cta-icon" />
+            จองเลยตอนนี้
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
+}

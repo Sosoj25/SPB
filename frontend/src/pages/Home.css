@@ -1,0 +1,245 @@
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.home__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.home__hero {
+  width: 100%;
+  max-width: 1300px;
+  background: var(--color-card-tint);
+  border-radius: 60px;
+  padding: 3.5rem 3rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.home__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex: 1 1 480px;
+  max-width: 620px;
+}
+
+.home__badge {
+  background: #fff;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.home__title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.15;
+}
+
+.home__desc {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.home__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.home__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-pill);
+  transition: background-color 0.15s ease, transform 0.18s ease;
+}
+
+.home__cta:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+
+.home__cta-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.home__secondary {
+  background: #fff;
+  border: 3px solid var(--color-primary);
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.95rem 1.75rem;
+  border-radius: var(--radius-pill);
+  transition: transform 0.18s ease;
+}
+
+.home__secondary:hover {
+  transform: translateY(-2px);
+}
+
+.home__stats {
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.home__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home__stat-value {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.home__stat-label {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.9rem;
+}
+
+.home__booking {
+  flex: 0 1 400px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 44px;
+  padding: 2.25rem;
+  box-shadow: 0 8px 26px rgba(43, 10, 99, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.home__booking-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.home__booking-header span {
+  color: var(--color-primary);
+  font-size: 1.3rem;
+}
+
+.home__booking-header h2 {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.35rem;
+}
+
+.home__booking-card {
+  background: var(--color-tint-light);
+  border-radius: 24px;
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.home__booking-label {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 0.85rem;
+}
+
+.home__booking-title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.home__booking-meta {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.9rem;
+}
+
+.home__booking-status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-muted-purple);
+  font-size: 0.95rem;
+}
+
+.home__booking-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home__booking-empty {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.95rem;
+}
+
+.home__booking-primary,
+.home__booking-outline {
+  /* ปุ่มบางอันเป็น <a> (ลิงก์ไปเลือกสนาม) จึงต้องบังคับ block เพื่อให้ padding เต็มความกว้าง */
+  display: block;
+  padding: 1rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  transition: transform 0.18s ease;
+}
+
+.home__booking-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.home__booking-outline {
+  background: #fff;
+  border: 3px solid var(--color-primary);
+  color: var(--color-heading);
+}
+
+.home__booking-primary:hover,
+.home__booking-outline:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 700px) {
+  .home__hero {
+    padding: 2.25rem 1.5rem;
+    border-radius: 32px;
+  }
+}
