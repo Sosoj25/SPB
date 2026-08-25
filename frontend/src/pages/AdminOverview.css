@@ -1,0 +1,51 @@
+.admin-revenue {
+  margin-top: 1.5rem;
+}
+
+.admin-revenue__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-revenue__header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}
+
+.admin-revenue__chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.2rem;
+  height: 260px;
+}
+
+.admin-revenue__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  height: 100%;
+}
+
+.admin-revenue__bar {
+  width: 100%;
+  border-radius: 1rem;
+  background: var(--color-tint-light);
+}
+
+.admin-revenue__bar--active {
+  background: var(--color-primary);
+}
+
+.admin-revenue__col p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-muted-purple);
+}
+

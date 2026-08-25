@@ -23,8 +23,8 @@ function UserAvatarIcon({ className }) {
 
 const LEFT_LINKS = [
   { label: "Home", to: "/home" },
-  { label: "About", to: "/home" },
-  { label: "NEWS", to: "/home" },
+  { label: "About", to: "/facilities" },
+  { label: "NEWS", to: "/news" },
 ];
 
 const RIGHT_LINKS = [

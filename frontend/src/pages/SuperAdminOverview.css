@@ -1,0 +1,19 @@
+.sa-branches {
+  margin-top: 1.5rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sa-branches__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.75rem 1.75rem 1.25rem;
+}
+
+.sa-branches__header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}

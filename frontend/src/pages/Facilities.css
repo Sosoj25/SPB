@@ -1,0 +1,316 @@
+.facilities {
+  --editorial-serif: "Noto Serif Thai", var(--font-main);
+  --editorial-sans: "Sarabun", var(--font-main);
+  --editorial-text: #1a1a1c;
+  --editorial-muted: #6b6b73;
+  --editorial-rule: #e3e3e5;
+  min-height: 100%;
+  background: #fff;
+}
+
+.facilities__main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+.facilities__rule {
+  border: none;
+  border-top: 1px solid var(--editorial-rule);
+  margin: 3rem 0;
+}
+
+.facilities__rule--strong {
+  border-top: 2px solid var(--editorial-text);
+}
+
+/* Masthead */
+.facilities__eyebrow {
+  font-family: var(--editorial-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  color: var(--color-primary);
+  margin: 0 0 1rem;
+}
+
+.facilities__title {
+  font-family: var(--editorial-serif);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 1.12;
+  color: var(--editorial-text);
+  margin: 0 0 1.25rem;
+}
+
+.facilities__intro {
+  font-family: var(--editorial-sans);
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--editorial-muted);
+  max-width: 640px;
+  margin: 0;
+}
+
+/* Amenities index */
+.facilities__index {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.facilities__index-item {
+  padding: 0 1.25rem;
+  border-left: 1px solid var(--editorial-rule);
+}
+
+.facilities__index-item:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.facilities__index-no {
+  font-family: var(--editorial-serif);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #c7c7cc;
+  margin: 0 0 0.5rem;
+}
+
+.facilities__index-title {
+  font-family: var(--editorial-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--editorial-text);
+  margin: 0 0 0.3rem;
+}
+
+.facilities__index-desc {
+  font-family: var(--editorial-sans);
+  font-size: 0.85rem;
+  color: var(--editorial-muted);
+  margin: 0;
+}
+
+/* Facility features */
+.facilities__feature {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  padding: 2.5rem 0;
+}
+
+.facilities__feature--reverse .facilities__feature-photo {
+  order: 2;
+}
+
+.facilities__feature-photo {
+  aspect-ratio: 700 / 520;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #f2f0f7;
+}
+
+.facilities__feature-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.facilities__feature-no {
+  font-family: var(--editorial-serif);
+  font-weight: 600;
+  font-size: 1.6rem;
+  color: #c7c7cc;
+  margin: 0 0 0.5rem;
+}
+
+.facilities__feature-eyebrow {
+  font-family: var(--editorial-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  color: var(--color-primary);
+  margin: 0 0 0.5rem;
+}
+
+.facilities__feature-title {
+  font-family: var(--editorial-serif);
+  font-weight: 600;
+  font-size: 2.15rem;
+  color: var(--editorial-text);
+  margin: 0 0 0.75rem;
+}
+
+.facilities__feature-desc {
+  font-family: var(--editorial-sans);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--editorial-muted);
+  margin: 0 0 1.5rem;
+}
+
+.facilities__facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.facilities__fact {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--editorial-rule);
+}
+
+.facilities__fact dt {
+  font-family: var(--editorial-sans);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: var(--editorial-muted);
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.facilities__fact dd {
+  font-family: var(--editorial-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--editorial-text);
+  margin: 0;
+}
+
+/* Founder */
+.facilities__section-label {
+  font-family: var(--editorial-sans);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+  color: var(--editorial-text);
+  margin: 0 0 2rem;
+}
+
+.facilities__founder-grid {
+  display: grid;
+  grid-template-columns: 460fr 900fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.facilities__founder-photo {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f2f0f7;
+}
+
+.facilities__founder-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.facilities__quote {
+  font-family: var(--editorial-serif);
+  font-size: 1.5rem;
+  line-height: 1.5;
+  color: var(--editorial-text);
+  margin: 0 0 1.5rem;
+}
+
+.facilities__founder-name {
+  font-family: var(--editorial-serif);
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--editorial-text);
+  margin: 1.25rem 0 0.3rem;
+}
+
+.facilities__founder-role {
+  font-family: var(--editorial-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.14em;
+  color: var(--color-primary);
+  margin: 0 0 0.9rem;
+}
+
+.facilities__founder-bio {
+  font-family: var(--editorial-sans);
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--editorial-muted);
+  margin: 0;
+}
+
+/* Stats */
+.facilities__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.facilities__stat {
+  padding: 1.5rem 1.5rem 1.5rem 0;
+  border-left: 1px solid var(--editorial-rule);
+}
+
+.facilities__stat:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+
+.facilities__stat-value {
+  font-family: var(--editorial-serif);
+  font-weight: 600;
+  font-size: 2.1rem;
+  color: var(--editorial-text);
+  margin: 0 0 0.4rem;
+}
+
+.facilities__stat-label {
+  font-family: var(--editorial-sans);
+  font-size: 0.9rem;
+  color: var(--editorial-muted);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .facilities__index {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 1.5rem;
+  }
+  .facilities__index-item:nth-child(2n + 1) {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .facilities__feature,
+  .facilities__feature--reverse .facilities__feature-photo {
+    grid-template-columns: 1fr;
+    order: initial;
+  }
+  .facilities__feature {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .facilities__founder-grid {
+    grid-template-columns: 1fr;
+  }
+  .facilities__founder-photo {
+    max-width: 280px;
+  }
+
+  .facilities__stats {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 1.5rem;
+  }
+  .facilities__stat:nth-child(2n + 1) {
+    border-left: none;
+    padding-left: 0;
+  }
+}

@@ -23,6 +23,10 @@
   --color-success-text: #1c733d;
   --color-warning-bg: #fff2d1;
   --color-warning-text: #996605;
+  --color-danger-bg: #fce5e5;
+  --color-danger-text: #b82633;
+  --color-neutral-bg: #f5f5f7;
+  --color-neutral-text: #c7c2d1;
   --shadow-card: 0 8px 26px rgba(43, 10, 99, 0.14);
   --radius-lg: 25px;
   --radius-pill: 200px;

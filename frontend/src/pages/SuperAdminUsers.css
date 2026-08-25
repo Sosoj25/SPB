@@ -1,0 +1,28 @@
+.sa-role-card {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border-radius: 1.75rem;
+  box-shadow: var(--shadow-card);
+  padding: 1.6rem;
+}
+
+.sa-role-card__label {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-heading);
+}
+
+.sa-role-card__value {
+  margin: 0 0 0.3rem;
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.sa-role-card__desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}

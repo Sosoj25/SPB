@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
 
 // Landing โหลดตรง ๆ เพราะเป็นหน้าแรกที่ทุกคนเห็น — ถ้า lazy จะได้จอโหลด
 // คั่นก่อนเห็นอะไรเลย ส่วนที่เหลือแบ่งเป็นก้อนแยกตาม route
@@ -20,6 +21,12 @@ const BookingField = lazy(() => import("./pages/BookingField"));
 const BookingSchedule = lazy(() => import("./pages/BookingSchedule"));
 const BookingPayment = lazy(() => import("./pages/BookingPayment"));
 const BookingReceipt = lazy(() => import("./pages/BookingReceipt"));
+const Facilities = lazy(() => import("./pages/Facilities"));
+const News = lazy(() => import("./pages/News"));
+const AdminOverview = lazy(() => import("./pages/AdminOverview"));
+const AdminBookings = lazy(() => import("./pages/AdminBookings"));
+const SuperAdminOverview = lazy(() => import("./pages/SuperAdminOverview"));
+const SuperAdminUsers = lazy(() => import("./pages/SuperAdminUsers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function RouteFallback() {
@@ -41,6 +48,8 @@ export default function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/edit" element={<ProfileEdit />} />
+            <Route path="/facilities" element={<Facilities />} />
+            <Route path="/news" element={<News />} />
 
             {/* ขั้นตอนการจอง — ส่ง state ระหว่างขั้นผ่าน query string
                 (?sport= ?facility= ?date= ?booking=) ไม่ใช้ state กลางทั้งแอป
@@ -50,6 +59,18 @@ export default function App() {
             <Route path="/booking/schedule" element={<BookingSchedule />} />
             <Route path="/booking/payment" element={<BookingPayment />} />
             <Route path="/booking/receipt" element={<BookingReceipt />} />
+          </Route>
+
+          {/* ข้อมูลในหน้า admin/superadmin ยังเป็น mock อยู่ (รอต่อ Supabase จริง)
+              แต่ route ถูกจำกัดสิทธิ์แล้วผ่าน RoleProtectedRoute */}
+          <Route element={<RoleProtectedRoute allow={["admin", "super_admin"]} />}>
+            <Route path="/admin/overview" element={<AdminOverview />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+          </Route>
+
+          <Route element={<RoleProtectedRoute allow={["super_admin"]} />}>
+            <Route path="/superadmin/overview" element={<SuperAdminOverview />} />
+            <Route path="/superadmin/users" element={<SuperAdminUsers />} />
           </Route>
 
           {/* ต้องอยู่นอก ProtectedRoute: URL ที่พิมพ์ผิดควรบอกว่าไม่มีหน้านี้

@@ -4,6 +4,12 @@ import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import Button from "../components/Button";
 import { loginWithUsername } from "../lib/auth";
+import { supabase } from "../lib/supabase";
+
+const HOME_BY_ROLE = {
+  admin: "/admin/overview",
+  super_admin: "/superadmin/overview",
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -51,9 +57,27 @@ export default function Login() {
       // login-with-username) หน้าเว็บไม่เคยเห็นอีเมลของบัญชีเลยจนกว่าจะ
       // ล็อกอินผ่าน — ก่อนหน้านี้ทำสองขั้นตรงนี้ ทำให้ใครก็ตามที่มี anon key
       // ยิงถามอีเมลของชื่อผู้ใช้ใดก็ได้โดยไม่ต้องรู้รหัสผ่าน
-      await loginWithUsername(form.username.trim(), form.password);
+      const user = await loginWithUsername(form.username.trim(), form.password);
 
-      navigate("/home", { replace: true });
+      // เช็ค role เพื่อพาไปหน้าแรกที่ตรงกับสิทธิ์ — ไม่ผูกกับ AuthContext
+      // เพราะ profile ที่นั่นเพิ่งเริ่มโหลดหลัง setSession ยังไม่ทันมาตอนนี้
+      // ถ้าเช็คไม่สำเร็จก็ยังพาเข้า /home ได้ตามปกติ ไม่ควรทำให้ login ที่
+      // สำเร็จแล้วกลายเป็น error
+      let destination = "/home";
+
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        destination = HOME_BY_ROLE[profile?.role] ?? "/home";
+      } catch (profileError) {
+        console.error("Fetch role after login failed:", profileError);
+      }
+
+      navigate(destination, { replace: true });
     } catch (error) {
       console.error("Login failed:", error);
 
