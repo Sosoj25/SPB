@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import Button from "../components/Button";
-import { supabase } from "../lib/supabase";
+import { loginWithUsername } from "../lib/auth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -47,35 +47,12 @@ export default function Login() {
     try {
       setLoading(true);
 
-      // 1. ค้นหา Email จาก Username
-      const { data: email, error: usernameError } =
-        await supabase.rpc("get_email_by_username", {
-          p_username: form.username.trim(),
-        });
+      // การแปลง username -> email เกิดที่ฝั่ง server ทั้งหมด (Edge Function
+      // login-with-username) หน้าเว็บไม่เคยเห็นอีเมลของบัญชีเลยจนกว่าจะ
+      // ล็อกอินผ่าน — ก่อนหน้านี้ทำสองขั้นตรงนี้ ทำให้ใครก็ตามที่มี anon key
+      // ยิงถามอีเมลของชื่อผู้ใช้ใดก็ได้โดยไม่ต้องรู้รหัสผ่าน
+      await loginWithUsername(form.username.trim(), form.password);
 
-      if (usernameError) {
-        console.error("Username lookup error:", usernameError);
-        throw new Error("ไม่สามารถตรวจสอบชื่อผู้ใช้ได้");
-      }
-
-      if (!email) {
-        throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
-      }
-
-      // 2. Login ด้วย Email + Password
-      const { error: loginError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password: form.password,
-        });
-
-      if (loginError) {
-        console.error("Login error:", loginError);
-
-        throw new Error("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
-      }
-
-      // 3. Login สำเร็จ
       navigate("/home", { replace: true });
     } catch (error) {
       console.error("Login failed:", error);

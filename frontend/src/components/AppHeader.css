@@ -28,6 +28,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .app-header__caret {
@@ -104,6 +105,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  object-fit: cover;
   flex-shrink: 0;
 }
 

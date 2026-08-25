@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import Button from "../components/Button";
-import { supabase } from "../lib/supabase";
+import { requestPasswordReset } from "../lib/auth";
 
 export default function ForgotPasswordStep1() {
   const [identifier, setIdentifier] = useState("");
@@ -29,48 +29,15 @@ export default function ForgotPasswordStep1() {
     try {
       setLoading(true);
 
-      let email = value;
-
-      // ถ้าผู้ใช้กรอก Username
-      // ให้ค้นหา Email จาก Username
-      if (!value.includes("@")) {
-        const { data, error: usernameError } =
-          await supabase.rpc("get_email_by_username", {
-            p_username: value,
-          });
-
-        if (usernameError) {
-          console.error(
-            "Username lookup error:",
-            usernameError
-          );
-
-          throw new Error(
-            "ไม่สามารถตรวจสอบชื่อผู้ใช้ได้"
-          );
-        }
-
-        email = data || null;
-      }
-
-      // ส่ง Reset Password Email
-      // หมายเหตุ: ถ้าไม่พบ username/email ในระบบ จะไม่ขึ้น error ต่างจากกรณีอื่น
-      // เพื่อป้องกันการสุ่มเช็คว่า username/email ใดมีอยู่จริง (user enumeration)
-      if (email) {
-        const { error: resetError } =
-          await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/reset-password`,
-          });
-
-        if (resetError) {
-          console.error(
-            "Reset password error:",
-            resetError
-          );
-
-          throw resetError;
-        }
-      }
+      // ทั้งการหาอีเมลและการส่งอีเมลเกิดที่ฝั่ง server (Edge Function
+      // forgot-password-by-username) และตอบผลเหมือนกันเสมอ
+      //
+      // หน้าจอนี้ระวังเรื่อง user enumeration ไว้ดีอยู่แล้ว แต่ RPC ที่มัน
+      // เรียกระหว่างทางต่างหากที่คืนอีเมลจริงออกไปให้ใครก็ได้
+      await requestPasswordReset(
+        value,
+        `${window.location.origin}/reset-password`
+      );
 
       setMessage(
         "หากมีบัญชีที่ตรงกับข้อมูลนี้ เราได้ส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปยังอีเมลของคุณแล้ว"

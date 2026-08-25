@@ -1,0 +1,968 @@
+/* สไตล์ร่วมของหน้าจองทั้ง 5 ขั้นตอน (mock up จาก Figma) */
+
+.booking {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-page-bg);
+  overflow-x: hidden;
+}
+
+.booking__band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* แถบภาพในดีไซน์คือ 1920x620 -> คงสัดส่วนไว้ทุกความกว้าง */
+  height: 32.3vw;
+  min-height: 320px;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.booking__main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.booking__main--narrow {
+  max-width: 780px;
+}
+
+.booking__intro {
+  background: var(--color-panel-tint);
+  border-radius: 40px;
+  padding: 2rem 2.4rem;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.booking__intro--plain {
+  background: none;
+  padding: 0.5rem 0 0;
+}
+
+.booking__title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 3.2vw, 2.7rem);
+  line-height: 1.2;
+}
+
+.booking__lead {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 1.15rem;
+}
+
+.booking__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.75rem;
+}
+
+/* ---------- การ์ด ---------- */
+
+.booking-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 30px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-card__media {
+  position: relative;
+  /* ภาพในการ์ดคือ 740x380 ตามดีไซน์ */
+  aspect-ratio: 740 / 380;
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-tint-light);
+}
+
+/* วางรูปแบบ absolute เพื่อไม่ให้ขนาดจริงของไฟล์ไปดันกรอบให้สูงเกินสัดส่วน */
+.booking-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.booking-card__badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.booking-card__body {
+  padding: 1.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.booking-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.booking-card__name {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.booking-card__meta {
+  color: var(--color-muted-purple);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.booking-card__desc {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.booking-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.booking-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.booking-card__price {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.35rem;
+}
+
+/* ---------- ชิ้นส่วนย่อย ---------- */
+
+.booking-chip {
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.booking-chip--success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.booking-chip--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.booking-chip--muted {
+  background: var(--color-disabled-bg);
+  color: var(--color-muted-purple);
+}
+
+.booking-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.95rem 2.2rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, transform 0.18s ease;
+}
+
+.booking-btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+
+.booking-btn--block {
+  width: 100%;
+}
+
+.booking-btn--ghost {
+  background: #fff;
+  color: var(--color-heading);
+  border: 3px solid var(--color-primary);
+}
+
+.booking-btn--ghost:hover {
+  background: var(--color-tint-light);
+}
+
+/* สนามที่เต็มในวันที่เลือก ยังกดเข้าไปดูวันอื่นได้ แค่ไม่ใช่ทางหลัก */
+.booking-btn--quiet {
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+}
+
+.booking-btn--quiet:hover {
+  background: var(--color-card-tint);
+}
+
+.booking-btn:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  border-color: var(--color-disabled-bg);
+  cursor: not-allowed;
+}
+
+.booking-btn:disabled:hover {
+  background: var(--color-disabled-bg);
+  transform: none;
+}
+
+.booking-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 1.6rem;
+}
+
+.booking-filter {
+  background: #fff;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.3rem;
+  border-radius: var(--radius-pill);
+}
+
+.booking-filter--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* ---------- แผงข้อมูล / แถวรายการ ---------- */
+
+.booking-panel {
+  background: #fff;
+  border-radius: 30px;
+  box-shadow: var(--shadow-card);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.booking-panel__title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.booking-panel__sub {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.95rem;
+}
+
+.booking-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.booking-row__label {
+  color: var(--color-muted-purple);
+  font-size: 0.98rem;
+}
+
+.booking-row__value {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.98rem;
+  text-align: right;
+}
+
+.booking-row__value--success {
+  color: var(--color-success-text);
+}
+
+.booking-row--total .booking-row__label {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.booking-row--total .booking-row__value {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+}
+
+.booking-divider {
+  width: 100%;
+  height: 2px;
+  border: none;
+  margin: 0.3rem 0;
+  background: var(--color-tint-light);
+}
+
+.booking-note {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.booking-points {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--color-tint-light);
+  border-radius: 13px;
+  padding: 0.9rem 1.2rem;
+}
+
+.booking-points__label {
+  color: var(--color-heading);
+  font-size: 0.98rem;
+}
+
+.booking-points__value {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.08rem;
+}
+
+/* ---------- ขั้นตอนเลือกวันและเวลา ---------- */
+
+.booking-schedule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.booking-schedule__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.booking-calendar__nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.booking-calendar__arrow {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-pill);
+}
+
+.booking-calendar__month {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.45rem;
+}
+
+.booking-calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.booking-calendar__dow {
+  padding-bottom: 0.2rem;
+  text-align: center;
+  color: var(--color-muted-purple);
+  font-size: 1rem;
+}
+
+.booking-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0;
+  border-radius: 18px;
+  background: var(--color-tint-light);
+  transition: transform 0.15s ease;
+}
+
+.booking-day:hover {
+  transform: translateY(-2px);
+}
+
+.booking-day__num {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.45rem;
+}
+
+.booking-day__state {
+  color: var(--color-muted-purple);
+  font-size: 0.72rem;
+}
+
+.booking-day--full {
+  background: var(--color-disabled-bg);
+  cursor: not-allowed;
+}
+
+.booking-day--full:hover {
+  transform: none;
+}
+
+.booking-day--full .booking-day__num,
+.booking-day--full .booking-day__state {
+  color: var(--color-disabled-text);
+}
+
+.booking-day--selected {
+  background: var(--color-primary);
+}
+
+.booking-day--selected .booking-day__num {
+  color: #fff;
+}
+
+.booking-day--selected .booking-day__state {
+  color: var(--color-on-primary-soft);
+}
+
+.booking-day--empty {
+  background: none;
+  cursor: default;
+}
+
+.booking-day--empty:hover {
+  transform: none;
+}
+
+.booking-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  margin-top: 0.4rem;
+}
+
+.booking-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-muted-purple);
+  font-size: 0.95rem;
+}
+
+.booking-legend__swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+}
+
+.booking-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  background: var(--color-tint-light);
+  text-align: left;
+}
+
+.booking-slot__time {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.booking-slot__state {
+  color: var(--color-muted-purple);
+  font-size: 0.88rem;
+}
+
+.booking-slot--full {
+  background: var(--color-disabled-bg);
+  cursor: not-allowed;
+}
+
+.booking-slot--full .booking-slot__time,
+.booking-slot--full .booking-slot__state {
+  color: var(--color-disabled-text);
+}
+
+.booking-slot--selected {
+  background: var(--color-primary);
+}
+
+.booking-slot--selected .booking-slot__time {
+  color: #fff;
+}
+
+.booking-slot--selected .booking-slot__state {
+  color: var(--color-on-primary-soft);
+}
+
+/* ---------- ขั้นตอนชำระเงิน ---------- */
+
+.booking-payment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.booking-payment__left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.booking-detail {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.booking-detail__thumb {
+  width: 108px;
+  height: 79px;
+  border-radius: 17px;
+  background: var(--color-tint-light);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.booking-detail__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.booking-detail__title {
+  margin: 0;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.booking-detail__line {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.98rem;
+}
+
+.booking-method {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.1rem 1.3rem;
+  border-radius: 17px;
+  background: var(--color-surface-soft);
+  border: 2px solid var(--color-tint-light);
+  text-align: left;
+}
+
+.booking-method--active {
+  background: var(--color-tint-light);
+  border: 3px solid var(--color-primary);
+}
+
+.booking-method__radio {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-disabled-text);
+  display: grid;
+  place-items: center;
+}
+
+.booking-method--active .booking-method__radio {
+  border-color: var(--color-primary);
+}
+
+.booking-method__radio::after {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.booking-method--active .booking-method__radio::after {
+  background: var(--color-primary);
+}
+
+.booking-method__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.booking-method__title {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.booking-method__desc {
+  color: var(--color-muted-purple);
+  font-size: 0.88rem;
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.3rem;
+  border-radius: 17px;
+  background: var(--color-surface-soft);
+}
+
+.booking-form__row {
+  display: flex;
+  gap: 1.1rem;
+}
+
+.booking-form__field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.booking-form__label {
+  color: var(--color-muted-purple);
+  font-size: 0.88rem;
+}
+
+.booking-form__input {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  border: 2px solid var(--color-tint-light);
+  background: #fff;
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.booking-form__input::placeholder {
+  color: var(--color-disabled-text);
+}
+
+.booking-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ---------- หน้าใบเสร็จ ---------- */
+
+.booking-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  margin-bottom: 2.2rem;
+}
+
+.booking-success__mark {
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  font-size: 2.8rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.booking-receipt {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+
+.booking-receipt__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.9rem;
+  background: var(--color-tint-light);
+}
+
+.booking-receipt__no {
+  margin: 0.2rem 0 0;
+  color: var(--color-muted-purple);
+  font-size: 0.88rem;
+}
+
+.booking-receipt__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.9rem;
+}
+
+.booking-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: 14px;
+  background: var(--color-tint-light);
+}
+
+.booking-total__label {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.booking-total__value {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.booking-pass {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1.75rem;
+}
+
+.booking-pass__qr {
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+  border-radius: 17px;
+  background: var(--color-tint-light);
+}
+
+.booking-pass__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.booking-pass__code {
+  margin: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.booking-actions .booking-btn {
+  flex: 1;
+}
+
+.booking__footnote {
+  margin: 1.4rem 0 0;
+  text-align: center;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1000px) {
+  .booking-schedule,
+  .booking-payment {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .booking__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .booking__intro {
+    padding: 1.5rem;
+    border-radius: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-day__num {
+    font-size: 1rem;
+  }
+
+  .booking-day__state {
+    display: none;
+  }
+
+  .booking-pass,
+  .booking-actions,
+  .booking-form__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
+/* ---------- สถานะการโหลด / ข้อความแจ้งเตือน ---------- */
+
+.booking-state {
+  margin: 0.9rem 0;
+  padding: 1rem 1.3rem;
+  border-radius: 18px;
+  background: var(--color-panel-tint);
+  color: var(--color-heading);
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.booking-state--error {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+/* ---------- ตัวเลือกวันบนหน้ารายการสนาม ---------- */
+
+.booking-datepick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  align-self: flex-start;
+  background: #fff;
+  border-radius: var(--radius-pill);
+  padding: 0.55rem 0.6rem 0.55rem 1.3rem;
+  box-shadow: var(--shadow-card);
+}
+
+.booking-datepick__label {
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.booking-datepick__input {
+  border: 2px solid var(--color-tint-light);
+  border-radius: var(--radius-pill);
+  padding: 0.45rem 1rem;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.booking-datepick__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ---------- ป้ายบอกว่าการชำระเงินยังเป็นการจำลอง ---------- */
+
+.booking-simulated {
+  margin-top: 1.2rem;
+  padding: 1.1rem 1.3rem;
+  border-radius: 18px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.booking-simulated__title {
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.booking-simulated__text {
+  margin: 0;
+  font-size: 0.97rem;
+  line-height: 1.5;
+}
+
+/* ปุ่มเลื่อนเดือนที่เลื่อนต่อไม่ได้ ต้องดูตายจริง ไม่ใช่แค่กดแล้วเงียบ */
+.booking-calendar__arrow:disabled {
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.booking-day:disabled,
+.booking-slot:disabled {
+  cursor: not-allowed;
+}
+
+/* เวลาพิมพ์ใบเสร็จ เอาเฉพาะเนื้อใบเสร็จ ไม่ต้องมีเมนูกับปุ่มติดไปด้วย */
+@media print {
+  .app-header,
+  .booking__band,
+  .booking-actions,
+  .booking__footnote {
+    display: none !important;
+  }
+
+  .booking {
+    background: #fff;
+  }
+
+  .booking-panel {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ใบเสร็จของรายการที่ยังไม่จ่าย/ถูกยกเลิก ไม่ควรใช้เครื่องหมายถูกสีเขียว */
+.booking-success__mark--muted {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}

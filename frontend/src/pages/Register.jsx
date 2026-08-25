@@ -55,8 +55,9 @@ export default function Register() {
       return;
     }
 
-    if (form.password.length < 6) {
-      setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+    // 6 ตัวสั้นเกินไปสำหรับบัญชีที่ผูกกับการชำระเงิน
+    if (form.password.length < 8) {
+      setError("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
       return;
     }
 

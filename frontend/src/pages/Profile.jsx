@@ -10,6 +10,7 @@ import {
   describeStatus,
   formatBookingDate,
   formatTimeRange,
+  BOOKING_PAGE_SIZE,
 } from "../lib/bookings";
 import { bgField } from "../assets/images";
 import "./Profile.css";
@@ -52,14 +53,20 @@ function InfoPanel({ user, profile }) {
 }
 
 function HistoryPanel() {
-  const { bookings, loading, error } = useUserBookings();
+  // ขยายทีละหน้าแทนการดึงประวัติทั้งหมดตั้งแต่เปิดหน้า
+  const [limit, setLimit] = useState(BOOKING_PAGE_SIZE);
+  const { bookings, hasMore, loading, error } = useUserBookings(limit);
 
   return (
     <section className="profile-card profile-card--flush">
       <div className="profile-history__header">
         <h2 className="profile-card__title">ประวัติการจอง</h2>
         {!loading && !error && (
-          <span className="profile__badge">ทั้งหมด {bookings.length} รายการ</span>
+          <span className="profile__badge">
+            {hasMore
+              ? `${bookings.length} รายการล่าสุด`
+              : `ทั้งหมด ${bookings.length} รายการ`}
+          </span>
         )}
       </div>
 
@@ -94,9 +101,10 @@ function HistoryPanel() {
             const status = describeStatus(booking);
 
             return (
-              <div
+              <Link
                 key={booking.id}
-                className={`profile-table__row ${
+                to={`/booking/receipt?booking=${booking.id}`}
+                className={`profile-table__row profile-table__row--link ${
                   i % 2 === 1 ? "profile-table__row--tint" : ""
                 }`}
               >
@@ -117,10 +125,20 @@ function HistoryPanel() {
                 <span className="profile-table__cell profile-table__cell--date">
                   {formatBookingDate(booking.booking_date)}
                 </span>
-              </div>
+              </Link>
             );
           })}
         </div>
+      )}
+
+      {!loading && !error && hasMore && (
+        <button
+          type="button"
+          className="profile-more"
+          onClick={() => setLimit((n) => n + BOOKING_PAGE_SIZE)}
+        >
+          ดูเพิ่มเติม
+        </button>
       )}
     </section>
   );

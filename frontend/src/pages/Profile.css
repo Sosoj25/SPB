@@ -545,3 +545,30 @@
     padding: 1.25rem;
   }
 }
+
+/* แถวประวัติการจองกดเข้าไปดูใบเสร็จได้ ต้องมีสัญญาณว่ากดได้ */
+.profile-table__row--link {
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.profile-table__row--link:hover {
+  background: var(--color-tint-light);
+}
+
+/* ปุ่มขยายรายการประวัติการจอง */
+.profile-more {
+  align-self: center;
+  margin-top: 1.2rem;
+  padding: 0.7rem 2.2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.profile-more:hover {
+  background: var(--color-card-tint);
+}

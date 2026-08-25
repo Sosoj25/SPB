@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import { useAsyncData } from "../hooks/useAsyncData";
 import { useNextBooking } from "../hooks/useBookings";
+import { fetchPlatformStats } from "../lib/stats";
 import {
   describeCountdown,
   describeFacility,
@@ -11,11 +13,43 @@ import {
 import { bgField, playIcon } from "../assets/images";
 import "./Home.css";
 
-const STATS = [
-  { value: "120+", label: "สนามพันธมิตร" },
-  { value: "8,400+", label: "การจองต่อเดือน" },
-  { value: "4.8★", label: "คะแนนผู้ใช้" },
-];
+const numberFormat = new Intl.NumberFormat("th-TH");
+
+// ตัวเลขทุกตัวมาจาก DB จริง
+//
+// ของเดิมเป็นค่าที่พิมพ์ไว้ตั้งแต่ตอนทำดีไซน์ ("120+ สนามพันธมิตร" ทั้งที่มี
+// 3 สนาม, "8,400+ การจองต่อเดือน" ทั้งที่มีหลักหน่วย, "4.8 ดาว" ทั้งที่ยัง
+// ไม่มีรีวิวสักอัน) ซึ่งเป็นการอ้างตัวเลขที่ไม่จริงกับผู้ใช้จริง
+function statCards(stats) {
+  return [
+    { value: numberFormat.format(stats.facilities), label: "สนามให้เลือกจอง" },
+    { value: numberFormat.format(stats.openSlots), label: "ช่วงเวลาที่เปิดจอง" },
+
+    // ดาวเฉลี่ยโชว์ได้ต่อเมื่อมีรีวิวจริงเท่านั้น ไม่งั้นก็กลับไปเป็น
+    // ตัวเลขที่แต่งขึ้นแบบเดิม — ระหว่างที่ยังไม่มี ใช้จำนวนกีฬาแทน
+    stats.reviewsCount > 0
+      ? { value: `${stats.avgRating}★`, label: `จาก ${numberFormat.format(stats.reviewsCount)} รีวิว` }
+      : { value: numberFormat.format(stats.sports), label: "ประเภทกีฬา" },
+  ];
+}
+
+function PlatformStats() {
+  const { data: stats } = useAsyncData(fetchPlatformStats, "platform-stats");
+
+  // ยังโหลดไม่เสร็จหรือโหลดไม่ได้ = ไม่ต้องโชว์อะไร ดีกว่าโชว์เลขศูนย์
+  if (!stats) return null;
+
+  return (
+    <div className="home__stats">
+      {statCards(stats).map((stat) => (
+        <div key={stat.label} className="home__stat">
+          <p className="home__stat-value">{stat.value}</p>
+          <p className="home__stat-label">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function NextBookingCard() {
   const { booking, loading, error } = useNextBooking();
@@ -40,7 +74,7 @@ function NextBookingCard() {
         </div>
 
         <div className="home__booking-actions">
-          <Link to="/home" className="home__booking-primary">
+          <Link to="/booking/sport" className="home__booking-primary">
             เลือกสนาม
           </Link>
         </div>
@@ -65,12 +99,12 @@ function NextBookingCard() {
       </p>
 
       <div className="home__booking-actions">
-        <button type="button" className="home__booking-primary">
+        <Link to={`/booking/receipt?booking=${booking.id}`} className="home__booking-primary">
           ดูรายละเอียด
-        </button>
-        <button type="button" className="home__booking-outline">
+        </Link>
+        <Link to="/booking/sport" className="home__booking-outline">
           จองใหม่
-        </button>
+        </Link>
       </div>
     </>
   );
@@ -98,23 +132,16 @@ export default function Home() {
             </p>
 
             <div className="home__actions">
-              <Link to="/home" className="home__cta">
+              <Link to="/booking/sport" className="home__cta">
                 <img src={playIcon} alt="" className="home__cta-icon" />
                 จองเลยตอนนี้
               </Link>
-              <Link to="/home" className="home__secondary">
+              <Link to="/booking/sport" className="home__secondary">
                 ดูสนามทั้งหมด
               </Link>
             </div>
 
-            <div className="home__stats">
-              {STATS.map((stat) => (
-                <div key={stat.label} className="home__stat">
-                  <p className="home__stat-value">{stat.value}</p>
-                  <p className="home__stat-label">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+            <PlatformStats />
           </div>
 
           <div className="home__booking">

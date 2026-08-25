@@ -28,7 +28,7 @@ const LEFT_LINKS = [
 ];
 
 const RIGHT_LINKS = [
-  { label: "จองสนามกีฬา", to: "/home" },
+  { label: "จองสนามกีฬา", to: "/booking/sport" },
   { label: "ชุมชน", to: "/home" },
 ];
 
@@ -73,6 +73,7 @@ export default function AppHeader() {
   const displayName =
     profile?.full_name || profile?.username || user?.email?.split("@")[0] || "ผู้ใช้งาน";
   const points = profile?.points ?? 0;
+  const avatarUrl = profile?.avatar_url || "";
 
   return (
     <header className="app-header">
@@ -84,14 +85,22 @@ export default function AppHeader() {
           aria-expanded={menuOpen}
           aria-haspopup="true"
         >
-          <UserAvatarIcon className="app-header__avatar" />
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="app-header__avatar" />
+          ) : (
+            <UserAvatarIcon className="app-header__avatar" />
+          )}
           <span className="app-header__caret" aria-hidden="true">▾</span>
         </button>
 
         {menuOpen && (
           <div className="app-menu" role="menu">
             <div className="app-menu__profile">
-              <UserAvatarIcon className="app-menu__avatar" />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="app-menu__avatar" />
+              ) : (
+                <UserAvatarIcon className="app-menu__avatar" />
+              )}
               <div>
                 <p className="app-menu__name">{displayName}</p>
                 <p className="app-menu__points">🏆 คะแนนสะสม {points.toLocaleString()}</p>

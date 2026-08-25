@@ -49,8 +49,29 @@ export default function ProfileEdit() {
       return;
     }
 
+    const trimmedUsername = form.username.trim();
+    const usernameChanged =
+      trimmedUsername.toLowerCase() !== (profile?.username || "").toLowerCase();
+
     try {
       setLoading(true);
+
+      // เช็คชื่อซ้ำก่อน เหมือน Register.jsx ไม่งั้นถ้าชนจะเจอ
+      // "duplicate key value violates unique constraint" ดิบๆ จาก Postgres
+      if (usernameChanged) {
+        const { data: usernameAvailable, error: usernameError } =
+          await supabase.rpc("is_username_available", {
+            p_username: trimmedUsername,
+          });
+
+        if (usernameError) {
+          console.error("Username availability check error:", usernameError);
+        } else if (usernameAvailable === false) {
+          setError("ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว กรุณาเลือกชื่ออื่น");
+          setLoading(false);
+          return;
+        }
+      }
 
       let avatarUrl = profile?.avatar_url || null;
 
@@ -76,7 +97,7 @@ export default function ProfileEdit() {
         .from("profiles")
         .update({
           full_name: form.full_name.trim(),
-          username: form.username.trim(),
+          username: trimmedUsername,
           phone: form.phone.trim() || null,
           bio: form.bio.trim() || null,
           avatar_url: avatarUrl,
@@ -93,7 +114,14 @@ export default function ProfileEdit() {
       });
     } catch (err) {
       console.error("Update profile error:", err);
-      setError(err.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+
+      // เผื่อสองคนตั้งชื่อชนกันพอดีในช่วงเสี้ยววินาทีระหว่างเช็คกับบันทึกจริง
+      const message =
+        err.code === "23505"
+          ? "ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว กรุณาเลือกชื่ออื่น"
+          : err.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล";
+
+      setError(message);
     } finally {
       setLoading(false);
     }

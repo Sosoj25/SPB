@@ -13,6 +13,17 @@
   --color-shadow-gold: rgba(254, 233, 160, 0.6);
   --color-gold: #f5b942;
   --color-gold-light: #ffe38a;
+  --color-page-bg: #faf7ff;
+  --color-panel-tint: rgba(243, 228, 255, 0.67);
+  --color-surface-soft: #fcfbff;
+  --color-disabled-bg: #f7f7fa;
+  --color-disabled-text: #c7c2d1;
+  --color-on-primary-soft: #ebdeff;
+  --color-success-bg: #def5e3;
+  --color-success-text: #1c733d;
+  --color-warning-bg: #fff2d1;
+  --color-warning-text: #996605;
+  --shadow-card: 0 8px 26px rgba(43, 10, 99, 0.14);
   --radius-lg: 25px;
   --radius-pill: 200px;
   --font-main: "Inter", "Noto Sans Thai", system-ui, -apple-system, sans-serif;
@@ -57,4 +68,13 @@ input {
 
 .link:hover {
   text-decoration: underline;
+}
+
+/* จอคั่นระหว่างโหลดโค้ดของ route ที่ถูกแบ่งเป็นก้อนแยก (React.lazy) */
+.route-fallback {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: var(--color-muted-purple);
+  font-size: 1.05rem;
 }
