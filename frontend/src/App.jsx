@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
+import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 
@@ -9,10 +10,15 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 //
 // เดิมรวมเป็นก้อนเดียว 515 kB แปลว่าคนที่แค่มาหน้า Login ต้องโหลดโค้ด
 // ปฏิทิน หน้าจอง และหน้าใบเสร็จทั้งหมดไปด้วยทั้งที่ยังไม่ได้ใช้
+//
+// ResetPassword ก็โหลดตรง ๆ เหมือนกัน (ไม่ lazy) ด้วยเหตุผลคนละแบบ: หน้านี้
+// ต้องอ่าน token จาก URL hash ให้ทันก่อนที่ Supabase client จะประมวลผลแล้ว
+// เคลียร์ hash ทิ้งไปเอง ถ้า lazy อยู่ ตัว import() ที่ต้องโหลดโค้ดแยกก้อนจะ
+// ช้ากว่า Supabase เกือบทุกครั้ง พอ component มาถึงจริง ๆ hash ก็ว่างไปแล้ว
+// ทำให้ลิงก์ที่ยังไม่หมดอายุกลับขึ้นว่า "หมดอายุ" ทุกครั้งที่คลิกครั้งแรก
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const ForgotPasswordStep1 = lazy(() => import("./pages/ForgotPasswordStep1"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Home = lazy(() => import("./pages/Home"));
 const Profile = lazy(() => import("./pages/Profile"));
 const ProfileEdit = lazy(() => import("./pages/ProfileEdit"));
