@@ -127,7 +127,7 @@ export default function BookingPayment() {
   useEffect(() => {
     if (!qr?.paymentId) return undefined;
 
-    pollRef.current = setInterval(async () => {
+    async function poll() {
       try {
         const { status } = await checkPlernpayPayment(qr.paymentId);
 
@@ -142,9 +142,22 @@ export default function BookingPayment() {
       } catch {
         // เช็คพลาดรอบเดียวไม่เป็นไร รอบถัดไป poll ใหม่เอง
       }
-    }, POLL_MS);
+    }
 
-    return () => clearInterval(pollRef.current);
+    pollRef.current = setInterval(poll, POLL_MS);
+
+    // แท็บถูกซ่อนตอนผู้ใช้สลับไปแอปธนาคารเพื่อสแกน/ยืนยันจ่ายเงิน — เบราว์เซอร์
+    // หน่วง setInterval ของแท็บที่ไม่ได้โฟกัสได้หลายสิบวินาที พอกลับมาที่แท็บนี้
+    // จึงเช็คทันทีหนึ่งครั้ง ไม่ต้องรอรอบ interval เดิมที่อาจถูกหน่วงไว้
+    function handleVisibility() {
+      if (document.visibilityState === "visible") poll();
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(pollRef.current);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qr?.paymentId]);
 
