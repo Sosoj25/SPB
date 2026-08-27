@@ -8,9 +8,16 @@ import {
   fetchUserRoleCounts,
   fetchUsers,
 } from "../lib/admin";
+import { fetchDaySlots, fetchMonthSlotSummary } from "../lib/schedule";
+import {
+  ADMIN_PAYMENT_PAGE_SIZE,
+  fetchAdminPaymentStats,
+  fetchAdminPayments,
+} from "../lib/payments";
 
 const EMPTY_BOOKINGS_PAGE = { bookings: [], hasMore: false };
 const EMPTY_USERS_PAGE = { users: [], hasMore: false };
+const EMPTY_MONTH_SUMMARY = new Map();
 
 export function useAdminOverviewStats() {
   const { data, loading, error } = useAsyncData(
@@ -71,4 +78,52 @@ export function useAdminUsers({
   );
 
   return { users: data.users, hasMore: data.hasMore, loading, error };
+}
+
+// facilityId เป็น null ระหว่างที่ยังโหลดรายการสนามอยู่ — key เป็น null ทำให้
+// useAsyncData ไม่ยิง query จนกว่าจะมี facility ให้เลือกจริง (ดู useAsyncData.js)
+export function useAdminScheduleMonth(facilityId, year, month, reloadKey = 0) {
+  const key = facilityId != null ? `schedule-month:${facilityId}:${year}:${month}:${reloadKey}` : null;
+
+  const { data, loading, error } = useAsyncData(
+    () => fetchMonthSlotSummary(facilityId, year, month),
+    key,
+    EMPTY_MONTH_SUMMARY,
+  );
+
+  return { summary: data, loading, error };
+}
+
+export function useAdminDaySlots(facilityId, date, reloadKey = 0) {
+  const key = facilityId != null && date ? `schedule-day:${facilityId}:${date}:${reloadKey}` : null;
+
+  const { data, loading, error } = useAsyncData(() => fetchDaySlots(facilityId, date), key, []);
+
+  return { slots: data, loading, error };
+}
+
+const EMPTY_PAYMENTS_PAGE = { payments: [], hasMore: false };
+
+export function useAdminPayments({
+  status,
+  page = 1,
+  limit = ADMIN_PAYMENT_PAGE_SIZE,
+  reloadKey = 0,
+}) {
+  const { data, loading, error } = useAsyncData(
+    () => fetchAdminPayments({ status, page, limit }),
+    `admin-payments:${status ?? ""}:${page}:${limit}:${reloadKey}`,
+    EMPTY_PAYMENTS_PAGE,
+  );
+
+  return { payments: data.payments, hasMore: data.hasMore, loading, error };
+}
+
+export function useAdminPaymentStats(reloadKey = 0) {
+  const { data, loading, error } = useAsyncData(
+    fetchAdminPaymentStats,
+    `admin-payment-stats:${reloadKey}`,
+  );
+
+  return { stats: data, loading, error };
 }

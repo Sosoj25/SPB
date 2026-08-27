@@ -1,0 +1,93 @@
+.payset__card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.payset__card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-heading);
+}
+
+.payset__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.payset__hint {
+  margin: -0.6rem 0 0;
+  font-size: 0.95rem;
+  color: var(--color-muted-purple);
+}
+
+.payset__row,
+.payset__channel-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.3rem;
+  background: var(--color-page-bg);
+  border-radius: 1.1rem;
+}
+
+.payset__row-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.payset__row-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-heading);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.payset__row-sub {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-muted-purple);
+}
+
+.payset__badge {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+}
+
+.payset__confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.payset__confirm span {
+  font-weight: 700;
+  color: var(--color-danger-text);
+  white-space: nowrap;
+}
+
+.payset__account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.1rem 1.3rem;
+  background: var(--color-page-bg);
+  border-radius: 1.1rem;
+}
+
+.payset__account-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}

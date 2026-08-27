@@ -1,32 +1,20 @@
 import { supabase } from "./supabase";
+import { assertImageFile, imageExt } from "./uploads";
 
-// enum payment_method ใน DB มีแค่ 3 ค่า (bank_transfer / qr / other)
-// แต่ดีไซน์แสดงช่องทางที่ผู้ใช้คุ้นเคย 4 แบบ — เก็บทั้งสองไว้คู่กัน
-// ค่า key ใช้ในหน้าจอ ส่วน dbValue คือค่าที่ส่งเข้า pay_booking
+// ช่องทางที่ "ใช้ได้จริง" สองแบบเท่านั้น — ตัดบัตรเครดิต/เดบิตและ TrueMoney
+// ที่เคยมีในดีไซน์ออกไป เพราะมันไม่เคยมีอะไรรองรับจริง (ทั้งคู่แมปไปที่ enum
+// 'other' เดียวกันแบบไม่มีทางแยกแยะ) การโชว์ตัวเลือกที่กดแล้วไม่มีอะไรเกิดขึ้น
+// จริงเป็นเรื่องหลอกผู้ใช้ยิ่งกว่าไม่มีตัวเลือกนั้นเสียอีก
 export const PAYMENT_METHODS = [
   {
-    key: "promptpay",
-    dbValue: "qr",
+    key: "qr",
     title: "พร้อมเพย์ (QR Code)",
-    desc: "สแกนจ่ายผ่านแอปธนาคาร",
+    desc: "สแกนจ่ายผ่านแอปธนาคาร ยืนยันอัตโนมัติทันทีที่จ่ายสำเร็จ",
   },
   {
-    key: "banking",
-    dbValue: "bank_transfer",
+    key: "bank_transfer",
     title: "โอนผ่านบัญชีธนาคาร",
-    desc: "Online Banking หรือโอนแล้วแนบสลิป",
-  },
-  {
-    key: "card",
-    dbValue: "other",
-    title: "บัตรเครดิต / เดบิต",
-    desc: "Visa · Mastercard · JCB",
-  },
-  {
-    key: "truemoney",
-    dbValue: "other",
-    title: "TrueMoney Wallet",
-    desc: "จ่ายผ่านกระเป๋าเงินอิเล็กทรอนิกส์",
+    desc: "โอนแล้วแนบสลิป เจ้าหน้าที่ตรวจสอบและยืนยันให้ภายใน 24 ชั่วโมง",
   },
 ];
 
@@ -38,20 +26,68 @@ const METHOD_LABELS = {
 
 export const describeMethod = (method) => METHOD_LABELS[method] ?? "—";
 
-// ชำระเงิน (ยังเป็นการจำลอง): unpaid -> paid แล้วยืนยันการจองให้ในคราวเดียว
-//
-// ต้องผ่าน RPC เพราะ trigger protect_booking_privileged_columns (0003)
-// ห้ามเจ้าของแถวแก้ status / payment_status ของตัวเอง — ไม่งั้นกดยืนยัน
-// ให้ตัวเองฟรีได้ทั้งที่ยังไม่จ่าย
-//
-// วันเปลี่ยนไปใช้ payment gateway จริง จุดที่ต้องแก้คือ pay_booking ใน DB
-// ที่เดียว: ให้ webhook ของ gateway เป็นคนเรียก แทนที่จะเชื่อหน้าเว็บ
-export async function payBooking(bookingId, methodKey) {
-  const method = PAYMENT_METHODS.find((item) => item.key === methodKey);
+export const describeGateway = (gateway) =>
+  gateway === "plernpay" ? "ยืนยันอัตโนมัติ" : "ตรวจสอบโดยแอดมิน";
 
-  const { data, error } = await supabase.rpc("pay_booking", {
+// ---------- เส้นทางที่ 1: พร้อมเพย์ผ่าน PlernPay ----------
+//
+// สร้าง QR จริงผ่าน Edge Function create-plernpay-charge (ต้องใช้
+// X-Client-Secret ของ PlernPay ซึ่งอยู่ฝั่งเซิร์ฟเวอร์เท่านั้น) แล้วให้หน้าเว็บ
+// poll checkPlernpayPayment เป็นระยะจนกว่าจะจ่ายสำเร็จจริง — ดูรายละเอียดใน
+// ตัว Edge Function ทั้งสอง (PlernPay ไม่มี webhook ยิงหาเราเอง มีแต่ endpoint
+// ให้ถามสถานะ)
+async function invokeEdgeFunction(name, body) {
+  const { data, error } = await supabase.functions.invoke(name, { body });
+
+  if (error) {
+    // supabase-js ไม่ดึง error.message จาก body ของ Edge Function ให้อัตโนมัติ
+    // ต้องอ่านเองจาก context ถึงจะได้ข้อความไทยที่ฟังก์ชันตั้งใจส่งกลับมา
+    const detail = await error.context?.json?.().catch(() => null);
+    throw new Error(detail?.error || error.message);
+  }
+
+  return data;
+}
+
+export const createPlernpayCharge = (bookingId) =>
+  invokeEdgeFunction("create-plernpay-charge", { bookingId });
+
+// เรียกทุกครั้งที่ poll — ฝั่งเซิร์ฟเวอร์เป็นคนไปถาม PlernPay จริงและอัปเดต
+// สถานะให้ (ดูคอมเมนต์ใน check-plernpay-payment) ที่นี่แค่ส่งต่อผลลัพธ์
+export const checkPlernpayPayment = (paymentId) =>
+  invokeEdgeFunction("check-plernpay-payment", { paymentId });
+
+// ---------- เส้นทางที่ 2: โอนผ่านบัญชีธนาคาร + แนบสลิป ----------
+
+// path แบบเดียวกับ avatars: <user_id>/<booking_id>/<timestamp>.<ext> — โฟลเดอร์
+// แรกต้องเป็นเจ้าของเสมอ เพราะ RLS ของ bucket payment-slips (0023) เช็คจากตรงนั้น
+export async function uploadPaymentSlip(file, userId, bookingId) {
+  assertImageFile(file);
+
+  const path = `${userId}/${bookingId}/${Date.now()}.${imageExt(file)}`;
+
+  const { error } = await supabase.storage.from("payment-slips").upload(path, file);
+  if (error) throw error;
+
+  return path;
+}
+
+// bucket เป็น private ตั้งใจ (สลิปมีเลขบัญชี/ชื่อบัญชีติดมา) — ต้องขอ signed
+// URL ทุกครั้งที่จะดูจริง ๆ แทนการเก็บ public URL ไว้ตรง ๆ
+export async function fetchSlipSignedUrl(path) {
+  const { data, error } = await supabase.storage
+    .from("payment-slips")
+    .createSignedUrl(path, 300);
+
+  if (error) throw error;
+
+  return data.signedUrl;
+}
+
+export async function submitBankTransferPayment(bookingId, slipPath) {
+  const { data, error } = await supabase.rpc("submit_bank_transfer_payment", {
     p_booking_id: bookingId,
-    p_method: method?.dbValue ?? "other",
+    p_slip_path: slipPath,
   });
 
   if (error) throw error;
@@ -71,4 +107,114 @@ export async function fetchBookingPayment(bookingId) {
   if (error) throw error;
 
   return data;
+}
+
+// ---------- ฝั่งแอดมิน: ตรวจสอบและอนุมัติการชำระเงิน ----------
+//
+// payments_select_own (RLS) มี "or is_admin()" อยู่แล้ว แอดมินจึงอ่านทุกแถว
+// ได้ตรง ๆ ไม่ต้องผ่าน RPC — ส่วนการ "เปลี่ยนสถานะ" ต้องผ่าน RPC เพราะ
+// payments กับ bookings ต้องขยับพร้อมกัน (ดู admin_approve_payment ใน 0021)
+
+const ADMIN_PAYMENT_SELECT = `
+  id,
+  amount,
+  payment_method,
+  gateway,
+  status,
+  slip_url,
+  rejection_reason,
+  created_at,
+  verified_at,
+  profiles!payments_user_id_fkey ( username, full_name ),
+  bookings (
+    booking_code,
+    booking_date,
+    start_time,
+    end_time,
+    facilities (
+      name,
+      venues ( name )
+    )
+  )
+`;
+
+export const ADMIN_PAYMENT_PAGE_SIZE = 20;
+
+// "รอตรวจสอบ" ในหน้าจอ = ยังไม่มีแอดมินคนไหนกดอนุมัติหรือปฏิเสธ — ส่วนใหญ่จะ
+// เป็นแถวโอนเงิน+สลิป (gateway='manual') ที่ต้องรอแอดมินจริง ๆ ส่วนแถว
+// พร้อมเพย์ (gateway='plernpay') ปกติจะขยับเป็น approved/rejected เองตอนที่
+// หน้าเว็บ poll check-plernpay-payment ก่อนที่แอดมินจะทันเห็นด้วยซ้ำ ค้าง
+// pending นานแปลว่าลูกค้าเปิดหน้าค้างไว้แล้วไม่จ่าย/ปิดแท็บไปกลางคัน
+// แอดมินก็ยังกดอนุมัติเองมือได้เผื่อกรณีนี้
+export const PAYMENT_REVIEW_STATUSES = ["pending", "paid"];
+
+export const PAYMENT_STATUS_LABELS = {
+  pending: { label: "รอตรวจสอบ", tone: "warning" },
+  paid: { label: "รอตรวจสอบ", tone: "warning" },
+  approved: { label: "อนุมัติแล้ว", tone: "success" },
+  rejected: { label: "ปฏิเสธ", tone: "danger" },
+  unpaid: { label: "ยังไม่ชำระ", tone: "muted" },
+};
+
+export const describePaymentStatus = (status) =>
+  PAYMENT_STATUS_LABELS[status] ?? { label: status ?? "—", tone: "muted" };
+
+// ขอเกินมา 1 แถวเพื่อรู้ว่ามีหน้าถัดไปไหม เหมือน fetchAdminBookings
+export async function fetchAdminPayments({
+  status,
+  page = 1,
+  limit = ADMIN_PAYMENT_PAGE_SIZE,
+} = {}) {
+  let query = supabase
+    .from("payments")
+    .select(ADMIN_PAYMENT_SELECT)
+    .order("created_at", { ascending: false });
+
+  if (status === "review") query = query.in("status", PAYMENT_REVIEW_STATUSES);
+  else if (status) query = query.eq("status", status);
+
+  const from = (page - 1) * limit;
+  const { data, error } = await query.range(from, from + limit);
+
+  if (error) throw error;
+
+  const rows = data ?? [];
+  return { payments: rows.slice(0, limit), hasMore: rows.length > limit };
+}
+
+export async function fetchAdminPaymentStats() {
+  const { data, error } = await supabase.rpc("admin_payment_stats");
+
+  if (error) throw error;
+
+  const row = Array.isArray(data) ? data[0] : data;
+
+  return {
+    pendingCount: row?.pending_count ?? 0,
+    pendingAmount: Number(row?.pending_amount ?? 0),
+    approvedToday: row?.approved_today ?? 0,
+    revenueMonth: Number(row?.revenue_month ?? 0),
+    rejectedMonth: row?.rejected_month ?? 0,
+  };
+}
+
+export async function approvePayment(paymentId) {
+  const { data, error } = await supabase.rpc("admin_approve_payment", {
+    p_payment_id: paymentId,
+  });
+
+  if (error) throw error;
+
+  return Array.isArray(data) ? data[0] : data;
+}
+
+export async function rejectPayment(paymentId, reason) {
+  const { data, error } = await supabase.rpc("admin_reject_payment", {
+    p_payment_id: paymentId,
+    p_reason: reason ?? null,
+  });
+
+  if (error) throw error;
+
+  return Array.isArray(data) ? data[0] : data;
 }

@@ -24,15 +24,16 @@ const json = (body: unknown, status = 200) =>
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 
-async function emailForUsername(username: string): Promise<string | null> {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_email_by_username`, {
+// รับได้ทั้งชื่อผู้ใช้และอีเมล คืนอีเมลจริงเฉพาะบัญชีที่ is_active = true
+async function resolveLoginEmail(identifier: string): Promise<string | null> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/resolve_login_email`, {
     method: "POST",
     headers: {
       apikey: SERVICE_KEY,
       Authorization: `Bearer ${SERVICE_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ p_username: username }),
+    body: JSON.stringify({ p_identifier: identifier }),
   });
 
   if (!res.ok) return null;
@@ -57,9 +58,10 @@ Deno.serve(async (req) => {
   }
 
   if (identifier) {
-    const email = identifier.includes("@")
-      ? identifier
-      : await emailForUsername(identifier);
+    // เดิมกรอกอีเมลมาตรง ๆ จะข้ามการเช็ค is_active ไปเลย เหมือน
+    // login-with-username — ตอนนี้ทั้งสองแบบผ่านฟังก์ชันเดียวกัน บัญชีที่
+    // ถูกระงับจึงขอลิงก์ตั้งรหัสผ่านใหม่ไม่ได้ด้วย
+    const email = await resolveLoginEmail(identifier);
 
     if (email) {
       // redirectTo มาจาก client ก็จริง แต่ Supabase Auth ตรวจกับ

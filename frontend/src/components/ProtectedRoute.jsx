@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
 export default function ProtectedRoute() {
-  const { user, loading } = useAuth();
+  const { user, suspended, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -16,7 +16,12 @@ export default function ProtectedRoute() {
       <Navigate
         to="/login"
         replace
-        state={{ from: location }}
+        state={{
+          from: location,
+          // AuthContext ตัด session ของบัญชีที่ถูกระงับทิ้งเอง ที่นี่แค่บอก
+          // ผู้ใช้ว่าทำไมถึงหลุดออกมา ไม่งั้นจะเหมือนระบบเด้งออกมั่ว ๆ
+          error: suspended ? "บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ" : undefined,
+        }}
       />
     );
   }

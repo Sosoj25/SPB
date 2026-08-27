@@ -4,7 +4,7 @@ import { useAuth } from "../context/useAuth";
 // เหมือน ProtectedRoute แต่เช็ค profile.role เพิ่ม — ต้อง login ผ่านมาก่อน
 // (loading ของ useAuth ครอบคลุมถึงตอนโหลด profile เสร็จด้วย ดู AuthContext.jsx)
 export default function RoleProtectedRoute({ allow }) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, suspended, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -12,10 +12,30 @@ export default function RoleProtectedRoute({ allow }) {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{
+          from: location,
+          error: suspended ? "บัญชีนี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ" : undefined,
+        }}
+      />
+    );
   }
 
-  if (!allow.includes(profile?.role)) {
+  // มี session แต่โหลด profile ไม่สำเร็จ (เน็ตหลุด, RLS ปฏิเสธ) — บอกให้รู้
+  // ว่าเกิดอะไรขึ้น ดีกว่าเด้งไป /home เงียบ ๆ ราวกับว่าไม่มีสิทธิ์ ซึ่งเป็น
+  // อาการเดียวกับบั๊ก race condition ใน AuthContext เป๊ะ หาต้นตอกันไม่เจอเลย
+  if (!profile) {
+    return (
+      <div className="route-fallback">
+        ตรวจสอบสิทธิ์ไม่สำเร็จ กรุณาโหลดหน้าใหม่อีกครั้ง
+      </div>
+    );
+  }
+
+  if (!allow.includes(profile.role)) {
     return <Navigate to="/home" replace />;
   }
 

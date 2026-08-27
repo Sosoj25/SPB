@@ -16,6 +16,18 @@
 // การค้นหาอีเมลเกิดขึ้นที่นี่ด้วย service role และอีเมลไม่เคยออกจาก server
 //
 // ============================================================
+// บัญชีที่ถูกระงับ (is_active = false)
+// ============================================================
+// เดิมไฟล์นี้เรียก get_email_by_username() เฉพาะตอนที่ผู้ใช้กรอก "ชื่อผู้ใช้"
+// ถ้ากรอกอีเมลมาตรง ๆ จะข้ามไปยิง /auth/v1/token เลย — แต่ get_email_by_username
+// คือที่เดียวในระบบที่เช็ค is_active ด่านเดียวที่มีจึงถูกข้ามไปทั้งดุ้น
+// (บัญชีที่แอดมินกด "ระงับ" ล็อกอินด้วยอีเมลตัวเองได้ตามปกติ)
+//
+// ตอนนี้ทั้งสองทางเข้าไปที่ resolve_login_email() ตัวเดียว (0021) ซึ่งรับได้
+// ทั้งชื่อผู้ใช้และอีเมล และเช็ค is_active เสมอไม่ว่าจะส่งอะไรเข้ามา —
+// ไม่มีโค้ดพาธไหนที่ข้ามการเช็คได้อีก
+//
+// ============================================================
 // verify_jwt = false โดยตั้งใจ
 // ============================================================
 // นี่คือปลายทางที่ "สร้าง" JWT ให้ผู้ใช้ ตอนเรียกจึงยังไม่มี JWT ให้ตรวจ
@@ -42,15 +54,16 @@ const json = (body: unknown, status = 200) =>
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 
-async function emailForUsername(username: string): Promise<string | null> {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_email_by_username`, {
+// รับได้ทั้งชื่อผู้ใช้และอีเมล คืนอีเมลจริงเฉพาะบัญชีที่ is_active = true
+async function resolveLoginEmail(identifier: string): Promise<string | null> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/resolve_login_email`, {
     method: "POST",
     headers: {
       apikey: SERVICE_KEY,
       Authorization: `Bearer ${SERVICE_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ p_username: username }),
+    body: JSON.stringify({ p_identifier: identifier }),
   });
 
   if (!res.ok) return null;
@@ -76,12 +89,13 @@ Deno.serve(async (req) => {
 
   if (!username || !password) return json({ error: INVALID }, 400);
 
-  // ผู้ใช้กรอกอีเมลมาตรง ๆ ก็ให้ผ่าน ไม่ต้องบังคับให้จำชื่อผู้ใช้
-  const email = username.includes("@") ? username : await emailForUsername(username);
+  // ผู้ใช้กรอกอีเมลมาตรง ๆ ก็ให้ผ่าน ไม่ต้องบังคับให้จำชื่อผู้ใช้ —
+  // resolve_login_email รับได้ทั้งสองแบบและเช็ค is_active ให้ทั้งสองแบบ
+  const email = await resolveLoginEmail(username);
 
-  // ชื่อผู้ใช้ไม่มีอยู่จริงก็ยังยิงต่อด้วยอีเมลที่ไม่มีทางมีอยู่ เพื่อให้เวลา
-  // ตอบกลับใกล้เคียงกรณีรหัสผ่านผิด — ไม่งั้นเวลาที่ต่างกันจะบอกได้เองว่า
-  // ชื่อผู้ใช้นั้นมีอยู่ในระบบไหม
+  // หาไม่เจอ (ไม่มีบัญชีนี้ หรือบัญชีถูกระงับ) ก็ยังยิงต่อด้วยอีเมลที่ไม่มี
+  // ทางมีอยู่ เพื่อให้เวลาตอบกลับใกล้เคียงกรณีรหัสผ่านผิด — ไม่งั้นเวลาที่
+  // ต่างกันจะบอกได้เองว่าบัญชีนั้นมีอยู่ในระบบและใช้งานได้อยู่ไหม
   const target = email ?? `${crypto.randomUUID()}@invalid.local`;
 
   const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {

@@ -2,8 +2,10 @@ import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BookingSteps from "../components/BookingSteps";
+import { Badge } from "../components/DashboardWidgets";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { fetchDayAvailability, fetchFacility, fetchFacilitySlots } from "../lib/catalog";
+import { fetchFacilityPricePreview } from "../lib/pricing";
 import {
   BOOKING_WINDOW_DAYS,
   addDaysISO,
@@ -100,11 +102,20 @@ export default function BookingSchedule() {
     EMPTY_SLOTS
   );
 
-  if (!hasFacility) return <Navigate to="/booking/sport" replace />;
-
   const chosen = slots.find((slot) => slot.id === selectedSlotId) ?? null;
   const hours = chosen ? hoursBetween(chosen.start, chosen.end) : 0;
-  const total = hours * (facility?.pricePerHour ?? 0);
+
+  // ตัวเลขจริงที่จะถูกเรียกเก็บ มาจากฟังก์ชันเดียวกับที่ create_booking ใช้
+  // (compute_facility_price, 0024) กันราคาประเมินที่โชว์ตอนเลือกเวลากับ
+  // ราคาที่เก็บจริงตอนยืนยันไม่ตรงกัน (ราคาตามช่วงเวลา/ส่วนลด)
+  const { data: pricePreview } = useAsyncData(
+    () => fetchFacilityPricePreview(facilityId, selectedDate, chosen.start, chosen.end),
+    hasFacility && chosen ? `price-preview:${facilityId}:${selectedDate}:${chosen.start}:${chosen.end}` : null,
+  );
+
+  const total = pricePreview ? pricePreview.totalAmount : hours * (facility?.pricePerHour ?? 0);
+
+  if (!hasFacility) return <Navigate to="/booking/sport" replace />;
 
   const canGoPrev = month > monthKey(today);
   const canGoNext = month < monthKey(lastBookable);
@@ -348,6 +359,17 @@ export default function BookingSchedule() {
                       : "ยังไม่ได้เลือก"}
                   </span>
                 </div>
+
+                {pricePreview?.discountLines.map((line, i) => (
+                  <div className="booking-row" key={i}>
+                    <span className="booking-row__label">{line.label}</span>
+                    <span className="booking-row__value">-{formatBaht(line.amount)}</span>
+                  </div>
+                ))}
+
+                {pricePreview?.isPeak && (
+                  <Badge tone="warning">ราคาพีค</Badge>
+                )}
 
                 <hr className="booking-divider" />
 

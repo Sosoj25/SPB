@@ -275,22 +275,60 @@ check("แก้ note ของตัวเองได้",
 
 section("5. ชำระเงิน");
 
-const paid = await call("/rest/v1/rpc/pay_booking", { p_booking_id: id, p_method: "qr" });
-check("pay_booking", !paid?.__error__,
-  paid?.__error__ ? errorOf(paid) : `${paid.status} / ${paid.payment_status}`);
-check("unpaid -> paid -> confirmed",
-  paid?.payment_status === "paid" && paid?.status === "confirmed");
+// pay_booking (จำลองเดิม) ถูกปิดไม่ให้ authenticated เรียกอีกต่อไปตั้งแต่
+// 0023 — ระบบชำระเงินตอนนี้ต้องผ่านสองเส้นทางที่ตรวจสอบได้จริงเท่านั้น
+check("pay_booking (จำลองเดิม) ถูกปิดใช้งานแล้ว",
+  errorOf(await call("/rest/v1/rpc/pay_booking", { p_booking_id: id, p_method: "qr" }))
+    .includes("permission denied"));
+
+check("ไม่แนบสลิปชำระเงินไม่ได้",
+  errorOf(await call("/rest/v1/rpc/submit_bank_transfer_payment",
+    { p_booking_id: id, p_slip_path: "" })).includes("แนบสลิป"));
+
+const submitted = await call("/rest/v1/rpc/submit_bank_transfer_payment", {
+  p_booking_id: id,
+  p_slip_path: `${userId}/${id}/e2e-test.jpg`,
+});
+check("submit_bank_transfer_payment", !submitted?.__error__,
+  submitted?.__error__ ? errorOf(submitted) : submitted.status);
+
+const afterSubmit = await call(
+  `/rest/v1/bookings?id=eq.${id}&select=status,payment_status`
+);
+check("โอนเงิน+แนบสลิป -> รอตรวจสอบ (ไม่ยืนยันการจองให้เองทันที)",
+  afterSubmit[0]?.payment_status === "pending" && afterSubmit[0]?.status === "pending");
 
 const payments = await call(
-  `/rest/v1/payments?select=amount,payment_method,status&booking_id=eq.${id}`
+  `/rest/v1/payments?select=amount,payment_method,status,gateway&booking_id=eq.${id}`
 );
-check("บันทึกแถว payments อัตโนมัติ",
-  payments.length === 1 && Number(payments[0].amount) === expected,
-  payments[0] && `${payments[0].amount} / ${payments[0].payment_method}`);
+check("บันทึกแถว payments ผ่าน RPC",
+  payments.length === 1 && Number(payments[0].amount) === expected
+    && payments[0].status === "pending" && payments[0].gateway === "manual",
+  payments[0] && `${payments[0].amount} / ${payments[0].payment_method} / ${payments[0].status}`);
 
-await call("/rest/v1/rpc/pay_booking", { p_booking_id: id, p_method: "qr" });
-check("กดจ่ายซ้ำไม่สร้างแถวเพิ่ม",
-  (await call(`/rest/v1/payments?booking_id=eq.${id}`)).length === 1);
+// เส้นทางพร้อมเพย์: create_gateway_payment สร้างแถว pending ไว้เฉย ๆ
+// ไม่แตะ bookings เลย (ต่างจากโอนเงินที่พา payment_status ไป pending ทันที)
+// เพราะรอ webhook จาก Omise เป็นคนยืนยันจริง — ทดสอบแค่ว่าไม่พังและไม่แตะ
+// booking เท่านั้น ไม่ยิงไป Omise จริงจากสคริปต์นี้
+const gwPayment = await call("/rest/v1/rpc/create_gateway_payment", {
+  p_booking_id: id,
+  p_method: "qr",
+});
+check("create_gateway_payment สร้างแถว pending",
+  !gwPayment?.__error__ && gwPayment.status === "pending" && gwPayment.gateway === "plernpay",
+  gwPayment?.__error__ ? errorOf(gwPayment) : gwPayment.id);
+
+const afterGw = await call(`/rest/v1/bookings?id=eq.${id}&select=payment_status`);
+check("create_gateway_payment ไม่แตะ payment_status ของ booking",
+  afterGw[0]?.payment_status === "pending");
+
+check("เรียก confirm_gateway_payment เองไม่ได้ (service_role เท่านั้น)",
+  errorOf(await call("/rest/v1/rpc/confirm_gateway_payment",
+    { p_payment_id: gwPayment.id, p_charge_id: "chrg_test" })).includes("permission denied"));
+
+check("เรียก fail_gateway_payment เองไม่ได้ (service_role เท่านั้น)",
+  errorOf(await call("/rest/v1/rpc/fail_gateway_payment",
+    { p_payment_id: gwPayment.id, p_charge_id: "chrg_test" })).includes("permission denied"));
 
 // --------------------------------------------------------------------------
 

@@ -31,6 +31,14 @@ const Facilities = lazy(() => import("./pages/Facilities"));
 const News = lazy(() => import("./pages/News"));
 const AdminOverview = lazy(() => import("./pages/AdminOverview"));
 const AdminBookings = lazy(() => import("./pages/AdminBookings"));
+const AdminFacilities = lazy(() => import("./pages/AdminFacilities"));
+const AdminFacilityPricing = lazy(() => import("./pages/AdminFacilityPricing"));
+const AdminFacilityImages = lazy(() => import("./pages/AdminFacilityImages"));
+const AdminSchedule = lazy(() => import("./pages/AdminSchedule"));
+const AdminPayments = lazy(() => import("./pages/AdminPayments"));
+const AdminPaymentSettings = lazy(() => import("./pages/AdminPaymentSettings"));
+const AdminNews = lazy(() => import("./pages/AdminNews"));
+const AdminNewsEditor = lazy(() => import("./pages/AdminNewsEditor"));
 const SuperAdminOverview = lazy(() => import("./pages/SuperAdminOverview"));
 const SuperAdminUsers = lazy(() => import("./pages/SuperAdminUsers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -67,11 +75,20 @@ export default function App() {
             <Route path="/booking/receipt" element={<BookingReceipt />} />
           </Route>
 
-          {/* ข้อมูลในหน้า admin/superadmin ยังเป็น mock อยู่ (รอต่อ Supabase จริง)
-              แต่ route ถูกจำกัดสิทธิ์แล้วผ่าน RoleProtectedRoute */}
+          {/* หน้า admin/superadmin ต่อกับ Supabase RPC จริงแล้ว (0015/0016)
+              route ถูกจำกัดสิทธิ์ผ่าน RoleProtectedRoute (client-side)
+              และฝั่ง server มี RLS + security definer RPC เช็คสิทธิ์ซ้ำอีกชั้น */}
           <Route element={<RoleProtectedRoute allow={["admin", "super_admin"]} />}>
             <Route path="/admin/overview" element={<AdminOverview />} />
             <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path="/admin/facilities" element={<AdminFacilities />} />
+            <Route path="/admin/pricing" element={<AdminFacilityPricing />} />
+            <Route path="/admin/photos" element={<AdminFacilityImages />} />
+            <Route path="/admin/schedule" element={<AdminSchedule />} />
+            <Route path="/admin/payments" element={<AdminPayments />} />
+            <Route path="/admin/payments/settings" element={<AdminPaymentSettings />} />
+            <Route path="/admin/news" element={<AdminNews />} />
+            <Route path="/admin/news/editor" element={<AdminNewsEditor />} />
           </Route>
 
           <Route element={<RoleProtectedRoute allow={["super_admin"]} />}>

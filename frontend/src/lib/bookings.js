@@ -156,6 +156,7 @@ export async function fetchBookingDetail(bookingId) {
       start_time,
       end_time,
       total_amount,
+      deposit_amount,
       status,
       payment_status,
       note,

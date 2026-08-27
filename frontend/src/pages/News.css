@@ -25,6 +25,12 @@
   margin: 3rem 0 2rem;
 }
 
+.news__empty {
+  font-family: var(--editorial-sans);
+  color: var(--editorial-muted);
+  padding: 2rem 0;
+}
+
 /* Masthead */
 .news__eyebrow {
   font-family: var(--editorial-sans);

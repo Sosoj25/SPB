@@ -1,0 +1,48 @@
+.crop-modal {
+  width: min(520px, 100%);
+}
+
+.crop-modal__ratios {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.crop-modal__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--color-tint-light);
+  margin: 0 auto;
+  cursor: grab;
+  touch-action: none;
+  max-width: 100%;
+}
+
+.crop-modal__frame:active {
+  cursor: grabbing;
+}
+
+.crop-modal__frame img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.crop-modal__hint {
+  text-align: center;
+  color: var(--color-faint-purple);
+  font-size: 0.9rem;
+  margin: 0.85rem 0 0;
+}
+
+.crop-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}

@@ -68,6 +68,7 @@ export default function BookingReceipt() {
   const facility = booking?.facilities;
   const hours = booking ? bookingHours(booking) : 0;
   const isPaid = booking && ["paid", "approved"].includes(booking.payment_status);
+  const isReviewing = booking?.payment_status === "pending";
   const isCancelled = booking?.status === "cancelled";
   const bookerName =
     profile?.full_name || profile?.username || user?.email?.split("@")[0] || "ผู้ใช้งาน";
@@ -130,14 +131,18 @@ export default function BookingReceipt() {
                   ? "การจองถูกยกเลิกแล้ว"
                   : isPaid
                     ? "ชำระเงินสำเร็จ"
-                    : "ยังไม่ได้ชำระเงิน"}
+                    : isReviewing
+                      ? "รอตรวจสอบการชำระเงิน"
+                      : "ยังไม่ได้ชำระเงิน"}
               </h1>
               <p className="booking__lead">
                 {isCancelled
                   ? "ช่วงเวลานี้ถูกปล่อยคืนให้ผู้อื่นจองต่อแล้ว"
                   : isPaid
                     ? `การจองของคุณได้รับการยืนยันแล้ว ใบเสร็จนี้ผูกกับบัญชี ${user?.email ?? ""}`
-                    : "รายการนี้ถูกกันเวลาไว้ให้แล้ว แต่ยังรอการชำระเงิน"}
+                    : isReviewing
+                      ? "เราได้รับหลักฐานการโอนเงินแล้ว เจ้าหน้าที่จะตรวจสอบและยืนยันให้ภายใน 24 ชั่วโมง"
+                      : "รายการนี้ถูกกันเวลาไว้ให้แล้ว แต่ยังรอการชำระเงิน"}
               </p>
             </section>
 
@@ -179,6 +184,13 @@ export default function BookingReceipt() {
                     {formatBaht(booking.total_amount)}
                   </span>
                 </div>
+
+                {booking.deposit_amount > 0 && (
+                  <div className="booking-row">
+                    <span className="booking-row__label">ยอดมัดจำขั้นต่ำ</span>
+                    <span className="booking-row__value">{formatBaht(booking.deposit_amount)}</span>
+                  </div>
+                )}
 
                 <div className="booking-row">
                   <span className="booking-row__label">สถานะการจอง</span>
@@ -227,7 +239,7 @@ export default function BookingReceipt() {
             )}
 
             <div className="booking-actions">
-              {isPaid ? (
+              {isPaid || isReviewing ? (
                 <button
                   type="button"
                   className="booking-btn booking-btn--ghost"

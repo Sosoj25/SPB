@@ -21,7 +21,9 @@ export default function Login() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // state.error มาจาก ProtectedRoute ตอนเตะบัญชีที่ถูกระงับออก — ต้องขึ้น
+  // เป็นกล่องแดงไม่ใช่กล่องเขียวแบบ state.message ที่หน้าอื่นส่งมา
+  const [error, setError] = useState(location.state?.error || "");
   const [message, setMessage] = useState(location.state?.message || "");
 
   const handleChange = (e) => {

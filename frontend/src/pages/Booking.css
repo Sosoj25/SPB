@@ -909,7 +909,7 @@
   border-color: var(--color-primary);
 }
 
-/* ---------- ป้ายบอกว่าการชำระเงินยังเป็นการจำลอง ---------- */
+/* ---------- กล่องแจ้งข้อมูล (ใช้ทั้งข้อความเตือนและข้อความสถานะปกติ) ---------- */
 
 .booking-simulated {
   margin-top: 1.2rem;
@@ -917,6 +917,11 @@
   border-radius: 18px;
   background: var(--color-warning-bg);
   color: var(--color-warning-text);
+}
+
+.booking-simulated--neutral {
+  background: var(--color-tint-light);
+  color: var(--color-heading);
 }
 
 .booking-simulated__title {
@@ -929,6 +934,53 @@
   margin: 0;
   font-size: 0.97rem;
   line-height: 1.5;
+}
+
+/* ---------- QR พร้อมเพย์ ---------- */
+
+.booking-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  border-radius: 17px;
+  background: var(--color-surface-soft);
+  text-align: center;
+}
+
+.booking-qr__image {
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+  border-radius: 14px;
+  background: #fff;
+  padding: 0.6rem;
+  box-shadow: var(--shadow-card);
+}
+
+.booking-qr__waiting {
+  color: var(--color-muted-purple);
+  font-size: 0.95rem;
+}
+
+.booking-qr__amount {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* ---------- อัปโหลดสลิป ---------- */
+
+.booking-file {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  border: 2px dashed var(--color-tint-light);
+  background: #fff;
+  color: var(--color-text);
+  font-size: 0.95rem;
 }
 
 /* ปุ่มเลื่อนเดือนที่เลื่อนต่อไม่ได้ ต้องดูตายจริง ไม่ใช่แค่กดแล้วเงียบ */

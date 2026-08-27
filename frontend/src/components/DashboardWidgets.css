@@ -318,6 +318,11 @@
   color: var(--color-danger-text);
 }
 
+.dash-message--success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
 .dash-modal-overlay {
   position: fixed;
   inset: 0;
@@ -378,4 +383,116 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--color-text);
+}
+
+.switch {
+  width: 56px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--color-disabled-text);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.switch--on {
+  background: var(--color-primary);
+}
+
+.switch:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.switch__thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.switch--on .switch__thumb {
+  transform: translateX(24px);
+}
+
+.dash-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.dash-field__label {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-heading);
+}
+
+.dash-field__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-faint-purple);
+}
+
+.dash-input,
+.dash-textarea,
+.dash-select-field {
+  background: var(--color-page-bg);
+  border: 2px solid var(--color-tint-light);
+  border-radius: 1rem;
+  padding: 1rem 1.3rem;
+  font-size: 1.05rem;
+  color: var(--color-text);
+  width: 100%;
+  font-family: inherit;
+}
+
+.dash-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.7;
+}
+
+.dash-select-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+.dash-select-field span:last-child {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.dash-dropzone {
+  background: var(--color-page-bg);
+  border: 2px dashed var(--color-tint-light);
+  border-radius: 1.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dash-dropzone strong {
+  color: var(--color-heading);
+  font-size: 1.2rem;
+}
+
+.dash-dropzone span {
+  color: var(--color-faint-purple);
+  font-size: 0.95rem;
 }
