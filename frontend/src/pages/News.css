@@ -234,6 +234,17 @@
   gap: 2.5rem;
 }
 
+.news__card {
+  cursor: pointer;
+  text-align: left;
+}
+
+.news__card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+  border-radius: var(--radius-lg);
+}
+
 .news__card-photo {
   aspect-ratio: 440 / 280;
   border-radius: var(--radius-lg);

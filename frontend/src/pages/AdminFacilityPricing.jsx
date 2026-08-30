@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
+import ImageCropModal from "../components/ImageCropModal";
 import { Switch, Badge } from "../components/DashboardWidgets";
 import { useAsyncData } from "../hooks/useAsyncData";
-import { fetchFacilitiesBySport, fetchSportCatalog } from "../lib/catalog";
+import { useFacilityImages } from "../hooks/useFacilityImages";
+import { fetchFacilitiesBySport, fetchSportCatalog, replaceSportIcon, uploadSportIcon } from "../lib/catalog";
 import { useFacilityPricingConfig, useFacilityPriceHistory } from "../hooks/usePricing";
 import {
   applyBasePriceToSport,
@@ -15,8 +17,21 @@ import {
   updateDiscount,
   updateFacilityBasePrice,
   updatePricingRule,
+  updateVenueDetails,
 } from "../lib/pricing";
+import {
+  MAX_IMAGES_PER_FACILITY,
+  RECOMMENDED_HEIGHT,
+  RECOMMENDED_WIDTH,
+  deleteFacilityImage,
+  reorderFacilityImages,
+  replaceImageFile,
+  setPrimaryImage,
+  updateImageCaption,
+  uploadFacilityImage,
+} from "../lib/facilityImages";
 import { formatBaht } from "../lib/bookings";
+import { assertImageFile } from "../lib/uploads";
 import { errorMessage } from "../lib/errors";
 import "./AdminFacilityPricing.css";
 
@@ -63,6 +78,21 @@ const previewDateFormatter = new Intl.DateTimeFormat("th-TH", {
   month: "short",
   year: "numeric",
 });
+
+// ลากสลับลำดับ (ทั้งช่วงราคาและรูปภาพ) ใช้ order ชั่วคราวตัวเดียวกันนี้ระหว่าง
+// รอ reorder จริงยืนยันกลับมา กันแถวกระตุกกลับตำแหน่งเดิมก่อนโดดไปตำแหน่งใหม่
+function applyLocalOrder(items, orderIds) {
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const ordered = orderIds.map((id) => byId.get(id)).filter(Boolean);
+  const orderedIds = new Set(orderIds);
+  const rest = items.filter((item) => !orderedIds.has(item.id));
+  return [...ordered, ...rest];
+}
+
+function formatKb(bytes) {
+  if (!bytes) return "";
+  return `${Math.round(bytes / 1024)} KB`;
+}
 
 function PricingRuleRow({ rule, onCommit, onDelete }) {
   const [draft, setDraft] = useState({
@@ -149,6 +179,9 @@ function PricingRuleRow({ rule, onCommit, onDelete }) {
 
 export default function AdminFacilityPricing() {
   const previewRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const uploaderRef = useRef(null);
+  const sportIconInputRef = useRef(null);
 
   const [sportId, setSportId] = useState(null);
   const [facilityId, setFacilityId] = useState(null);
@@ -166,18 +199,37 @@ export default function AdminFacilityPricing() {
     thresholdHours: "",
   });
 
-  const { data: sports } = useAsyncData(fetchSportCatalog, "pricing-sports", EMPTY_LIST);
+  // สถานะฝั่งรูปภาพ (เดิมอยู่หน้า AdminFacilityImages แยกต่างหาก — ย้ายมารวม
+  // กับหน้าราคาเพราะทั้งคู่แก้ไข "สนาม" เดียวกัน ใช้ตัวเลือกกีฬา/สนามร่วมกัน)
+  const [uploading, setUploading] = useState(false);
+  const [sportIconUploading, setSportIconUploading] = useState(false);
+  const [sportIconError, setSportIconError] = useState("");
+  const [dragOverDrop, setDragOverDrop] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [cropTarget, setCropTarget] = useState(null);
+  const [captionDrafts, setCaptionDrafts] = useState({});
+  const [editingCaptionId, setEditingCaptionId] = useState(null);
+  const [savingCaptions, setSavingCaptions] = useState(false);
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [localOrder, setLocalOrder] = useState(null);
+
+  // key ผูกกับ reloadKey ด้วย เพื่อให้รูปกีฬาที่เพิ่งอัปโหลด (handleSportIconChange
+  // ด้านล่าง) สะท้อนขึ้นพรีวิวทันทีหลังอัปเดต icon_url สำเร็จ
+  const { data: sports } = useAsyncData(fetchSportCatalog, `pricing-sports:${reloadKey}`, EMPTY_LIST);
   const effectiveSportId = sportId ?? sports[0]?.id ?? null;
+  const effectiveSport = sports.find((s) => s.id === effectiveSportId) ?? null;
 
   const { data: facilities } = useAsyncData(
     () => fetchFacilitiesBySport(effectiveSportId),
-    effectiveSportId != null ? `pricing-facilities:${effectiveSportId}` : null,
+    effectiveSportId != null ? `pricing-facilities:${effectiveSportId}:${reloadKey}` : null,
     EMPTY_LIST,
   );
 
   const effectiveFacilityId = facilities.some((f) => f.id === facilityId)
     ? facilityId
     : (facilities[0]?.id ?? null);
+  const selectedFacility = facilities.find((f) => f.id === effectiveFacilityId);
 
   const { config, loading: configLoading } = useFacilityPricingConfig(effectiveFacilityId, reloadKey);
   const { history } = useFacilityPriceHistory(effectiveFacilityId, reloadKey);
@@ -185,6 +237,22 @@ export default function AdminFacilityPricing() {
   const { data: preview, loading: previewLoading } = useAsyncData(
     () => fetchFacilityPricePreview(effectiveFacilityId, PREVIEW_DATE, PREVIEW_START, PREVIEW_END),
     effectiveFacilityId != null ? `pricing-preview:${effectiveFacilityId}:${reloadKey}` : null,
+  );
+
+  const { images, loading: imagesLoading } = useFacilityImages(effectiveFacilityId, reloadKey);
+
+  // order ชั่วคราวของแกลเลอรีรูป ล้างด้วยการเทียบ loading กับรอบก่อนหน้าตอน
+  // render แทน useEffect (เหมือน AdminFacilities.jsx / AdminFacilityImages เดิม)
+  const [prevImagesLoading, setPrevImagesLoading] = useState(imagesLoading);
+  if (imagesLoading !== prevImagesLoading) {
+    setPrevImagesLoading(imagesLoading);
+    if (!imagesLoading) setLocalOrder(null);
+  }
+
+  const displayImages = localOrder ? applyLocalOrder(images, localOrder) : images;
+  const coverImage = images.find((img) => img.isPrimary) ?? images[0] ?? null;
+  const lowResImages = images.filter(
+    (img) => img.width && img.height && (img.width < RECOMMENDED_WIDTH || img.height < RECOMMENDED_HEIGHT),
   );
 
   // headerDraft เป็น null จนกว่าผู้ใช้จะพิมพ์ — ก่อนหน้านั้นอิงจากค่าที่โหลด
@@ -198,6 +266,19 @@ export default function AdminFacilityPricing() {
 
   async function handleSaveBasePrice() {
     if (!config.basePrice || !effectiveFacilityId) return;
+
+    const name = base.name.trim();
+    const venueName = base.venueName.trim();
+    const venueAddress = base.venueAddress.trim();
+    if (!name) {
+      setActionError("กรุณากรอกชื่อสนาม");
+      return;
+    }
+    if (!venueName || !venueAddress) {
+      setActionError("กรุณากรอกชื่อและที่อยู่ของสถานที่");
+      return;
+    }
+
     setSavingBase(true);
     setActionError("");
     setActionMessage("");
@@ -205,6 +286,7 @@ export default function AdminFacilityPricing() {
     try {
       const before = config.basePrice;
       const payload = {
+        name,
         pricePerHour: Number(base.pricePerHour),
         minBookingHours: Number(base.minBookingHours),
         depositPercent: Number(base.depositPercent),
@@ -212,6 +294,25 @@ export default function AdminFacilityPricing() {
 
       await updateFacilityBasePrice(effectiveFacilityId, payload);
 
+      if (venueName !== before.venueName || venueAddress !== before.venueAddress) {
+        await updateVenueDetails(before.venueId, { name: venueName, address: venueAddress });
+      }
+
+      if (before.name !== payload.name) {
+        await logPriceChange(
+          effectiveFacilityId,
+          `เปลี่ยนชื่อสนาม "${before.name}" → "${payload.name}"`,
+        );
+      }
+      if (venueName !== before.venueName) {
+        await logPriceChange(
+          effectiveFacilityId,
+          `เปลี่ยนชื่อสถานที่ "${before.venueName}" → "${venueName}"`,
+        );
+      }
+      if (venueAddress !== before.venueAddress) {
+        await logPriceChange(effectiveFacilityId, "เปลี่ยนที่อยู่สถานที่");
+      }
       if (before.pricePerHour !== payload.pricePerHour) {
         await logPriceChange(
           effectiveFacilityId,
@@ -232,7 +333,7 @@ export default function AdminFacilityPricing() {
       }
 
       setBaseDraft(null);
-      setActionMessage("บันทึกราคาเรียบร้อย");
+      setActionMessage("บันทึกข้อมูลสนามเรียบร้อย");
       reload();
     } catch (err) {
       console.error("updateFacilityBasePrice failed:", err);
@@ -362,13 +463,168 @@ export default function AdminFacilityPricing() {
     }
   }
 
+  async function handleFiles(fileList) {
+    if (!effectiveFacilityId) return;
+    const files = Array.from(fileList ?? []);
+    if (files.length === 0) return;
+
+    setActionError("");
+    setUploading(true);
+
+    let count = images.length;
+    const errors = [];
+
+    for (const file of files) {
+      try {
+        await uploadFacilityImage(file, effectiveFacilityId, {
+          existingCount: count,
+          isFirst: count === 0,
+        });
+        count += 1;
+      } catch (err) {
+        console.error("uploadFacilityImage failed:", err);
+        errors.push(errorMessage(err));
+      }
+    }
+
+    setUploading(false);
+    if (errors.length > 0) setActionError(errors.join(" · "));
+    reload();
+  }
+
+  async function handleSportIconChange(file) {
+    if (!file || !effectiveSportId) return;
+
+    setSportIconError("");
+    try {
+      assertImageFile(file);
+    } catch (err) {
+      setSportIconError(err.message);
+      return;
+    }
+
+    setSportIconUploading(true);
+    try {
+      await uploadSportIcon(file, effectiveSportId);
+      reload();
+    } catch (err) {
+      console.error("uploadSportIcon failed:", err);
+      setSportIconError(errorMessage(err));
+    } finally {
+      setSportIconUploading(false);
+    }
+  }
+
+  function handleDropzoneDrop(e) {
+    e.preventDefault();
+    setDragOverDrop(false);
+    handleFiles(e.dataTransfer.files);
+  }
+
+  async function handleSetPrimary(image) {
+    setActionError("");
+    try {
+      await setPrimaryImage(image.id);
+      reload();
+    } catch (err) {
+      console.error("setPrimaryImage failed:", err);
+      setActionError(errorMessage(err));
+    }
+  }
+
+  async function handleDeleteImage(image) {
+    setActionError("");
+    try {
+      await deleteFacilityImage(image);
+      setConfirmDeleteId(null);
+      reload();
+    } catch (err) {
+      console.error("deleteFacilityImage failed:", err);
+      setActionError(errorMessage(err));
+    }
+  }
+
+  async function handleCropConfirm(blob) {
+    setActionError("");
+    try {
+      if (cropTarget.kind === "sport-icon") {
+        await replaceSportIcon(blob, cropTarget.sportId);
+      } else {
+        await replaceImageFile(cropTarget, blob);
+      }
+      setCropTarget(null);
+      reload();
+    } catch (err) {
+      console.error("crop confirm failed:", err);
+      setActionError(errorMessage(err));
+    }
+  }
+
+  function handleGalleryDragEnd() {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
+  async function handleGalleryDrop(index) {
+    const from = dragIndex;
+    handleGalleryDragEnd();
+    if (from === null || from === index) return;
+
+    const reordered = [...displayImages];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(index, 0, moved);
+
+    setLocalOrder(reordered.map((i) => i.id));
+    setActionError("");
+    try {
+      await reorderFacilityImages(reordered);
+      reload();
+    } catch (err) {
+      console.error("reorderFacilityImages failed:", err);
+      setActionError(errorMessage(err));
+      setLocalOrder(null);
+    }
+  }
+
+  const dirtyCaptionCount = Object.entries(captionDrafts).filter(
+    ([id, value]) => images.find((i) => String(i.id) === id)?.caption !== value,
+  ).length;
+
+  async function handleSaveCaptions() {
+    setSavingCaptions(true);
+    setActionError("");
+    try {
+      const dirty = Object.entries(captionDrafts).filter(
+        ([id, value]) => images.find((i) => String(i.id) === id)?.caption !== value,
+      );
+      await Promise.all(dirty.map(([id, value]) => updateImageCaption(Number(id), value)));
+      setEditingCaptionId(null);
+      reload();
+    } catch (err) {
+      console.error("updateImageCaption failed:", err);
+      setActionError(errorMessage(err));
+    } finally {
+      setSavingCaptions(false);
+    }
+  }
+
   return (
     <DashboardLayout
       variant="admin"
-      title="แก้ไขราคา"
-      subtitle="ตั้งราคาพื้นฐาน ราคาตามช่วงเวลา และส่วนลดของแต่ละสนาม"
+      title="จัดการสนาม"
+      subtitle="ชื่อ ที่ตั้ง ราคา และรูปภาพของแต่ละสนาม"
       headerExtra={
         <div className="pricing-page__actions">
+          {effectiveSportId != null && (
+            <a
+              href={`/booking/field?sport=${effectiveSportId}`}
+              target="_blank"
+              rel="noreferrer"
+              className="dash-btn"
+            >
+              ดูหน้าเว็บ
+            </a>
+          )}
           <button
             type="button"
             className="dash-btn"
@@ -379,10 +635,18 @@ export default function AdminFacilityPricing() {
           <button
             type="button"
             className="dash-btn dash-btn--add"
+            disabled={savingCaptions || dirtyCaptionCount === 0}
+            onClick={handleSaveCaptions}
+          >
+            {savingCaptions ? "กำลังบันทึก..." : "บันทึกรูปภาพ"}
+          </button>
+          <button
+            type="button"
+            className="dash-btn dash-btn--add"
             disabled={savingBase || !config.basePrice}
             onClick={handleSaveBasePrice}
           >
-            {savingBase ? "กำลังบันทึก..." : "บันทึกราคา"}
+            {savingBase ? "กำลังบันทึก..." : "บันทึกข้อมูลสนาม"}
           </button>
         </div>
       }
@@ -438,13 +702,44 @@ export default function AdminFacilityPricing() {
         <div className="pricing-page">
           <div className="pricing-page__main">
             <section className="dash-card">
-              <h2>ราคาพื้นฐาน</h2>
-              <p className="pricing-page__hint">ใช้เมื่อไม่มีราคาตามช่วงเวลากำหนดไว้</p>
+              <h2>ข้อมูลสนาม</h2>
+              <p className="pricing-page__hint">
+                ชื่อ ที่ตั้ง และราคาพื้นฐาน (ใช้เมื่อไม่มีราคาตามช่วงเวลากำหนดไว้)
+              </p>
 
               {configLoading || !base ? (
                 <p className="dash-empty">กำลังโหลดข้อมูล...</p>
               ) : (
                 <div className="pricing-page__base-grid">
+                  <div className="dash-field">
+                    <label className="dash-field__label">ชื่อสนาม</label>
+                    <input
+                      type="text"
+                      className="dash-input"
+                      value={base.name}
+                      onChange={(e) => setBaseDraft({ ...base, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="dash-field">
+                    <label className="dash-field__label">สถานที่</label>
+                    <input
+                      type="text"
+                      className="dash-input"
+                      value={base.venueName}
+                      onChange={(e) => setBaseDraft({ ...base, venueName: e.target.value })}
+                    />
+                    <p className="dash-field__hint">มีผลกับทุกสนามในสถานที่เดียวกัน</p>
+                  </div>
+                  <div className="dash-field">
+                    <label className="dash-field__label">ที่อยู่</label>
+                    <input
+                      type="text"
+                      className="dash-input"
+                      value={base.venueAddress}
+                      onChange={(e) => setBaseDraft({ ...base, venueAddress: e.target.value })}
+                    />
+                    <p className="dash-field__hint">มีผลกับทุกสนามในสถานที่เดียวกัน</p>
+                  </div>
                   <div className="dash-field">
                     <label className="dash-field__label">ราคาต่อชั่วโมง</label>
                     <input
@@ -519,6 +814,199 @@ export default function AdminFacilityPricing() {
                   onDelete={handleDeleteRule}
                 />
               ))}
+            </section>
+
+            <section className="dash-card">
+              <div className="photos-page__section-header">
+                <div>
+                  <h2>รูปภาพประจำกีฬา</h2>
+                  <p className="photos-page__hint">
+                    ใช้เป็นรูปของ &quot;{effectiveSport?.name ?? "กีฬา"}&quot; บนหน้ารายการกีฬา
+                    และเป็นรูปสำรองของสนามที่ยังไม่มีรูปของตัวเอง
+                  </p>
+                </div>
+              </div>
+
+              {sportIconError && (
+                <div className="dash-message dash-message--error">{sportIconError}</div>
+              )}
+
+              <div className="photos-preview-card" style={{ maxWidth: "320px" }}>
+                <div
+                  className="photos-preview-card__image"
+                  style={effectiveSport?.image ? { backgroundImage: `url(${effectiveSport.image})` } : undefined}
+                />
+              </div>
+              <input
+                ref={sportIconInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className="photos-page__file-input"
+                onChange={(e) => {
+                  handleSportIconChange(e.target.files?.[0] ?? null);
+                  e.target.value = "";
+                }}
+              />
+              <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  className="dash-btn"
+                  disabled={sportIconUploading || !effectiveSportId}
+                  onClick={() => sportIconInputRef.current?.click()}
+                >
+                  {sportIconUploading ? "กำลังอัปโหลด..." : "เปลี่ยนรูปกีฬา"}
+                </button>
+                <button
+                  type="button"
+                  className="dash-btn"
+                  disabled={!effectiveSport?.image}
+                  onClick={() =>
+                    setCropTarget({
+                      kind: "sport-icon",
+                      sportId: effectiveSportId,
+                      imageUrl: effectiveSport.image,
+                    })
+                  }
+                >
+                  ครอบตัด
+                </button>
+              </div>
+            </section>
+
+            <section className="dash-card" ref={uploaderRef}>
+              <h2>อัปโหลดรูปภาพ</h2>
+              <div
+                className={`dash-dropzone photos-page__dropzone ${dragOverDrop ? "photos-page__dropzone--over" : ""}`}
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOverDrop(true);
+                }}
+                onDragLeave={() => setDragOverDrop(false)}
+                onDrop={handleDropzoneDrop}
+              >
+                <strong>ลากไฟล์มาวาง หรือคลิกเพื่อเลือกรูป</strong>
+                <span>
+                  JPG, PNG, WebP · แนะนำ {RECOMMENDED_WIDTH} × {RECOMMENDED_HEIGHT} px (อัตราส่วน 16:9) ·
+                  ไม่เกิน 5 MB ต่อไฟล์
+                </span>
+                <button type="button" className="dash-btn" disabled={uploading}>
+                  {uploading ? "กำลังอัปโหลด..." : "เลือกไฟล์"}
+                </button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                multiple
+                className="photos-page__file-input"
+                onChange={(e) => {
+                  handleFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+            </section>
+
+            <section className="dash-card">
+              <div className="photos-page__section-header">
+                <div>
+                  <h2>คลังรูปของสนามนี้</h2>
+                  <p className="photos-page__hint">ลากเพื่อจัดลำดับ · รูปแรกจะถูกใช้เป็นหน้าปก</p>
+                </div>
+              </div>
+
+              {!imagesLoading && images.length === 0 && (
+                <p className="dash-empty">ยังไม่มีรูปภาพ อัปโหลดรูปแรกด้านบน</p>
+              )}
+
+              <div className="photos-gallery">
+                {displayImages.map((image, index) => (
+                  <div
+                    key={image.id}
+                    className={`photos-gallery__item ${dragIndex === index ? "photos-gallery__item--dragging" : ""} ${
+                      dragOverIndex === index ? "photos-gallery__item--drag-over" : ""
+                    }`}
+                    draggable
+                    onDragStart={() => setDragIndex(index)}
+                    onDragEnter={() => {
+                      if (dragIndex !== null && index !== dragIndex) setDragOverIndex(index);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleGalleryDrop(index)}
+                    onDragEnd={handleGalleryDragEnd}
+                  >
+                    <div
+                      className={`photos-gallery__thumb ${image.isPrimary ? "photos-gallery__thumb--cover" : ""}`}
+                      style={{ backgroundImage: `url(${image.imageUrl})` }}
+                    >
+                      <span className={`photos-gallery__badge ${image.isPrimary ? "photos-gallery__badge--cover" : ""}`}>
+                        {image.isPrimary ? "หน้าปก" : index + 1}
+                      </span>
+                    </div>
+
+                    {editingCaptionId === image.id ? (
+                      <input
+                        className="dash-input photos-gallery__caption-input"
+                        autoFocus
+                        value={captionDrafts[image.id] ?? image.caption}
+                        onChange={(e) =>
+                          setCaptionDrafts((d) => ({ ...d, [image.id]: e.target.value }))
+                        }
+                        onBlur={() => setEditingCaptionId(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") e.currentTarget.blur();
+                        }}
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        className="photos-gallery__caption"
+                        onClick={() => setEditingCaptionId(image.id)}
+                      >
+                        {(captionDrafts[image.id] ?? image.caption) || "เพิ่มคำบรรยาย"}
+                      </button>
+                    )}
+
+                    <p className="photos-gallery__meta">
+                      {image.width && image.height ? `${image.width} × ${image.height} · ` : ""}
+                      {formatKb(image.sizeBytes)}
+                    </p>
+
+                    <div className="photos-gallery__row-actions">
+                      {!image.isPrimary && (
+                        <button type="button" className="dash-btn" onClick={() => handleSetPrimary(image)}>
+                          ตั้งเป็นหน้าปก
+                        </button>
+                      )}
+                      <button type="button" className="dash-btn" onClick={() => setCropTarget(image)}>
+                        ครอบตัด
+                      </button>
+                      {confirmDeleteId === image.id ? (
+                        <>
+                          <button type="button" className="dash-btn" onClick={() => setConfirmDeleteId(null)}>
+                            ยกเลิก
+                          </button>
+                          <button
+                            type="button"
+                            className="dash-btn dash-btn--cancel"
+                            onClick={() => handleDeleteImage(image)}
+                          >
+                            ยืนยันลบ
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          className="dash-btn dash-btn--cancel"
+                          onClick={() => setConfirmDeleteId(image.id)}
+                        >
+                          ลบ
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
           </div>
 
@@ -690,8 +1178,99 @@ export default function AdminFacilityPricing() {
                 </div>
               ))}
             </section>
+
+            <section className="dash-card">
+              <h2>ตัวอย่างการ์ดสนาม</h2>
+              <p className="photos-page__hint">แบบที่ลูกค้าเห็นในหน้าเลือกสนาม</p>
+
+              <div className="photos-preview-card">
+                <div
+                  className="photos-preview-card__image"
+                  style={{
+                    backgroundImage: `url(${coverImage?.imageUrl ?? selectedFacility?.image})`,
+                  }}
+                />
+                <div className="photos-preview-card__body">
+                  <p className="photos-preview-card__name">{selectedFacility?.name ?? "สนาม"}</p>
+                  <p className="photos-preview-card__sub">
+                    {selectedFacility?.sportName ?? ""}
+                    {selectedFacility?.capacity ? ` · ${selectedFacility.capacity} คน` : ""}
+                  </p>
+                  <div className="photos-preview-card__row">
+                    <span className="photos-preview-card__price">
+                      {selectedFacility ? `${formatBaht(selectedFacility.pricePerHour)}/ชม.` : ""}
+                    </span>
+                    <span className="dash-pill dash-pill--active photos-preview-card__cta">เลือก</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="dash-card">
+              <h2>ครอบตัดรูป</h2>
+              <p className="photos-page__hint">เลือกอัตราส่วนที่จะใช้แสดงผล แล้วกด "ครอบตัด" ที่รูปในคลังด้านบน</p>
+              <p className="photos-page__note">อัตราส่วน 16:9 คือค่าที่การ์ดสนามใช้แสดงผล</p>
+            </section>
+
+            <section className="dash-card">
+              <h2>ข้อกำหนดรูปภาพ</h2>
+              <div className="photos-requirements">
+                <div className="photos-requirements__row">
+                  <span>ขนาดแนะนำ</span>
+                  <strong>
+                    {RECOMMENDED_WIDTH} × {RECOMMENDED_HEIGHT} px
+                  </strong>
+                </div>
+                <div className="photos-requirements__row">
+                  <span>อัตราส่วน</span>
+                  <strong>16:9</strong>
+                </div>
+                <div className="photos-requirements__row">
+                  <span>ขนาดไฟล์</span>
+                  <strong>ไม่เกิน 5 MB</strong>
+                </div>
+                <div className="photos-requirements__row">
+                  <span>จำนวนรูป</span>
+                  <strong>สูงสุด {MAX_IMAGES_PER_FACILITY} รูปต่อสนาม</strong>
+                </div>
+                <div className="photos-requirements__row">
+                  <span>นามสกุล</span>
+                  <strong>JPG, PNG, WebP</strong>
+                </div>
+              </div>
+            </section>
+
+            {lowResImages.length > 0 && (
+              <section className="photos-warning">
+                <p className="photos-warning__title">⚠ พบรูปความละเอียดต่ำ {lowResImages.length} รูป</p>
+                <p className="photos-warning__text">
+                  {lowResImages
+                    .map((img) => `"${img.caption || "ไม่มีชื่อ"}" (${img.width} × ${img.height} px)`)
+                    .join(", ")}{" "}
+                  ต่ำกว่าที่แนะนำ อาจแตกเมื่อแสดงบนหน้าจอใหญ่
+                </p>
+                <button
+                  type="button"
+                  className="dash-btn photos-warning__btn"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    uploaderRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  อัปโหลดใหม่
+                </button>
+              </section>
+            )}
           </div>
         </div>
+      )}
+
+      {cropTarget && (
+        <ImageCropModal
+          imageUrl={cropTarget.imageUrl}
+          onCancel={() => setCropTarget(null)}
+          onConfirm={handleCropConfirm}
+        />
       )}
     </DashboardLayout>
   );

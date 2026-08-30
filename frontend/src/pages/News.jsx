@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import NewsHighlightCarousel from "../components/NewsHighlightCarousel";
 import { usePublicNews } from "../hooks/useNews";
 import { NEWS_CATEGORIES } from "../lib/news";
 import { formatBookingDate } from "../lib/bookings";
@@ -17,15 +19,24 @@ function meta(item) {
 export default function News() {
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
   const { news, loading, error } = usePublicNews();
+  const navigate = useNavigate();
 
   const filtered = useMemo(
     () => (activeCategory === "ทั้งหมด" ? news : news.filter((n) => n.category === activeCategory)),
     [news, activeCategory],
   );
 
-  const lead = filtered.find((n) => n.isFeatured) ?? filtered[0] ?? null;
-  const sidebarStories = filtered.filter((n) => n.id !== lead?.id).slice(0, 4);
-  const gridStories = filtered.filter((n) => n.id !== lead?.id).slice(4, 7);
+  // ข่าวเด่นแสดงในสไลด์ได้ทุกข่าวที่ปักหมุดไว้ (ไม่จำกัดแค่ข่าวเดียว) ส่วนข่าว
+  // ทั่วไปที่เหลือแสดงเป็นตารางด้านล่างครบทุกข่าว ไม่ตัดจำนวน
+  const featured = useMemo(() => filtered.filter((n) => n.isFeatured), [filtered]);
+  const others = useMemo(() => filtered.filter((n) => !n.isFeatured), [filtered]);
+  // ผูก key ของ carousel กับชุด id ข่าวเด่น — สลับหมวดหมู่แล้ว React จะ
+  // remount carousel ใหม่ทั้งก้อน ทำให้กลับไปเริ่มที่ข่าวแรกของชุดใหม่เสมอ
+  const featuredKey = useMemo(() => featured.map((n) => n.id).join(","), [featured]);
+
+  function openArticle(id) {
+    navigate(`/news/${id}`);
+  }
 
   return (
     <div className="news">
@@ -56,60 +67,44 @@ export default function News() {
 
         {loading && <p className="news__empty">กำลังโหลดข่าวสาร...</p>}
         {!loading && error && <p className="news__empty">{error}</p>}
-        {!loading && !error && !lead && <p className="news__empty">ยังไม่มีข่าวในหมวดนี้</p>}
-
-        {lead && (
-          <section className="news__lead-grid">
-            <article className="news__lead">
-              <div className="news__lead-photo">
-                {lead.coverImage ? (
-                  <img src={lead.coverImage} alt={lead.title} />
-                ) : (
-                  <div className="news__card-placeholder" aria-hidden="true" />
-                )}
-              </div>
-              <p className="news__meta">{meta(lead)}</p>
-              <h2 className="news__lead-title">{lead.title}</h2>
-              <p className="news__lead-desc">{lead.subtitle || lead.excerpt}</p>
-            </article>
-
-            {sidebarStories.length > 0 && (
-              <aside className="news__sidebar">
-                <p className="news__sidebar-title">เรื่องอื่นในสัปดาห์นี้</p>
-                <div className="news__sidebar-list">
-                  {sidebarStories.map((story, index) => (
-                    <div key={story.id} className="news__sidebar-item">
-                      <span className="news__sidebar-no">{String(index + 1).padStart(2, "0")}</span>
-                      <div>
-                        <p className="news__sidebar-meta">{meta(story)}</p>
-                        <p className="news__sidebar-headline">{story.title}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </aside>
-            )}
-          </section>
+        {!loading && !error && filtered.length === 0 && (
+          <p className="news__empty">ยังไม่มีข่าวในหมวดนี้</p>
         )}
 
-        {gridStories.length > 0 && (
+        {!loading && !error && featured.length > 0 && (
+          <>
+            <p className="news__section-label">ข่าวเด่น</p>
+            <NewsHighlightCarousel key={featuredKey} items={featured} onSelect={openArticle} />
+          </>
+        )}
+
+        {!loading && !error && others.length > 0 && (
           <>
             <div className="news__rule news__rule--strong" />
-            <p className="news__section-label">รายงานพิเศษ</p>
+            <p className="news__section-label">ข่าวทั้งหมด</p>
 
             <section className="news__grid">
-              {gridStories.map((report) => (
-                <article key={report.id} className="news__card">
+              {others.map((item) => (
+                <article
+                  key={item.id}
+                  className="news__card"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => openArticle(item.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") openArticle(item.id);
+                  }}
+                >
                   <div className="news__card-photo">
-                    {report.coverImage ? (
-                      <img src={report.coverImage} alt={report.title} />
+                    {item.coverImage ? (
+                      <img src={item.coverImage} alt={item.title} />
                     ) : (
                       <div className="news__card-placeholder" aria-hidden="true" />
                     )}
                   </div>
-                  <p className="news__meta">{meta(report)}</p>
-                  <h3 className="news__card-title">{report.title}</h3>
-                  <p className="news__card-desc">{report.subtitle || report.excerpt}</p>
+                  <p className="news__meta">{meta(item)}</p>
+                  <h3 className="news__card-title">{item.title}</h3>
+                  <p className="news__card-desc">{item.subtitle || item.excerpt}</p>
                 </article>
               ))}
             </section>

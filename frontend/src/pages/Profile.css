@@ -488,11 +488,30 @@
   border: 2px solid var(--color-tint-light);
   border-left-width: 6px;
   border-radius: 20px;
-  padding: 1rem 1.25rem;
+  overflow: hidden;
 }
 
 .profile-notification--unread {
   border-left-color: var(--color-primary);
+}
+
+.profile-notification__body {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  padding: 1rem 1.25rem;
+}
+
+.profile-notification--link .profile-notification__body:hover {
+  background: var(--color-tint-light);
+}
+
+.profile-notification__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .profile-notification__title {
@@ -500,6 +519,13 @@
   color: var(--color-heading);
   font-weight: 700;
   font-size: 1rem;
+}
+
+.profile-notification__time {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--color-faint-purple);
+  white-space: nowrap;
 }
 
 .profile-notification__message {

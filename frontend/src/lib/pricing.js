@@ -42,7 +42,7 @@ export async function fetchFacilityPricingConfig(facilityId) {
   const [facilityRes, rulesRes, discountsRes] = await Promise.all([
     supabase
       .from("facilities")
-      .select("id, price_per_hour, min_booking_hours, deposit_percent")
+      .select("id, name, price_per_hour, min_booking_hours, deposit_percent, venue_id, venues ( id, name, address )")
       .eq("id", facilityId)
       .single(),
     supabase
@@ -64,6 +64,10 @@ export async function fetchFacilityPricingConfig(facilityId) {
   return {
     basePrice: {
       facilityId: facilityRes.data.id,
+      name: facilityRes.data.name,
+      venueId: facilityRes.data.venues?.id ?? facilityRes.data.venue_id,
+      venueName: facilityRes.data.venues?.name ?? "",
+      venueAddress: facilityRes.data.venues?.address ?? "",
       pricePerHour: Number(facilityRes.data.price_per_hour),
       minBookingHours: facilityRes.data.min_booking_hours,
       depositPercent: Number(facilityRes.data.deposit_percent),
@@ -73,16 +77,27 @@ export async function fetchFacilityPricingConfig(facilityId) {
   };
 }
 
-export async function updateFacilityBasePrice(facilityId, { pricePerHour, minBookingHours, depositPercent }) {
+export async function updateFacilityBasePrice(
+  facilityId,
+  { name, pricePerHour, minBookingHours, depositPercent },
+) {
   const { error } = await supabase
     .from("facilities")
     .update({
+      name,
       price_per_hour: pricePerHour,
       min_booking_hours: minBookingHours,
       deposit_percent: depositPercent,
     })
     .eq("id", facilityId);
 
+  if (error) throw error;
+}
+
+// venues เป็นคนละตารางกับ facilities — หนึ่งสถานที่มีได้หลายสนาม เปลี่ยน
+// ชื่อ/ที่อยู่ตรงนี้จึงมีผลกับทุกสนามที่อยู่ในสถานที่เดียวกันด้วย
+export async function updateVenueDetails(venueId, { name, address }) {
+  const { error } = await supabase.from("venues").update({ name, address }).eq("id", venueId);
   if (error) throw error;
 }
 

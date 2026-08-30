@@ -181,12 +181,13 @@ export async function fetchBookingDetail(bookingId) {
 
 // สร้างการจองสถานะ pending / unpaid
 //
-// ส่งไปแค่ id ของช่วงเวลาที่แอดมินเปิดไว้ ไม่ส่งสนาม/วัน/เวลา/ยอดเงิน —
-// RPC อ่านทั้งหมดจากแถวใน facility_time_slots เอง ค่าที่ผู้ใช้กำหนดเองได้
-// จึงเหลือแค่ note อย่างเดียว ปิดทางจองสนามแพงในราคาถูกหรือยืดเวลาเอง
-export async function createBooking({ slotId, note }) {
+// ส่งไปแค่ id ของช่วงเวลาที่แอดมินเปิดไว้ (เลือกได้หลายช่วง แต่ต้องต่อกัน —
+// RPC เป็นคนตรวจ ไม่ใช่ฝั่งนี้) ไม่ส่งสนาม/วัน/เวลา/ยอดเงิน — RPC อ่านทั้งหมด
+// จากแถวใน facility_time_slots เอง ค่าที่ผู้ใช้กำหนดเองได้จึงเหลือแค่ note
+// อย่างเดียว ปิดทางจองสนามแพงในราคาถูกหรือยืดเวลาเอง
+export async function createBooking({ slotIds, note }) {
   const { data, error } = await supabase.rpc("create_booking", {
-    p_slot_id: slotId,
+    p_slot_ids: slotIds,
     p_note: note ?? null,
   });
 

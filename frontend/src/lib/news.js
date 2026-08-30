@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { assertImageFile, imageExt, removeStorageFolder } from "./uploads";
+import { stripNewsFormatting } from "./newsContent";
 
 const NEWS_SELECT = `
   id,
@@ -174,7 +175,8 @@ function toPublicNews(row) {
     id: row.id,
     title: row.title,
     subtitle: row.subtitle ?? "",
-    excerpt: (row.content ?? "").slice(0, 140),
+    content: row.content,
+    excerpt: stripNewsFormatting(row.content).slice(0, 140),
     coverImage: row.cover_image,
     category: row.category,
     isFeatured: row.is_featured,
@@ -193,4 +195,18 @@ export async function fetchPublicNews({ limit = 20 } = {}) {
 
   if (error) throw error;
   return (data ?? []).map(toPublicNews);
+}
+
+// สำหรับหน้ารายละเอียดข่าวของ user — ใช้ select ชุดเดียวกับหน้ารวม (ไม่มี
+// status/view_count/profiles) เพราะ RLS ข้างต้นกันข่าวที่ยังไม่เผยแพร่ไว้แล้ว
+// แถวจะไม่ถูกส่งกลับมาเลยถ้ายังไม่ถึงเวลาเผยแพร่หรือเป็นฉบับร่าง
+export async function fetchPublicNewsById(id) {
+  const { data, error } = await supabase
+    .from("news")
+    .select(PUBLIC_NEWS_SELECT)
+    .eq("id", id)
+    .single();
+
+  if (error) throw error;
+  return toPublicNews(data);
 }

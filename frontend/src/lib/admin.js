@@ -66,6 +66,10 @@ export async function fetchSuperAdminOverviewStats() {
 
 // facilities/venues มี RLS ของตัวเอง (สนามที่ปิดอยู่จะ join กลับมาเป็น null)
 // เหมือน BOOKING_SELECT ใน lib/bookings.js — เพิ่ม profiles มาโชว์ชื่อผู้จอง
+//
+// ต้องระบุ !bookings_user_id_fkey ตรง ๆ เพราะตั้งแต่ 0038 เพิ่ม
+// checked_in_by / checked_out_by (ก็ชี้ไปที่ profiles เหมือนกัน) bookings
+// มี FK ไปหา profiles ถึง 3 เส้น PostgREST เดาไม่ได้แล้วว่าจะ join ผ่านเส้นไหน
 const ADMIN_BOOKING_SELECT = `
   id,
   booking_code,
@@ -76,7 +80,7 @@ const ADMIN_BOOKING_SELECT = `
   payment_status,
   total_amount,
   note,
-  profiles ( username, full_name ),
+  profiles!bookings_user_id_fkey ( username, full_name ),
   facilities (
     name,
     sports ( name ),

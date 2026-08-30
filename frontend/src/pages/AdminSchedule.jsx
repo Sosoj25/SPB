@@ -5,7 +5,13 @@ import { useAdminDaySlots, useAdminScheduleMonth } from "../hooks/useAdmin";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { fetchFacilitiesBySport, fetchFacility, fetchSportCatalog } from "../lib/catalog";
 import { hoursBetween, toISODate, toHhMm, todayISO } from "../lib/bookings";
-import { ensureFutureSlots, setDayActive, setSlotActive } from "../lib/schedule";
+import {
+  addCustomSlot,
+  deleteSlot,
+  ensureFutureSlots,
+  setDayActive,
+  setSlotActive,
+} from "../lib/schedule";
 import { errorMessage } from "../lib/errors";
 import "./AdminSchedule.css";
 
@@ -52,6 +58,10 @@ export default function AdminSchedule() {
   const [savingSlotId, setSavingSlotId] = useState(null);
   const [extending, setExtending] = useState(false);
   const [extendMessage, setExtendMessage] = useState("");
+  const [newSlotStart, setNewSlotStart] = useState("");
+  const [newSlotEnd, setNewSlotEnd] = useState("");
+  const [addingSlot, setAddingSlot] = useState(false);
+  const [addSlotError, setAddSlotError] = useState("");
 
   const { data: sports } = useAsyncData(fetchSportCatalog, "schedule-sports", EMPTY_LIST);
 
@@ -111,6 +121,25 @@ export default function AdminSchedule() {
     }
   }
 
+  async function removeSlot(slot) {
+    if (!window.confirm(`ลบช่วงเวลา ${toHhMm(slot.startTime)} – ${toHhMm(slot.endTime)} ทิ้งเลยไหม?`)) {
+      return;
+    }
+
+    setActionError("");
+    setSavingSlotId(slot.id);
+
+    try {
+      await deleteSlot(slot.id);
+      setReloadKey((k) => k + 1);
+    } catch (err) {
+      console.error("deleteSlot failed:", err);
+      setActionError(errorMessage(err));
+    } finally {
+      setSavingSlotId(null);
+    }
+  }
+
   async function bulkSetDay(isActive) {
     if (!effectiveFacilityId) return;
     setActionError("");
@@ -121,6 +150,26 @@ export default function AdminSchedule() {
     } catch (err) {
       console.error("setDayActive failed:", err);
       setActionError(errorMessage(err));
+    }
+  }
+
+  async function addSlot(e) {
+    e.preventDefault();
+    if (!effectiveFacilityId || !newSlotStart || !newSlotEnd) return;
+
+    setAddSlotError("");
+    setAddingSlot(true);
+
+    try {
+      await addCustomSlot(effectiveFacilityId, selectedDate, newSlotStart, newSlotEnd);
+      setNewSlotStart("");
+      setNewSlotEnd("");
+      setReloadKey((k) => k + 1);
+    } catch (err) {
+      console.error("addCustomSlot failed:", err);
+      setAddSlotError(errorMessage(err));
+    } finally {
+      setAddingSlot(false);
     }
   }
 
@@ -295,6 +344,33 @@ export default function AdminSchedule() {
               </button>
             </div>
 
+            <form className="admin-schedule__add-slot" onSubmit={addSlot}>
+              <div className="admin-schedule__add-slot-fields">
+                <label className="admin-schedule__add-slot-field">
+                  <span>เริ่ม</span>
+                  <input
+                    type="time"
+                    value={newSlotStart}
+                    onChange={(e) => setNewSlotStart(e.target.value)}
+                    required
+                  />
+                </label>
+                <label className="admin-schedule__add-slot-field">
+                  <span>ถึง</span>
+                  <input
+                    type="time"
+                    value={newSlotEnd}
+                    onChange={(e) => setNewSlotEnd(e.target.value)}
+                    required
+                  />
+                </label>
+                <button type="submit" className="dash-pill dash-pill--tint" disabled={addingSlot}>
+                  {addingSlot ? "กำลังเพิ่ม..." : "+ เพิ่มช่วงเวลา"}
+                </button>
+              </div>
+              {addSlotError && <p className="admin-schedule__add-slot-error">{addSlotError}</p>}
+            </form>
+
             <p className="admin-schedule__slots-label">ช่วงเวลา</p>
 
             {slotsLoading && <p className="dash-empty">กำลังโหลดข้อมูล...</p>}
@@ -336,6 +412,16 @@ export default function AdminSchedule() {
                     disabled={Boolean(slot.bookedBy) || savingSlotId === slot.id}
                     label={`เปิดจองช่วง ${toHhMm(slot.startTime)}`}
                   />
+                  <button
+                    type="button"
+                    className="admin-schedule__slot-delete"
+                    onClick={() => removeSlot(slot)}
+                    disabled={Boolean(slot.bookedBy) || savingSlotId === slot.id}
+                    title="ลบช่วงเวลานี้"
+                    aria-label={`ลบช่วงเวลา ${toHhMm(slot.startTime)} ถึง ${toHhMm(slot.endTime)}`}
+                  >
+                    ลบ
+                  </button>
                 </div>
               );
             })}

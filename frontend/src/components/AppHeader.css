@@ -13,6 +13,9 @@
 
 .app-header__user {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-right: auto;
 }
 
@@ -60,6 +63,115 @@
 
 .app-header__link:hover {
   color: var(--color-primary);
+}
+
+.app-header__bell {
+  position: relative;
+}
+
+.app-header__bell-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+  font-size: 1.25rem;
+}
+
+.app-header__bell-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
+  border-radius: var(--radius-pill);
+  background: #d93347;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2rem;
+  text-align: center;
+}
+
+.app-header__bell-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: min(320px, calc(100vw - 2rem));
+  max-height: 420px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(43, 10, 99, 0.22);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-header__bell-title {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-heading);
+}
+
+.app-header__bell-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.app-header__bell-item:hover {
+  background: var(--color-tint-light);
+}
+
+.app-header__bell-item--unread {
+  background: #f4edff;
+}
+
+.app-header__bell-item-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-heading);
+}
+
+.app-header__bell-item-message {
+  font-size: 0.82rem;
+  color: var(--color-muted-purple);
+}
+
+.app-header__bell-item-time {
+  font-size: 0.75rem;
+  color: var(--color-faint-purple);
+}
+
+.app-header__bell-empty {
+  margin: 0.25rem 0.35rem;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.app-header__bell-viewall {
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--color-primary);
+}
+
+.app-header__bell-viewall:hover {
+  background: var(--color-tint-light);
 }
 
 .app-header__logout-btn {

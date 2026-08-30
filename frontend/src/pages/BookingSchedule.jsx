@@ -62,15 +62,19 @@ export default function BookingSchedule() {
   // วันที่, ช่วงเวลาที่เลือก และ error ของการกดยืนยัน อยู่ก้อนเดียวกันโดยตั้งใจ:
   // ทั้งสามอย่างมีความหมายเฉพาะกับวันนั้นวันเดียว เก็บรวมกันแล้วเซ็ตพร้อมกัน
   // จึงไม่มีจังหวะที่ค่าทั้งสามไม่ตรงกัน และไม่ต้องมี effect คอยล้างค่าตามหลัง
+  //
+  // slotIds เก็บได้หลายช่วง (จองต่อกันในครั้งเดียวได้) แต่ต้องต่อเนื่องกันสนิท
+  // — ฝั่งนี้แค่คุมว่ากดยังไงให้ยังต่อกันอยู่เสมอ ตัวตัดสินจริงคือ
+  // create_booking() ที่เช็คซ้ำอีกชั้นฝั่ง server
   const [pick, setPick] = useState(() => {
     const wanted = params.get("date");
     return {
       date: wanted && wanted >= today && wanted <= lastBookable ? wanted : today,
-      slotId: null,
+      slotIds: [],
       error: "",
     };
   });
-  const { date: selectedDate, slotId: selectedSlotId, error: submitError } = pick;
+  const { date: selectedDate, slotIds: selectedSlotIds, error: submitError } = pick;
 
   const [month, setMonth] = useState(() => monthKey(pick.date));
   const [submitting, setSubmitting] = useState(false);
@@ -102,15 +106,23 @@ export default function BookingSchedule() {
     EMPTY_SLOTS
   );
 
-  const chosen = slots.find((slot) => slot.id === selectedSlotId) ?? null;
-  const hours = chosen ? hoursBetween(chosen.start, chosen.end) : 0;
+  // slots มาจาก facility_slots() ที่เรียงตาม start_time อยู่แล้ว (0011) —
+  // filter ตามลำดับเดิมจึงได้ selectedSlots ที่เรียงเวลาถูกต้องเสมอ ไม่ต้อง
+  // สนใจว่า slotIds ถูกเพิ่มเข้ามาตามลำดับไหน
+  const selectedSlots = slots.filter((slot) => selectedSlotIds.includes(slot.id));
+  const firstSlot = selectedSlots[0] ?? null;
+  const lastSlot = selectedSlots[selectedSlots.length - 1] ?? null;
+  const hours = firstSlot ? hoursBetween(firstSlot.start, lastSlot.end) : 0;
 
   // ตัวเลขจริงที่จะถูกเรียกเก็บ มาจากฟังก์ชันเดียวกับที่ create_booking ใช้
   // (compute_facility_price, 0024) กันราคาประเมินที่โชว์ตอนเลือกเวลากับ
-  // ราคาที่เก็บจริงตอนยืนยันไม่ตรงกัน (ราคาตามช่วงเวลา/ส่วนลด)
+  // ราคาที่เก็บจริงตอนยืนยันไม่ตรงกัน (ราคาตามช่วงเวลา/ส่วนลด) — ส่งช่วงเวลา
+  // รวมทั้งหมด (ต้น slot แรก ถึง จบ slot สุดท้าย) เหมือนที่ RPC จะคิดจริง
   const { data: pricePreview } = useAsyncData(
-    () => fetchFacilityPricePreview(facilityId, selectedDate, chosen.start, chosen.end),
-    hasFacility && chosen ? `price-preview:${facilityId}:${selectedDate}:${chosen.start}:${chosen.end}` : null,
+    () => fetchFacilityPricePreview(facilityId, selectedDate, firstSlot.start, lastSlot.end),
+    hasFacility && firstSlot
+      ? `price-preview:${facilityId}:${selectedDate}:${firstSlot.start}:${lastSlot.end}`
+      : null,
   );
 
   const total = pricePreview ? pricePreview.totalAmount : hours * (facility?.pricePerHour ?? 0);
@@ -130,16 +142,60 @@ export default function BookingSchedule() {
     setPick((prev) => ({ ...prev, error: "" }));
 
     try {
-      const booking = await createBooking({ slotId: selectedSlotId });
+      const booking = await createBooking({ slotIds: selectedSlotIds });
 
       navigate(`/booking/payment?booking=${booking.id}`);
     } catch (err) {
       console.error("create_booking failed:", err);
-      setPick((prev) => ({ ...prev, slotId: null, error: errorMessage(err) }));
+      setPick((prev) => ({ ...prev, slotIds: [], error: errorMessage(err) }));
       setSubmitting(false);
       // ถ้าพลาดเพราะมีคนจองตัดหน้า ตารางบนจอตอนนี้เก่าแล้ว — ดึงใหม่
       setReloadKey((key) => key + 1);
     }
+  }
+
+  // กดเลือก/ยกเลิกช่วงเวลา — ต้องคุมให้ผลลัพธ์เป็นช่วงที่ต่อกันสนิทเสมอ:
+  //  - ช่วงว่าง: เริ่มเลือกใหม่
+  //  - กดช่วงที่ติดกับขอบใดขอบหนึ่งของช่วงที่เลือกอยู่: ต่อออกไปทางนั้น
+  //  - กดช่วงที่ไม่ติดกับช่วงที่เลือกอยู่เลย: เริ่มเลือกใหม่จากช่วงนั้นแทน
+  //    (ดีกว่าปฏิเสธเฉย ๆ เพราะผู้ใช้เห็นผลลัพธ์ทันทีว่าเลือกอะไรอยู่)
+  //  - กดช่วงที่เลือกอยู่แล้วซึ่งอยู่ปลายสุด (ต้นหรือท้าย): ตัดออกจากปลายนั้น
+  //  - กดช่วงที่เลือกอยู่แล้วตรงกลาง: เคลียร์ทั้งหมด (ตัดตรงกลางแล้วจะเหลือ
+  //    เป็นสองก้อนไม่ต่อกัน ซึ่งจองพร้อมกันไม่ได้อยู่แล้ว)
+  function toggleSlot(slot) {
+    if (slot.isBooked) return;
+
+    setPick((prev) => {
+      const current = slots.filter((s) => prev.slotIds.includes(s.id));
+
+      if (current.length === 0) {
+        return { ...prev, slotIds: [slot.id], error: "" };
+      }
+
+      const first = current[0];
+      const last = current[current.length - 1];
+      const alreadySelected = current.some((s) => s.id === slot.id);
+
+      if (alreadySelected) {
+        if (slot.id === first.id || slot.id === last.id) {
+          return {
+            ...prev,
+            slotIds: current.filter((s) => s.id !== slot.id).map((s) => s.id),
+            error: "",
+          };
+        }
+        return { ...prev, slotIds: [], error: "" };
+      }
+
+      if (slot.end === first.start) {
+        return { ...prev, slotIds: [slot.id, ...prev.slotIds], error: "" };
+      }
+      if (slot.start === last.end) {
+        return { ...prev, slotIds: [...prev.slotIds, slot.id], error: "" };
+      }
+
+      return { ...prev, slotIds: [slot.id], error: "" };
+    });
   }
 
   return (
@@ -235,7 +291,7 @@ export default function BookingSchedule() {
                       key={iso}
                       type="button"
                       disabled={disabled}
-                      onClick={() => setPick({ date: iso, slotId: null, error: "" })}
+                      onClick={() => setPick({ date: iso, slotIds: [], error: "" })}
                       aria-pressed={iso === selectedDate}
                       className={`booking-day ${disabled ? "booking-day--full" : ""} ${
                         iso === selectedDate ? "booking-day--selected" : ""
@@ -285,7 +341,8 @@ export default function BookingSchedule() {
               <section className="booking-panel">
                 <h2 className="booking-panel__title">ช่วงเวลาที่ว่าง</h2>
                 <p className="booking-panel__sub">
-                  {formatBookingDate(selectedDate)} · เลือกได้ 1 ช่วงต่อการจอง
+                  {formatBookingDate(selectedDate)} · เลือกได้หลายช่วงในครั้งเดียว
+                  แต่ต้องเป็นเวลาที่ต่อเนื่องกัน
                 </p>
 
                 {slotsLoading && <p className="booking-state">กำลังโหลดช่วงเวลา...</p>}
@@ -301,21 +358,14 @@ export default function BookingSchedule() {
                 )}
 
                 {slots.map((slot) => {
-                  const isSelected = slot.id === selectedSlotId;
+                  const isSelected = selectedSlotIds.includes(slot.id);
 
                   return (
                     <button
                       key={slot.id}
                       type="button"
                       disabled={slot.isBooked}
-                      onClick={() =>
-                        setPick((prev) => ({
-                          ...prev,
-                          // กดช่วงเดิมซ้ำ = ยกเลิกการเลือก
-                          slotId: prev.slotId === slot.id ? null : slot.id,
-                          error: "",
-                        }))
-                      }
+                      onClick={() => toggleSlot(slot)}
                       aria-pressed={isSelected}
                       className={`booking-slot ${
                         slot.isBooked ? "booking-slot--full" : ""
@@ -354,8 +404,8 @@ export default function BookingSchedule() {
                 <div className="booking-row">
                   <span className="booking-row__label">เวลา</span>
                   <span className="booking-row__value">
-                    {chosen
-                      ? `${chosen.start} – ${chosen.end} น. (${hours} ชม.)`
+                    {firstSlot
+                      ? `${firstSlot.start} – ${lastSlot.end} น. (${hours} ชม.)`
                       : "ยังไม่ได้เลือก"}
                   </span>
                 </div>
@@ -385,7 +435,7 @@ export default function BookingSchedule() {
                 <button
                   type="button"
                   className="booking-btn booking-btn--block"
-                  disabled={!chosen || submitting}
+                  disabled={!firstSlot || submitting}
                   onClick={handleSubmit}
                 >
                   {submitting ? "กำลังสร้างรายการจอง..." : "ถัดไป: ยืนยันการจอง"}

@@ -1,5 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useAdminPaymentStats, useAdminRefundStats } from "../hooks/useAdmin";
 import { logoRound } from "../assets/images";
 import "./DashboardLayout.css";
 
@@ -10,9 +12,9 @@ const ADMIN_NAV = [
     items: [
       { icon: "▤", label: "ภาพรวม", to: "/admin/overview" },
       { icon: "🗓", label: "จัดการการจอง", to: "/admin/bookings" },
-      { icon: "🏟", label: "จัดการสนาม", to: "/admin/facilities" },
-      { icon: "💰", label: "ราคาสนาม", to: "/admin/pricing" },
-      { icon: "🖼", label: "รูปสนาม", to: "/admin/photos" },
+      { icon: "✓", label: "เช็คอิน", to: "/admin/checkin" },
+      { icon: "🏟", label: "จัดการสิ่งอำนวยความสะดวก", to: "/admin/facilities" },
+      { icon: "💰", label: "จัดการสนาม", to: "/admin/pricing" },
       { icon: "🕘", label: "ตารางเวลา", to: "/admin/schedule" },
     ],
   },
@@ -20,6 +22,7 @@ const ADMIN_NAV = [
     section: "การเงิน",
     items: [
       { icon: "฿", label: "รายการชำระเงิน", to: "/admin/payments" },
+      { icon: "↩", label: "จัดการคำขอคืนเงิน", to: "/admin/refunds" },
       { icon: "⚙", label: "ตั้งค่าการรับชำระเงิน", to: "/admin/payments/settings" },
     ],
   },
@@ -43,11 +46,73 @@ const ROLE_LABELS = {
   super_admin: "ผู้ดูแลระบบสูงสุด (Super Admin)",
 };
 
+// รวมยอด "รอตรวจสอบ" จากการชำระเงิน (0021) และคำขอคืนเงิน (0034) — สอง
+// คิวเดียวที่แอดมินต้องมากดอนุมัติ/ปฏิเสธเองจริง ๆ ในระบบตอนนี้ ก่อนหน้านี้
+// กระดิ่งเป็นแค่เลข 0 ฮาร์ดโค้ด ไม่เคยต่อกับข้อมูลจริงเลย
+function NotificationBell() {
+  const { stats: paymentStats } = useAdminPaymentStats();
+  const { stats: refundStats } = useAdminRefundStats();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (rootRef.current && !rootRef.current.contains(event.target)) setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [open]);
+
+  const paymentCount = paymentStats?.pendingCount ?? 0;
+  const refundCount = refundStats?.pendingCount ?? 0;
+  const total = paymentCount + refundCount;
+
+  return (
+    <div className="dash__bell" ref={rootRef}>
+      <button
+        type="button"
+        className="dash__bell-trigger"
+        aria-label={`การแจ้งเตือน ${total} รายการ`}
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        🔔 {total}
+      </button>
+
+      {open && (
+        <div className="dash__bell-panel" role="menu">
+          <Link
+            to="/admin/payments"
+            className="dash__bell-item"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <span>การชำระเงินรอตรวจสอบ</span>
+            <span className="dash__bell-count">{paymentCount}</span>
+          </Link>
+          <Link
+            to="/admin/refunds"
+            className="dash__bell-item"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            <span>คำขอคืนเงินรอตรวจสอบ</span>
+            <span className="dash__bell-count">{refundCount}</span>
+          </Link>
+          {total === 0 && <p className="dash__bell-empty">ไม่มีรายการที่ต้องตรวจสอบ</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   variant,
   title,
   subtitle,
-  notifCount = 0,
   headerExtra,
   children,
 }) {
@@ -135,9 +200,7 @@ export default function DashboardLayout({
             {subtitle && <p className="dash__subtitle">{subtitle}</p>}
           </div>
           {headerExtra}
-          <div className="dash__bell" aria-label={`การแจ้งเตือน ${notifCount} รายการ`}>
-            🔔 {notifCount}
-          </div>
+          <NotificationBell />
         </header>
 
         <main className="dash__content">{children}</main>

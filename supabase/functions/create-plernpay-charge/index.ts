@@ -40,6 +40,23 @@ const json = (body: unknown, status = 200) =>
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 
+// ถ้าล้มเหลวหลังจากสร้างแถว payments (pending) ไปแล้ว ต้องปิดเคสเป็น
+// rejected ทันที ไม่งั้นแถวจะค้าง pending ตลอดไปแบบไม่มี gateway_charge_id
+// (check-plernpay-payment ไม่มี paymentId ฝั่ง frontend ให้ poll ต่อ และ
+// reconcile-plernpay-payments ก็ข้ามแถวที่ charge_id เป็น null โดยตั้งใจ) —
+// ทำให้มันค้างโชว์ "รอตรวจสอบ" ในคิวแอดมินตลอดไปทั้งที่ไม่เคยมี QR จริงเกิดขึ้น
+async function failPayment(paymentId: string, reason: string) {
+  await fetch(`${SUPABASE_URL}/rest/v1/rpc/fail_gateway_payment`, {
+    method: "POST",
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ p_payment_id: paymentId, p_charge_id: null, p_reason: reason }),
+  }).catch((err) => console.error("failPayment failed:", err));
+}
+
 // รหัส error ของ PlernPay ที่ผู้ใช้ปลายทางเจอได้จริง — ที่เหลือ (เช่น
 // 1000/1001 credentials ผิด, 1011 configuration required) เป็นความผิดฝั่ง
 // เราเอง ไม่ใช่สิ่งที่ผู้ใช้แก้ไขได้ จึงตอบข้อความกลางแทน
@@ -120,6 +137,7 @@ Deno.serve(async (req) => {
     console.error("PlernPay /v1/topup/create failed:", topupRes.status, JSON.stringify(topup));
     const message = PLERNPAY_ERROR_MESSAGES[topup?.code] ??
       "สร้าง QR พร้อมเพย์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+    await failPayment(payment.id, message);
     return json({ error: message }, 502);
   }
 
@@ -130,6 +148,7 @@ Deno.serve(async (req) => {
     qrImage = await QRCode.toDataURL(topup.qr_code, { margin: 1, width: 320 });
   } catch (err) {
     console.error("QR render failed:", err);
+    await failPayment(payment.id, "สร้างรูป QR ไม่สำเร็จ");
     return json({ error: "สร้างรูป QR ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง" }, 500);
   }
 

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useNotifications, useUnreadNotificationCount } from "../hooks/useNotifications";
+import { formatNotificationTime, markNotificationRead, notificationLink } from "../lib/notifications";
 import { logoShield } from "../assets/images";
 import "./AppHeader.css";
 
@@ -31,6 +33,99 @@ const RIGHT_LINKS = [
   { label: "จองสนามกีฬา", to: "/booking/sport" },
   { label: "ชุมชน", to: "/home" },
 ];
+
+// กระดิ่งฝั่งลูกค้า — ต่างจาก dash__bell ของแอดมิน (DashboardLayout.jsx) ตรง
+// ที่นี่ดึงแถวแจ้งเตือนของผู้ใช้เองจากตาราง notifications จริง (เขียนเข้ามา
+// จาก 5 RPC ฝั่งแอดมิน ดู 0037_wire_notifications.sql) ไม่ใช่ตัวเลขสรุปคิว
+function NotificationBell({ userId }) {
+  const [open, setOpen] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const rootRef = useRef(null);
+
+  const unreadCount = useUnreadNotificationCount(userId, reloadKey);
+  const { notifications, loading } = useNotifications(userId, reloadKey, 8);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (rootRef.current && !rootRef.current.contains(event.target)) setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [open]);
+
+  async function handleItemClick(item) {
+    setOpen(false);
+
+    if (!item.is_read) {
+      try {
+        await markNotificationRead(item.id);
+        setReloadKey((k) => k + 1);
+      } catch (err) {
+        console.error("markNotificationRead failed:", err);
+      }
+    }
+  }
+
+  if (!userId) return null;
+
+  return (
+    <div className="app-header__bell" ref={rootRef}>
+      <button
+        type="button"
+        className="app-header__bell-trigger"
+        aria-label={`การแจ้งเตือน ${unreadCount} รายการที่ยังไม่ได้อ่าน`}
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        🔔
+        {unreadCount > 0 && <span className="app-header__bell-badge">{unreadCount}</span>}
+      </button>
+
+      {open && (
+        <div className="app-header__bell-panel" role="menu">
+          <p className="app-header__bell-title">การแจ้งเตือน</p>
+
+          {loading && <p className="app-header__bell-empty">กำลังโหลด...</p>}
+
+          {!loading && notifications.length === 0 && (
+            <p className="app-header__bell-empty">ยังไม่มีการแจ้งเตือน</p>
+          )}
+
+          {!loading &&
+            notifications.map((item) => (
+              <Link
+                key={item.id}
+                to={notificationLink(item) ?? "/profile?tab=notifications"}
+                role="menuitem"
+                className={`app-header__bell-item ${
+                  item.is_read ? "" : "app-header__bell-item--unread"
+                }`}
+                onClick={() => handleItemClick(item)}
+              >
+                <span className="app-header__bell-item-title">{item.title}</span>
+                <span className="app-header__bell-item-message">{item.message}</span>
+                <span className="app-header__bell-item-time">
+                  {formatNotificationTime(item.created_at)}
+                </span>
+              </Link>
+            ))}
+
+          <Link
+            to="/profile?tab=notifications"
+            className="app-header__bell-viewall"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+          >
+            ดูการแจ้งเตือนทั้งหมด
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const MENU_ITEMS = [
   { label: "โปรไฟล์ของฉัน", desc: "ข้อมูลส่วนตัว และการตั้งค่า", to: "/profile" },
@@ -126,6 +221,8 @@ export default function AppHeader() {
             </button>
           </div>
         )}
+
+        <NotificationBell userId={user?.id} />
       </div>
 
       <nav className="app-header__links">

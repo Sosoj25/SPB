@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -29,13 +29,15 @@ const BookingPayment = lazy(() => import("./pages/BookingPayment"));
 const BookingReceipt = lazy(() => import("./pages/BookingReceipt"));
 const Facilities = lazy(() => import("./pages/Facilities"));
 const News = lazy(() => import("./pages/News"));
+const NewsDetail = lazy(() => import("./pages/NewsDetail"));
 const AdminOverview = lazy(() => import("./pages/AdminOverview"));
 const AdminBookings = lazy(() => import("./pages/AdminBookings"));
 const AdminFacilities = lazy(() => import("./pages/AdminFacilities"));
 const AdminFacilityPricing = lazy(() => import("./pages/AdminFacilityPricing"));
-const AdminFacilityImages = lazy(() => import("./pages/AdminFacilityImages"));
 const AdminSchedule = lazy(() => import("./pages/AdminSchedule"));
+const AdminCheckin = lazy(() => import("./pages/AdminCheckin"));
 const AdminPayments = lazy(() => import("./pages/AdminPayments"));
+const AdminRefunds = lazy(() => import("./pages/AdminRefunds"));
 const AdminPaymentSettings = lazy(() => import("./pages/AdminPaymentSettings"));
 const AdminNews = lazy(() => import("./pages/AdminNews"));
 const AdminNewsEditor = lazy(() => import("./pages/AdminNewsEditor"));
@@ -64,6 +66,7 @@ export default function App() {
             <Route path="/profile/edit" element={<ProfileEdit />} />
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/news" element={<News />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
 
             {/* ขั้นตอนการจอง — ส่ง state ระหว่างขั้นผ่าน query string
                 (?sport= ?facility= ?date= ?booking=) ไม่ใช้ state กลางทั้งแอป
@@ -83,9 +86,13 @@ export default function App() {
             <Route path="/admin/bookings" element={<AdminBookings />} />
             <Route path="/admin/facilities" element={<AdminFacilities />} />
             <Route path="/admin/pricing" element={<AdminFacilityPricing />} />
-            <Route path="/admin/photos" element={<AdminFacilityImages />} />
+            {/* รวมเข้ากับหน้าราคาแล้ว (ชื่อ ที่ตั้ง ราคา รูปภาพ อยู่หน้าเดียวกัน)
+                คงลิงก์เดิมไว้กันบุ๊กมาร์ก/ลิงก์เก่าพัง */}
+            <Route path="/admin/photos" element={<Navigate to="/admin/pricing" replace />} />
             <Route path="/admin/schedule" element={<AdminSchedule />} />
+            <Route path="/admin/checkin" element={<AdminCheckin />} />
             <Route path="/admin/payments" element={<AdminPayments />} />
+            <Route path="/admin/refunds" element={<AdminRefunds />} />
             <Route path="/admin/payments/settings" element={<AdminPaymentSettings />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/news/editor" element={<AdminNewsEditor />} />

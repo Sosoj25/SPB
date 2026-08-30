@@ -62,11 +62,12 @@
 
 .pricing-page__base-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.25rem;
 }
 
 .pricing-page__base-grid .dash-field {
-  flex: 1;
+  flex: 1 1 200px;
 }
 
 .pricing-page__section-header {
@@ -308,4 +309,226 @@
   .pricing-rule {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* ---------- ส่วนรูปภาพ (เดิมอยู่ AdminFacilityImages.css แยกไฟล์ ย้ายมารวม
+   เพราะหน้ารูปภาพถูกรวมเข้ากับหน้าราคาแล้ว) ---------- */
+
+.photos-page__section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.photos-page__hint {
+  margin: 0 0 1rem;
+  color: var(--color-muted-purple);
+  font-size: 1rem;
+}
+
+.photos-page__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.photos-page__dropzone {
+  cursor: pointer;
+}
+
+.photos-page__dropzone--over {
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+}
+
+.photos-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.photos-gallery__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.photos-gallery__item--dragging {
+  opacity: 0.4;
+}
+
+.photos-gallery__item--drag-over {
+  box-shadow: inset 0 0 0 3px var(--color-primary);
+  border-radius: 1.25rem;
+}
+
+.photos-gallery__thumb {
+  position: relative;
+  height: 150px;
+  border-radius: 1.25rem;
+  background-color: var(--color-tint-light);
+  background-size: cover;
+  background-position: center;
+  cursor: grab;
+}
+
+.photos-gallery__thumb--cover {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.photos-gallery__badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #fff;
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-pill);
+}
+
+.photos-gallery__badge--cover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.photos-gallery__caption {
+  background: none;
+  text-align: left;
+  font-weight: 700;
+  color: var(--color-heading);
+  padding: 0;
+}
+
+.photos-gallery__caption-input {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.photos-gallery__meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-faint-purple);
+}
+
+.photos-gallery__row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.photos-gallery__row-actions .dash-btn {
+  font-size: 0.8rem;
+  padding: 0.45rem 0.9rem;
+}
+
+.photos-preview-card {
+  border: 2px solid var(--color-tint-light);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.photos-preview-card__image {
+  height: 160px;
+  background-color: var(--color-tint-light);
+  background-size: cover;
+  background-position: center;
+}
+
+.photos-preview-card__body {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.photos-preview-card__name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-heading);
+}
+
+.photos-preview-card__sub {
+  margin: 0;
+  color: var(--color-muted-purple);
+}
+
+.photos-preview-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.photos-preview-card__price {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.05rem;
+}
+
+.photos-preview-card__cta {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.photos-page__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-faint-purple);
+}
+
+.photos-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.photos-requirements__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--color-muted-purple);
+}
+
+.photos-requirements__row strong {
+  color: var(--color-heading);
+}
+
+.photos-warning {
+  background: var(--color-warning-bg);
+  border-radius: 2rem;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.photos-warning__title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-warning-text);
+  font-size: 1.1rem;
+}
+
+.photos-warning__text {
+  margin: 0;
+  color: var(--color-warning-text);
+  line-height: 1.6;
+}
+
+.photos-warning__btn {
+  background: #fff;
+  border: 2px solid var(--color-warning-text);
+  color: var(--color-warning-text);
+  justify-content: center;
+  text-align: center;
 }

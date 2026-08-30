@@ -5,13 +5,29 @@ import {
   fetchAdminNewsStats,
   fetchNewsById,
   fetchPublicNews,
+  fetchPublicNewsById,
 } from "../lib/news";
 
 const EMPTY_NEWS_PAGE = { news: [], hasMore: false };
 const EMPTY_STATS = { published: 0, draft: 0, scheduled: 0, totalViews: 0 };
 
-export function usePublicNews() {
-  const { data, loading, error } = useAsyncData(() => fetchPublicNews(), "public-news", []);
+export function usePublicNews(limit = 60) {
+  const { data, loading, error } = useAsyncData(
+    () => fetchPublicNews({ limit }),
+    `public-news:${limit}`,
+    [],
+  );
+  return { news: data, loading, error };
+}
+
+// id มาจาก useParams() เสมอเป็น string — key เทียบ id ตรง ๆ ก็พอ ไม่ต้อง
+// แปลงเป็นตัวเลขเพราะ fetchPublicNewsById ส่งต่อให้ .eq() ซึ่งแปลงเองได้
+export function usePublicNewsById(id) {
+  const { data, loading, error } = useAsyncData(
+    () => fetchPublicNewsById(id),
+    id != null ? `public-news:${id}` : null,
+  );
+
   return { news: data, loading, error };
 }
 

@@ -199,6 +199,42 @@
   color: var(--color-muted-purple);
 }
 
+.admin-schedule__add-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-schedule__add-slot-fields {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.admin-schedule__add-slot-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-schedule__add-slot-field input {
+  border: 2px solid var(--color-tint-light);
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.admin-schedule__add-slot-error {
+  margin: 0;
+  color: var(--color-danger-text);
+  font-size: 0.9rem;
+}
+
 .admin-schedule__slots-label {
   margin: 0;
   font-weight: 700;
@@ -268,6 +304,21 @@
 .admin-schedule__slot-price strong {
   flex: 1;
   color: var(--color-heading);
+}
+
+.admin-schedule__slot-delete {
+  flex-shrink: 0;
+  border: 2px solid var(--color-danger-bg);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.admin-schedule__slot-delete:disabled {
+  opacity: 0.5;
 }
 
 @media (max-width: 1200px) {

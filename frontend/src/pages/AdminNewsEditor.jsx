@@ -1,23 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Switch } from "../components/DashboardWidgets";
+import ImageCropModal from "../components/ImageCropModal";
 import { useAuth } from "../context/useAuth";
 import { useNewsById } from "../hooks/useNews";
 import { NEWS_CATEGORIES, createNews, updateNews, uploadNewsCoverImage } from "../lib/news";
 import { assertImageFile } from "../lib/uploads";
 import { errorMessage } from "../lib/errors";
 import "./AdminNewsEditor.css";
-
-const TOOLBAR = [
-  { id: "bold", icon: "B", title: "ตัวหนา" },
-  { id: "italic", icon: "I", title: "ตัวเอียง" },
-  { id: "underline", icon: "U", title: "ขีดเส้นใต้" },
-  { id: "link", icon: "🔗", title: "แทรกลิงก์" },
-  { id: "list", icon: "≔", title: "รายการ" },
-  { id: "image", icon: "🖼", title: "แทรกรูปภาพ" },
-  { id: "quote", icon: "❝", title: "ข้อความคำพูด" },
-];
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -103,7 +94,7 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
   const [cover, setCover] = useState({ file: null, url: null });
   const [saving, setSaving] = useState("");
   const [saveError, setSaveError] = useState("");
-  const contentRef = useRef(null);
+  const [cropOpen, setCropOpen] = useState(false);
 
   // คืน object URL เมื่อเปลี่ยนรูปหรือออกจากหน้า
   useEffect(() => {
@@ -126,81 +117,14 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
     setCover(file ? { file, url: URL.createObjectURL(file) } : { file: null, url: null });
   }
 
-  function updateField(key, value) {
-    setForm((prev) => ({ ...prev, [key]: value }));
+  function handleCropConfirm(blob) {
+    const file = new File([blob], "cover.jpg", { type: "image/jpeg" });
+    setCover({ file, url: URL.createObjectURL(blob) });
+    setCropOpen(false);
   }
 
-  // ครอบ/แทรกไวยากรณ์รูปแบบข้อความลงในตำแหน่งเคอร์เซอร์ของ textarea
-  // แล้วคืนโฟกัส+เลือกข้อความใหม่ในเฟรมถัดไป (ต้องรอ state อัปเดต DOM ก่อน)
-  function applyFormatting(id) {
-    const textarea = contentRef.current;
-    if (!textarea) return;
-
-    const { selectionStart, selectionEnd, value } = textarea;
-    const selected = value.slice(selectionStart, selectionEnd);
-
-    function setSelectionLater(start, end) {
-      requestAnimationFrame(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, end);
-      });
-    }
-
-    function wrap(before, after = before, placeholder = "ข้อความ") {
-      const text = selected || placeholder;
-      const next = value.slice(0, selectionStart) + before + text + after + value.slice(selectionEnd);
-      updateField("content", next);
-      setSelectionLater(selectionStart + before.length, selectionStart + before.length + text.length);
-    }
-
-    function prefixLines(prefix) {
-      const start = value.lastIndexOf("\n", selectionStart - 1) + 1;
-      const nextNewline = value.indexOf("\n", selectionEnd);
-      const end = nextNewline === -1 ? value.length : nextNewline;
-      const updatedBlock = value
-        .slice(start, end)
-        .split("\n")
-        .map((line) => (line.startsWith(prefix) ? line : `${prefix}${line}`))
-        .join("\n");
-      const next = value.slice(0, start) + updatedBlock + value.slice(end);
-      updateField("content", next);
-      setSelectionLater(start, start + updatedBlock.length);
-    }
-
-    switch (id) {
-      case "bold":
-        wrap("**");
-        break;
-      case "italic":
-        wrap("*");
-        break;
-      case "underline":
-        wrap("<u>", "</u>");
-        break;
-      case "quote":
-        prefixLines("> ");
-        break;
-      case "list":
-        prefixLines("- ");
-        break;
-      case "link": {
-        const url = window.prompt("ใส่ลิงก์ (URL)");
-        if (!url) return;
-        wrap("[", `](${url})`, "ข้อความลิงก์");
-        break;
-      }
-      case "image": {
-        const url = window.prompt("ใส่ลิงก์รูปภาพ (URL)");
-        if (!url) return;
-        const insert = `![${selected || "รูปภาพ"}](${url})`;
-        const next = value.slice(0, selectionStart) + insert + value.slice(selectionEnd);
-        updateField("content", next);
-        setSelectionLater(selectionStart + insert.length, selectionStart + insert.length);
-        break;
-      }
-      default:
-        break;
-    }
+  function updateField(key, value) {
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   function removeTag(tag) {
@@ -343,27 +267,12 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
               />
             </div>
 
-            <div className="admin-editor__toolbar">
-              {TOOLBAR.map(({ id, icon, title }) => (
-                <button
-                  key={id}
-                  type="button"
-                  className="admin-editor__toolbar-btn"
-                  title={title}
-                  onClick={() => applyFormatting(id)}
-                >
-                  {icon}
-                </button>
-              ))}
-            </div>
-
             <div className="dash-field">
               <label className="dash-field__label" htmlFor="news-body">
                 รายละเอียด
               </label>
               <textarea
                 id="news-body"
-                ref={contentRef}
                 className="dash-textarea"
                 rows={9}
                 value={form.content}
@@ -386,10 +295,19 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
               onChange={(e) => pickCover(e.target.files?.[0] ?? null)}
             />
             {coverPreview && (
-              <div
-                className="admin-editor__thumb admin-editor__thumb--selected admin-editor__thumb--preview"
-                style={{ backgroundImage: `url(${coverPreview})` }}
-              />
+              <>
+                <div
+                  className="admin-editor__thumb admin-editor__thumb--selected admin-editor__thumb--preview"
+                  style={{ backgroundImage: `url(${coverPreview})` }}
+                />
+                <button
+                  type="button"
+                  className="dash-btn"
+                  onClick={() => setCropOpen(true)}
+                >
+                  ครอบตัด
+                </button>
+              </>
             )}
           </section>
         </div>
@@ -495,6 +413,14 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
           </section>
         </aside>
       </div>
+
+      {cropOpen && coverPreview && (
+        <ImageCropModal
+          imageUrl={coverPreview}
+          onCancel={() => setCropOpen(false)}
+          onConfirm={handleCropConfirm}
+        />
+      )}
     </DashboardLayout>
   );
 }

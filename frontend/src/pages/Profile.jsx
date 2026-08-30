@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import { useAuth } from "../context/useAuth";
 import { useUserBookings } from "../hooks/useBookings";
+import { useNotifications } from "../hooks/useNotifications";
 import { supabase } from "../lib/supabase";
 import {
   describeFacility,
@@ -12,6 +13,12 @@ import {
   formatTimeRange,
   BOOKING_PAGE_SIZE,
 } from "../lib/bookings";
+import {
+  formatNotificationTime,
+  markAllNotificationsRead,
+  markNotificationRead,
+  notificationLink,
+} from "../lib/notifications";
 import { bgField } from "../assets/images";
 import "./Profile.css";
 
@@ -218,43 +225,39 @@ function SecurityPanel({ user, isVerified }) {
 }
 
 function NotificationsPanel({ userId }) {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+  const { notifications, loading, error } = useNotifications(userId, reloadKey);
+  const hasUnread = notifications.some((item) => !item.is_read);
 
-  useEffect(() => {
-    if (!userId) return;
+  async function handleOpen(item) {
+    if (!item.is_read) {
+      try {
+        await markNotificationRead(item.id);
+        setReloadKey((k) => k + 1);
+      } catch (err) {
+        console.error("markNotificationRead failed:", err);
+      }
+    }
+  }
 
-    let mounted = true;
-
-    supabase
-      .from("notifications")
-      .select("id, title, message, is_read, created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(20)
-      .then(({ data, error: queryError }) => {
-        if (!mounted) return;
-
-        if (queryError) {
-          console.error("Notifications error:", queryError);
-          setError("ไม่สามารถโหลดการแจ้งเตือนได้");
-        } else {
-          setNotifications(data ?? []);
-        }
-
-        setLoading(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [userId]);
+  async function handleMarkAllRead() {
+    try {
+      await markAllNotificationsRead(userId);
+      setReloadKey((k) => k + 1);
+    } catch (err) {
+      console.error("markAllNotificationsRead failed:", err);
+    }
+  }
 
   return (
     <section className="profile-card">
       <div className="profile-card__header">
         <h2 className="profile-card__title">การแจ้งเตือน</h2>
+        {hasUnread && (
+          <button type="button" className="profile-btn profile-btn--small" onClick={handleMarkAllRead}>
+            ทำเครื่องหมายว่าอ่านแล้วทั้งหมด
+          </button>
+        )}
       </div>
 
       {loading && <p className="profile-empty">กำลังโหลดการแจ้งเตือน...</p>}
@@ -274,17 +277,42 @@ function NotificationsPanel({ userId }) {
 
       {!loading && !error && notifications.length > 0 && (
         <ul className="profile-notifications">
-          {notifications.map((item) => (
-            <li
-              key={item.id}
-              className={`profile-notification ${
-                item.is_read ? "" : "profile-notification--unread"
-              }`}
-            >
-              <p className="profile-notification__title">{item.title}</p>
-              <p className="profile-notification__message">{item.message}</p>
-            </li>
-          ))}
+          {notifications.map((item) => {
+            const link = notificationLink(item);
+            const content = (
+              <>
+                <div className="profile-notification__head">
+                  <p className="profile-notification__title">{item.title}</p>
+                  <span className="profile-notification__time">
+                    {formatNotificationTime(item.created_at)}
+                  </span>
+                </div>
+                <p className="profile-notification__message">{item.message}</p>
+              </>
+            );
+
+            const className = `profile-notification ${
+              item.is_read ? "" : "profile-notification--unread"
+            } ${link ? "profile-notification--link" : ""}`;
+
+            return (
+              <li key={item.id} className={className}>
+                {link ? (
+                  <Link to={link} className="profile-notification__body" onClick={() => handleOpen(item)}>
+                    {content}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="profile-notification__body"
+                    onClick={() => handleOpen(item)}
+                  >
+                    {content}
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>
@@ -294,7 +322,11 @@ function NotificationsPanel({ userId }) {
 export default function Profile() {
   const { user, profile } = useAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState("info");
+  const [searchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(
+    SIDEBAR_NAV.some((item) => item.key === requestedTab) ? requestedTab : "info",
+  );
   const [message] = useState(location.state?.message || "");
 
   const displayName =

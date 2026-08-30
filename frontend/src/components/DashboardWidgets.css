@@ -71,6 +71,18 @@
   color: var(--color-primary);
 }
 
+.stat-card__value--success {
+  color: var(--color-success-text);
+}
+
+.stat-card__value--warning {
+  color: var(--color-warning-text);
+}
+
+.stat-card__value--danger {
+  color: var(--color-danger-text);
+}
+
 .pagination {
   display: flex;
   align-items: center;
@@ -146,6 +158,17 @@
 .dash-pill--active {
   background: var(--color-primary);
   color: #fff;
+}
+
+.dash-pill--solid {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.dash-pill--ghost {
+  background: #fff;
+  border: 2px solid var(--color-disabled-text);
+  color: var(--color-disabled-text);
 }
 
 .dash-table {

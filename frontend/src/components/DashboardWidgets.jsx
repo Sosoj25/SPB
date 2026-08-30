@@ -4,11 +4,17 @@ export function Badge({ tone = "neutral", children }) {
   return <span className={`badge badge--${tone}`}>{children}</span>;
 }
 
-export function StatCard({ label, value, hint }) {
+export function StatCard({ label, value, hint, tone = "default" }) {
   return (
     <div className="stat-card">
       <p className="stat-card__label">{label}</p>
-      <p className="stat-card__value">{value}</p>
+      <p
+        className={`stat-card__value ${
+          tone !== "default" ? `stat-card__value--${tone}` : ""
+        }`}
+      >
+        {value}
+      </p>
       {hint && <p className="stat-card__hint">{hint}</p>}
     </div>
   );

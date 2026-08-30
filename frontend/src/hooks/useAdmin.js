@@ -8,12 +8,18 @@ import {
   fetchUserRoleCounts,
   fetchUsers,
 } from "../lib/admin";
+import { fetchAdminCheckins } from "../lib/checkin";
 import { fetchDaySlots, fetchMonthSlotSummary } from "../lib/schedule";
 import {
   ADMIN_PAYMENT_PAGE_SIZE,
   fetchAdminPaymentStats,
   fetchAdminPayments,
 } from "../lib/payments";
+import {
+  ADMIN_REFUND_PAGE_SIZE,
+  fetchAdminRefundStats,
+  fetchAdminRefunds,
+} from "../lib/refunds";
 
 const EMPTY_BOOKINGS_PAGE = { bookings: [], hasMore: false };
 const EMPTY_USERS_PAGE = { users: [], hasMore: false };
@@ -126,4 +132,42 @@ export function useAdminPaymentStats(reloadKey = 0) {
   );
 
   return { stats: data, loading, error };
+}
+
+const EMPTY_REFUNDS_PAGE = { refunds: [], hasMore: false };
+
+export function useAdminRefunds({
+  status,
+  page = 1,
+  limit = ADMIN_REFUND_PAGE_SIZE,
+  reloadKey = 0,
+}) {
+  const { data, loading, error } = useAsyncData(
+    () => fetchAdminRefunds({ status, page, limit }),
+    `admin-refunds:${status ?? ""}:${page}:${limit}:${reloadKey}`,
+    EMPTY_REFUNDS_PAGE,
+  );
+
+  return { refunds: data.refunds, hasMore: data.hasMore, loading, error };
+}
+
+export function useAdminRefundStats(reloadKey = 0) {
+  const { data, loading, error } = useAsyncData(
+    fetchAdminRefundStats,
+    `admin-refund-stats:${reloadKey}`,
+  );
+
+  return { stats: data, loading, error };
+}
+
+const EMPTY_CHECKINS = [];
+
+export function useAdminCheckins(reloadKey = 0) {
+  const { data, loading, error } = useAsyncData(
+    fetchAdminCheckins,
+    `admin-checkins:${reloadKey}`,
+    EMPTY_CHECKINS,
+  );
+
+  return { entries: data, loading, error };
 }

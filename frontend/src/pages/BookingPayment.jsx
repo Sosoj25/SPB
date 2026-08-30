@@ -22,6 +22,7 @@ import {
   submitBankTransferPayment,
   uploadPaymentSlip,
 } from "../lib/payments";
+import { fetchRefundPolicy } from "../lib/refundPolicy";
 import { errorMessage } from "../lib/errors";
 import { assertImageFile } from "../lib/uploads";
 import { sportImage } from "../lib/catalog";
@@ -31,9 +32,12 @@ const PAYMENT_LABELS = ["เลือกกีฬา", "เลือกสนา
 
 // PlernPay จำกัด 30 requests/นาทีต่อ API key "รวมทั้งระบบ" ไม่ใช่ต่อการจอง
 // เดียว และเกินแล้วแอปทั้งตัวจะถูก deactivate ทันที (ดูคอมเมนต์ใน
-// check-plernpay-payment) — เว้นช่วง poll ให้กว้างกว่าปกติไว้ก่อนตั้งใจ ถ้า
-// มีคนจ่ายพร้อมกันเยอะขึ้นในอนาคต ควรติดต่อขอเพิ่ม limit ไม่ใช่ลดค่านี้ลง
-const POLL_MS = 8000;
+// check-plernpay-payment) — เดิมตั้งไว้ที่ 8 วิเพื่อความปลอดภัยสูงสุด แต่ผู้ใช้
+// ยอมรับความเสี่ยงแล้วขอให้ลดลงมาที่ 4 วิเพื่อให้ลูกค้าไม่ต้องรอนาน (1 คน
+// poll ต่อเนื่อง = 15 req/min ยังเหลือ headroom ให้จ่ายพร้อมกันได้อีก ~1 คน
+// ก่อนชน limit รวม 30 req/min) ถ้ามีคนจ่ายพร้อมกันเยอะขึ้นในอนาคตควรติดต่อขอ
+// เพิ่ม limit แทนการลดค่านี้ลงอีก
+const POLL_MS = 4000;
 
 export default function BookingPayment() {
   const [params] = useSearchParams();
@@ -93,6 +97,10 @@ export default function BookingPayment() {
     fetchPrimaryPaymentAccount,
     "primary-payment-account",
   );
+
+  // นโยบายคืนเงินที่แอดมินตั้งไว้ (/admin/refunds, 0033) — แสดงให้ลูกค้าเห็น
+  // ก่อนตัดสินใจจ่ายเงิน
+  const { data: refundPolicy } = useAsyncData(fetchRefundPolicy, "refund-policy");
 
   // ถ้าช่องทางที่เลือกไว้ถูกแอดมินปิดไปแล้ว (หรือยังไม่เคยเลือก) ใช้ช่องทาง
   // แรกที่ยังเปิดอยู่แทน — คำนวณตอน render เลย ไม่ต้องมี effect ตั้ง state
@@ -345,7 +353,7 @@ export default function BookingPayment() {
                             เป๊ะตามยอดนี้ ไม่ใช่ยอดเต็มของ booking ไม่งั้นระบบจะจับคู่
                             รายการไม่เจอ */}
                         <p className="booking-qr__amount">
-                          โอนยอด {formatBaht(qr.uniqueAmount ?? booking.total_amount)} เป๊ะ ๆ
+                          โอนยอด {formatBaht(qr.uniqueAmount ?? booking.total_amount)}
                         </p>
                         <p className="booking-qr__waiting">
                           สแกนด้วยแอปธนาคารเพื่อชำระ
@@ -415,6 +423,44 @@ export default function BookingPayment() {
                   </div>
                 )}
               </section>
+
+              {refundPolicy && (
+                <section className="booking-panel">
+                  <h2 className="booking-panel__title">นโยบายคืนเงิน</h2>
+
+                  <div className="booking-row">
+                    <span className="booking-row__label">
+                      ยกเลิกก่อน {refundPolicy.fullRefundHours} ชม.
+                    </span>
+                    <span className="booking-row__value booking-row__value--success">
+                      คืนเต็มจำนวน
+                    </span>
+                  </div>
+                  <div className="booking-row">
+                    <span className="booking-row__label">
+                      ยกเลิกก่อน {refundPolicy.partialRefundHours} ชม.
+                    </span>
+                    <span className="booking-row__value booking-row__value--warning">
+                      คืน {refundPolicy.partialRefundPercent}%
+                    </span>
+                  </div>
+                  <div className="booking-row">
+                    <span className="booking-row__label">
+                      ยกเลิกน้อยกว่า {refundPolicy.partialRefundHours} ชม.
+                    </span>
+                    <span className="booking-row__value booking-row__value--danger">
+                      ไม่คืนเงิน
+                    </span>
+                  </div>
+
+                  <p className="booking-note">
+                    กรณีสนามไม่พร้อมใช้งานจากฝ่ายสนาม คืนเต็มจำนวนเสมอ ไม่ขึ้นกับเวลายกเลิก
+                  </p>
+                  <p className="booking-note">
+                    ยอดมัดจำ (ถ้ามี) ไม่คืนเสมอ ไม่ว่าจะยกเลิกก่อนเวลากี่ชั่วโมงก็ตาม
+                  </p>
+                </section>
+              )}
             </div>
 
             <section className="booking-panel">
@@ -440,7 +486,11 @@ export default function BookingPayment() {
 
               {booking.deposit_amount > 0 && (
                 <div className="booking-row">
-                  <span className="booking-row__label">ยอดมัดจำขั้นต่ำ</span>
+                  <span className="booking-row__label">
+                    ยอดมัดจำขั้นต่ำ
+                    <br />
+                    <span className="booking-row__hint">ไม่คืนเงินไม่ว่าจะยกเลิกเวลาใด</span>
+                  </span>
                   <span className="booking-row__value">{formatBaht(booking.deposit_amount)}</span>
                 </div>
               )}

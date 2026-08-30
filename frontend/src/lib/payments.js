@@ -95,6 +95,27 @@ export async function submitBankTransferPayment(bookingId, slipPath) {
   return data;
 }
 
+// ให้แอดมินเทียบชื่อบัญชีที่ลูกค้ากรอกตอนขอคืนเงิน (AdminRefunds.jsx) กับสลิป
+// การชำระเงินเดิมจริง ๆ — เอาแถวที่จ่ายสำเร็จ (status='approved') ล่าสุดของ
+// การจองนี้ ต่างจากเดิมที่กรองด้วย .not("slip_url", "is", null) เพราะการจ่าย
+// ผ่านพร้อมเพย์ QR (gateway='plernpay') ไม่เคยมีสลิปเลย — กรองแบบเดิมทำให้
+// แอดมินเจอ "ไม่พบสลิป" เสมอสำหรับบุ๊กกิ้งที่จ่ายผ่าน QR ทั้งที่จ่ายเงินจริง
+// แล้ว ต้องคืนข้อมูลพอให้แอดมินรู้ว่าเป็นการจ่ายช่องทางไหน ไม่ใช่แค่ path
+// ของสลิปอย่างเดียว
+export async function fetchLatestPaymentInfo(bookingId) {
+  const { data, error } = await supabase
+    .from("payments")
+    .select("payment_method, gateway, slip_url, amount, verified_at")
+    .eq("booking_id", bookingId)
+    .eq("status", "approved")
+    .order("verified_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchBookingPayment(bookingId) {
   const { data, error } = await supabase
     .from("payments")
@@ -120,6 +141,7 @@ const ADMIN_PAYMENT_SELECT = `
   amount,
   payment_method,
   gateway,
+  gateway_charge_id,
   status,
   slip_url,
   rejection_reason,
@@ -151,13 +173,20 @@ export const PAYMENT_REVIEW_STATUSES = ["pending", "paid"];
 export const PAYMENT_STATUS_LABELS = {
   pending: { label: "รอตรวจสอบ", tone: "warning" },
   paid: { label: "รอตรวจสอบ", tone: "warning" },
-  approved: { label: "อนุมัติแล้ว", tone: "success" },
+  approved: { label: "ชำระแล้ว", tone: "success" },
   rejected: { label: "ปฏิเสธ", tone: "danger" },
   unpaid: { label: "ยังไม่ชำระ", tone: "muted" },
 };
 
 export const describePaymentStatus = (status) =>
   PAYMENT_STATUS_LABELS[status] ?? { label: status ?? "—", tone: "muted" };
+
+const dateTimeFormatter = new Intl.DateTimeFormat("th-TH", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
+export const formatDateTime = (value) => (value ? dateTimeFormatter.format(new Date(value)) : "—");
 
 // ขอเกินมา 1 แถวเพื่อรู้ว่ามีหน้าถัดไปไหม เหมือน fetchAdminBookings
 export async function fetchAdminPayments({

@@ -43,31 +43,6 @@
   color: var(--color-heading);
 }
 
-.admin-editor__toolbar {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.admin-editor__toolbar-btn {
-  background: var(--color-tint-light);
-  color: var(--color-heading);
-  font-weight: 700;
-  font-size: 1.05rem;
-  width: 56px;
-  height: 48px;
-  border-radius: 0.75rem;
-}
-
-.admin-editor__toolbar-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.admin-editor__toolbar-btn:hover:not(:disabled) {
-  background: var(--color-tint);
-}
-
 .admin-editor__thumbs {
   display: flex;
   gap: 0.85rem;
@@ -149,9 +124,11 @@
 }
 
 .admin-editor__preview-photo {
-  height: 150px;
+  aspect-ratio: 440 / 280;
   border-radius: 0.75rem;
   background: var(--color-tint-light);
+  background-size: cover;
+  background-position: center;
 }
 
 .admin-editor__preview-eyebrow {

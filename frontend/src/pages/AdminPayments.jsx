@@ -8,6 +8,7 @@ import {
   describeMethod,
   describePaymentStatus,
   fetchSlipSignedUrl,
+  formatDateTime,
   rejectPayment,
 } from "../lib/payments";
 import {
@@ -29,7 +30,7 @@ import { errorMessage } from "../lib/errors";
 
 const FILTERS = [
   { key: "review", label: "รอตรวจสอบ" },
-  { key: "approved", label: "อนุมัติแล้ว" },
+  { key: "approved", label: "ชำระแล้ว" },
   { key: "rejected", label: "ปฏิเสธ" },
   { key: "", label: "ทั้งหมด" },
 ];
@@ -49,6 +50,49 @@ function describeBooking(payment) {
   )}`;
 }
 
+// พร้อมเพย์ (PlernPay) ไม่มีสลิปให้ดูเหมือนโอนบัญชี เพราะยืนยันอัตโนมัติผ่าน
+// API ตรง — สิ่งที่แทนสลิปได้คือเลขอ้างอิงฝั่ง PlernPay (gateway_charge_id)
+// กับเวลาที่ระบบยืนยันจริง (verified_at) ไว้ให้แอดมินอ้างอิงย้อนหลังได้
+function PaymentReferenceModal({ payment, onClose }) {
+  return (
+    <div className="dash-modal-overlay" onClick={onClose}>
+      <div className="dash-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="dash-modal__header">
+          <h2>อ้างอิงพร้อมเพย์ {payment.bookings?.booking_code ?? ""}</h2>
+          <button type="button" className="dash-modal__close" onClick={onClose} aria-label="ปิด">
+            ✕
+          </button>
+        </div>
+
+        <dl className="dash-modal__facts">
+          <div>
+            <dt>เลขอ้างอิง PlernPay</dt>
+            <dd>{payment.gateway_charge_id ?? "ยังไม่ได้รับ (สร้าง QR ไม่สำเร็จ)"}</dd>
+          </div>
+          <div>
+            <dt>ยอดชำระ</dt>
+            <dd>{formatBaht(payment.amount)}</dd>
+          </div>
+          <div>
+            <dt>สถานะ</dt>
+            <dd>{describePaymentStatus(payment.status).label}</dd>
+          </div>
+          <div>
+            <dt>เวลาที่ยืนยัน</dt>
+            <dd>{payment.verified_at ? formatDateTime(payment.verified_at) : "ยังไม่ยืนยัน"}</dd>
+          </div>
+          {payment.status === "rejected" && payment.rejection_reason && (
+            <div>
+              <dt>เหตุผล</dt>
+              <dd>{payment.rejection_reason}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPayments() {
   const [filter, setFilter] = useState("review");
   const [page, setPage] = useState(1);
@@ -56,6 +100,7 @@ export default function AdminPayments() {
   const [busyId, setBusyId] = useState(null);
   const [actionError, setActionError] = useState("");
   const [slipBusyId, setSlipBusyId] = useState(null);
+  const [viewingPayment, setViewingPayment] = useState(null);
 
   const { payments, hasMore, loading, error } = useAdminPayments({
     status: filter || undefined,
@@ -143,7 +188,7 @@ export default function AdminPayments() {
           value={stats ? stats.pendingCount : "—"}
           hint={stats ? formatBaht(stats.pendingAmount) : undefined}
         />
-        <StatCard label="อนุมัติวันนี้" value={stats ? stats.approvedToday : "—"} />
+        <StatCard label="ชำระวันนี้" value={stats ? stats.approvedToday : "—"} />
         <StatCard
           label="ยอดรับชำระเดือนนี้"
           value={stats ? formatBaht(stats.revenueMonth) : "—"}
@@ -227,6 +272,15 @@ export default function AdminPayments() {
                                 {slipBusyId === payment.id ? "กำลังเปิด..." : "ดูสลิป"}
                               </button>
                             )}
+                            {payment.gateway === "plernpay" && (
+                              <button
+                                type="button"
+                                className="dash-btn"
+                                onClick={() => setViewingPayment(payment)}
+                              >
+                                ดูอ้างอิง
+                              </button>
+                            )}
                             {waiting && (
                               <>
                                 <button
@@ -263,6 +317,13 @@ export default function AdminPayments() {
           </>
         )}
       </div>
+
+      {viewingPayment && (
+        <PaymentReferenceModal
+          payment={viewingPayment}
+          onClose={() => setViewingPayment(null)}
+        />
+      )}
     </DashboardLayout>
   );
 }

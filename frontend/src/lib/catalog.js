@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { toHhMm } from "./bookings";
+import { assertImageFile, imageExt } from "./uploads";
 import {
   sportBasketball,
   sportFootball,
@@ -29,7 +30,7 @@ const FACILITY_SELECT = `
   description,
   capacity,
   price_per_hour,
-  sports ( id, name ),
+  sports ( id, name, icon_url ),
   venues!inner ( id, name, address, phone, opening_time, closing_time ),
   facility_images ( image_url, is_primary, sort_order )
 `;
@@ -53,7 +54,7 @@ function toFacility(row) {
     venuePhone: row.venues?.phone ?? "",
     openingTime: toHhMm(row.venues?.opening_time),
     closingTime: toHhMm(row.venues?.closing_time),
-    image: images[0]?.image_url ?? sportImage(row.sports?.name),
+    image: images[0]?.image_url ?? row.sports?.icon_url ?? sportImage(row.sports?.name),
   };
 }
 
@@ -64,7 +65,7 @@ function toFacility(row) {
 export async function fetchSportCatalog() {
   const { data, error } = await supabase
     .from("sports")
-    .select("id, name, description, facilities ( id, price_per_hour, status )")
+    .select("id, name, description, icon_url, facilities ( id, price_per_hour, status )")
     .eq("is_active", true)
     .order("id");
 
@@ -80,7 +81,7 @@ export async function fetchSportCatalog() {
         id: sport.id,
         name: sport.name,
         description: sport.description ?? "",
-        image: sportImage(sport.name),
+        image: sport.icon_url || sportImage(sport.name),
         courtCount: open.length,
         minPrice: open.length
           ? Math.min(...open.map((f) => Number(f.price_per_hour)))
@@ -88,6 +89,55 @@ export async function fetchSportCatalog() {
       };
     })
     .filter((sport) => sport.courtCount > 0);
+}
+
+// ---------- Admin: รูปภาพประจำกีฬา ----------
+//
+// เป็นรูปตั้งต้นของกีฬานั้นบนหน้ารายการกีฬา และรูปสำรองของสนาม (toFacility
+// ด้านบน) เมื่อสนามยังไม่มีรูปของตัวเองใน facility_images — sports_admin_manage
+// (0000) ให้สิทธิ์ admin update ตาราง sports อยู่แล้ว ที่นี่แค่อัปโหลดไฟล์แล้ว
+// เขียน public URL ทับ icon_url เดิม
+export async function uploadSportIcon(file, sportId) {
+  assertImageFile(file);
+
+  const path = `${sportId}/${Date.now()}.${imageExt(file)}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("sport-images")
+    .upload(path, file, { upsert: true });
+  if (uploadError) throw uploadError;
+
+  const { data: publicData } = supabase.storage.from("sport-images").getPublicUrl(path);
+
+  const { error } = await supabase
+    .from("sports")
+    .update({ icon_url: publicData.publicUrl })
+    .eq("id", sportId);
+  if (error) throw error;
+
+  return publicData.publicUrl;
+}
+
+// ใช้ตอนยืนยันครอบตัดรูปกีฬา (ImageCropModal) — ผลลัพธ์จาก canvas เป็น jpeg
+// ที่ควบคุมขนาดไว้แล้วเสมอ จึงไม่ต้องเช็ค assertImageFile ซ้ำ (เหมือน
+// replaceImageFile ใน lib/facilityImages.js) คนละ path ใหม่กันแคชเบราว์เซอร์ค้าง
+export async function replaceSportIcon(blob, sportId) {
+  const path = `${sportId}/${Date.now()}-cropped.jpg`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("sport-images")
+    .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
+  if (uploadError) throw uploadError;
+
+  const { data: publicData } = supabase.storage.from("sport-images").getPublicUrl(path);
+
+  const { error } = await supabase
+    .from("sports")
+    .update({ icon_url: publicData.publicUrl })
+    .eq("id", sportId);
+  if (error) throw error;
+
+  return publicData.publicUrl;
 }
 
 export async function fetchFacilitiesBySport(sportId) {

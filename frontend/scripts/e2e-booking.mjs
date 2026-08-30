@@ -185,7 +185,7 @@ if (!free.length) {
 section("3. สร้างการจอง");
 
 const target = free[free.length - 1];
-const booking = await call("/rest/v1/rpc/create_booking", { p_slot_id: target.slot_id });
+const booking = await call("/rest/v1/rpc/create_booking", { p_slot_ids: [target.slot_id] });
 const created = booking && !booking.__error__;
 check(
   "create_booking",
@@ -256,11 +256,61 @@ check("เรียก complete_past_bookings ไม่ได้",
 
 check("ไม่ล็อกอินแล้วจองไม่ได้",
   errorOf(await call("/rest/v1/rpc/create_booking",
-    { p_slot_id: target.slot_id }, { auth: false })).includes("permission denied"));
+    { p_slot_ids: [target.slot_id] }, { auth: false })).includes("permission denied"));
 
 check("จองช่วงเดิมซ้ำไม่ได้",
-  errorOf(await call("/rest/v1/rpc/create_booking", { p_slot_id: target.slot_id }))
+  errorOf(await call("/rest/v1/rpc/create_booking", { p_slot_ids: [target.slot_id] }))
     .includes("ถูกจองไปแล้ว"));
+
+// --------------------------------------------------------------------------
+
+section("3b. จองหลายช่วงเวลาต่อกันในครั้งเดียว");
+
+const adjacentPair = free
+  .slice(0, free.length - 1)
+  .map((s, i) => [s, free[i + 1]])
+  .find(([a, b]) => a.slot_end === b.slot_start);
+
+if (!adjacentPair) {
+  console.log("ข้าม: ไม่มีช่วงว่างที่ต่อกันเหลือให้ทดสอบ");
+} else {
+  const [slotA, slotB] = adjacentPair;
+  const nonAdjacent = free.find((s) => s.slot_start !== slotA.slot_end && s !== slotA);
+
+  if (nonAdjacent) {
+    check("เลือกช่วงไม่ต่อกันแล้วโดนปฏิเสธ",
+      errorOf(await call("/rest/v1/rpc/create_booking", {
+        p_slot_ids: [slotA.slot_id, nonAdjacent.slot_id],
+      })).includes("ต่อเนื่องกัน"));
+  }
+
+  const multiBooking = await call("/rest/v1/rpc/create_booking", {
+    p_slot_ids: [slotA.slot_id, slotB.slot_id],
+  });
+  const multiCreated = multiBooking && !multiBooking.__error__;
+  check("create_booking หลายช่วงต่อกัน", multiCreated,
+    multiCreated
+      ? `${multiBooking.booking_code} ${multiBooking.start_time}-${multiBooking.end_time} = ${multiBooking.total_amount}`
+      : errorOf(multiBooking));
+
+  if (multiCreated) {
+    check("start/end ครอบคลุมทั้งสองช่วง",
+      multiBooking.start_time === slotA.slot_start && multiBooking.end_time === slotB.slot_end);
+
+    const afterMulti = await call("/rest/v1/rpc/facility_slots", {
+      p_facility_id: facility.id,
+      p_date: date,
+    });
+    check("ทั้งสอง slot ถูกกันพร้อมกัน",
+      afterMulti.find((s) => s.slot_id === slotA.slot_id)?.is_booked === true &&
+      afterMulti.find((s) => s.slot_id === slotB.slot_id)?.is_booked === true);
+
+    const cancelledMulti = await call("/rest/v1/rpc/cancel_booking", {
+      p_booking_id: multiBooking.id,
+    });
+    check("ยกเลิกการจองหลายช่วงได้", cancelledMulti?.status === "cancelled");
+  }
+}
 
 check("รีวิวสนามที่ยังไม่ได้ไปเล่นไม่ได้",
   errorOf(await call("/rest/v1/reviews", {
