@@ -1036,6 +1036,17 @@
   font-size: 1.3rem;
 }
 
+.booking-qr__countdown {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-warning-text);
+}
+
+.booking-qr__countdown--expiring {
+  color: var(--color-danger-text);
+}
+
 /* ---------- อัปโหลดสลิป ---------- */
 
 .booking-file {

@@ -39,6 +39,12 @@ const PAYMENT_LABELS = ["เลือกกีฬา", "เลือกสนา
 // เพิ่ม limit แทนการลดค่านี้ลงอีก
 const POLL_MS = 4000;
 
+function formatQrCountdown(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 export default function BookingPayment() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -55,6 +61,7 @@ export default function BookingPayment() {
   const [qr, setQr] = useState(null); // { paymentId, qrImage, uniqueAmount, expiresAt }
   const [qrLoading, setQrLoading] = useState(false);
   const [qrError, setQrError] = useState("");
+  const [qrNowTick, setQrNowTick] = useState(() => Date.now());
   const pollRef = useRef(null);
 
   // ---------- โอนผ่านบัญชี + สลิป ----------
@@ -129,6 +136,29 @@ export default function BookingPayment() {
     };
   }, []);
 
+  // นับถอยหลังเวลาหมดอายุของ QR ให้ลูกค้าเห็นชัด ๆ — เดิมหน้านี้ไม่เคยบอกเลย
+  // ว่า QR มีเวลาจำกัดแค่ไหน (PlernPay หมดอายุ QR ที่ ~5 นาที) ลูกค้าจึงไม่รู้
+  // ว่าต้องรีบโอน สแกนแล้วเดินไปทำอย่างอื่นก่อนอาจโอนไม่ทันแล้วโดน "QR หมดอายุ"
+  // ทั้งที่คิดว่าโอนสำเร็จแล้ว — คำนวณเป็นค่า derived จาก qrNowTick แทนการยิง
+  // setState ตรง ๆ ใน effect (react-hooks/set-state-in-effect)
+  useEffect(() => {
+    if (!qr) return undefined;
+
+    const id = setInterval(() => setQrNowTick(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [qr]);
+
+  const qrSecondsLeft = qr
+    ? Math.max(
+        0,
+        Math.round(
+          ((qr.expiresAt ? new Date(qr.expiresAt).getTime() : qr.generatedAt + (qr.expiresIn ?? 300) * 1000) -
+            qrNowTick) /
+            1000,
+        ),
+      )
+    : null;
+
   // poll สถานะการจ่ายเป็นระยะจนกว่าจะ approved/rejected หรือออกจากหน้านี้ —
   // เรียกผ่าน Edge Function เสมอ (ไม่อ่านตาราง payments ตรง ๆ) เพราะ
   // check-plernpay-payment เป็นคนไปถาม PlernPay จริงและอัปเดตสถานะให้ในตัว
@@ -185,7 +215,8 @@ export default function BookingPayment() {
 
     try {
       const result = await createPlernpayCharge(bookingId);
-      setQr(result);
+      setQr({ ...result, generatedAt: Date.now() });
+      setQrNowTick(Date.now());
     } catch (err) {
       console.error("createPlernpayCharge failed:", err);
       setQrError(errorMessage(err));
@@ -355,6 +386,18 @@ export default function BookingPayment() {
                         <p className="booking-qr__amount">
                           โอนยอด {formatBaht(qr.uniqueAmount ?? booking.total_amount)}
                         </p>
+                        {qrSecondsLeft > 0 ? (
+                          <p className="booking-qr__countdown">
+                            QR หมดอายุใน {formatQrCountdown(qrSecondsLeft)} นาที กรุณาโอนก่อนหมดเวลา
+                          </p>
+                        ) : (
+                          qrSecondsLeft === 0 && (
+                            <p className="booking-qr__countdown booking-qr__countdown--expiring">
+                              QR อาจหมดอายุแล้ว ถ้าคุณโอนเงินไปแล้วกำลังตรวจสอบขั้นสุดท้ายให้อยู่
+                              ถ้าไม่สำเร็จภายในไม่กี่วินาที กรุณากด &quot;สร้าง QR ใหม่&quot;
+                            </p>
+                          )
+                        )}
                         <p className="booking-qr__waiting">
                           สแกนด้วยแอปธนาคารเพื่อชำระ
                           <br />
