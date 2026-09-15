@@ -1,3 +1,5 @@
+/* หน้าอ่านข่าว รวมสไตล์ของเนื้อหาที่ lib/newsContent.jsx วาดออกมา */
+
 .news-detail {
   --editorial-serif: "Noto Serif Thai", var(--font-main);
   --editorial-sans: "Sarabun", var(--font-main);
@@ -141,4 +143,61 @@
 
 .news-content__list li {
   margin-bottom: 0.5rem;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 900px) {
+  .news-detail__main {
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+
+  .news-detail__photo {
+    margin-bottom: 1.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .news-detail__main {
+    padding: 1.5rem 0.9rem 2.5rem;
+  }
+
+  .news-detail__back {
+    margin-bottom: 1.25rem;
+  }
+
+  .news-detail__subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* เนื้อข่าวอ่านยาว ๆ บนจอแคบ — ลดขนาดลงนิดแต่คงระยะบรรทัดโปร่งไว้เท่าเดิม
+     ให้สายตายังไล่บรรทัดได้โดยไม่หลง */
+  .news-detail__content {
+    font-size: 1.02rem;
+    line-height: 1.8;
+  }
+
+  .news-detail__photo {
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+  }
+
+  .news-content__image {
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .news-detail__main {
+    padding: 1.25rem 0.6rem 2.5rem;
+  }
 }

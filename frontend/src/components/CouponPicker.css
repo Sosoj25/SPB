@@ -1,0 +1,175 @@
+/* กล่องคูปองในหน้าชำระเงิน — อยู่ในการ์ด "สรุปยอดชำระ" จึงใช้โทนม่วงอ่อน
+   เดียวกับหน้าแลกรางวัลเพื่อให้เห็นว่าเป็นของระบบเดียวกัน */
+.coupon {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1.1rem 1.2rem;
+  margin: 0.5rem 0;
+  border-radius: 1.25rem;
+  background: var(--color-tint-light);
+}
+
+.coupon__title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.coupon__empty {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+/* รายการคูปองที่ใช้ได้ — กดทั้งแถวได้เลย ไม่ต้องกดปุ่มเล็ก ๆ ที่ท้ายแถว */
+.coupon__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  background: #fff;
+  font-family: inherit;
+}
+
+.coupon__option:hover:not(:disabled) {
+  box-shadow: 0 0 0 2px var(--color-primary) inset;
+}
+
+.coupon__option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.coupon__option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.coupon__option-name {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--color-heading);
+}
+
+.coupon__option-meta {
+  font-size: 0.82rem;
+  color: var(--color-faint-purple);
+}
+
+.coupon__option-benefit {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.coupon__manual {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.coupon__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 2px solid #fff;
+  background: #fff;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: var(--color-text);
+}
+
+.coupon__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.coupon__apply {
+  flex-shrink: 0;
+  padding: 0.7rem 1.2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.coupon__apply:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.coupon__apply:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* สถานะ "ใช้คูปองแล้ว" — เขียวเพื่อให้ต่างจากกล่องที่ยังต้องเลือก */
+.coupon__applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.coupon__applied-title {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-success-text);
+}
+
+.coupon__applied-note {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-muted-purple);
+}
+
+.coupon__remove {
+  flex-shrink: 0;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  color: var(--color-danger-text);
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.coupon__remove:hover:not(:disabled) {
+  background: var(--color-danger-bg);
+}
+
+.coupon__error {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--color-danger-text);
+  font-weight: 600;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .coupon {
+    padding: 0.9rem 1rem;
+  }
+}

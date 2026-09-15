@@ -1,5 +1,8 @@
+/* หน้าโปรไฟล์และหน้าแก้ไขโปรไฟล์ (ProfileEdit ใช้ไฟล์นี้ร่วมกัน) */
+
 .profile {
-  min-height: 100vh;
+  /* 100dvh = ความสูงที่เห็นจริงบนมือถือ (ดูเหตุผลเต็มใน index.css) */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-size: cover;
@@ -41,6 +44,8 @@
 .profile__sidebar-banner {
   height: 110px;
   background: linear-gradient(120deg, var(--color-primary), #c9a8ff);
+  background-size: cover;
+  background-position: center;
 }
 
 .profile__sidebar-body {
@@ -298,6 +303,58 @@
   display: none;
 }
 
+.profile-cover-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.profile-cover-upload__preview {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(120deg, var(--color-primary), #c9a8ff);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-cover-upload__placeholder {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.profile-sport-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.profile-sport-chip {
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-tint-light);
+  background: var(--color-tint-light);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.profile-sport-chip:hover {
+  background: var(--color-on-primary-soft);
+}
+
+.profile-sport-chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
 .profile-card__actions {
   display: flex;
   justify-content: flex-end;
@@ -344,9 +401,16 @@
   padding: 1.75rem 2rem;
 }
 
+/* กรอบ + จำกัดความสูง ไม่งั้นประวัติยาวเท่าไหร่หน้าโปรไฟล์ก็ยาวตามไม่มีเพดาน
+   (ยิ่งกด "ดูเพิ่มเติม" ยิ่งยาว) — เลื่อนดูภายในกรอบนี้แทน หัวตารางค้างด้านบน
+   ด้วย sticky ให้ยังเห็นชื่อคอลัมน์ตลอดตอนเลื่อน */
 .profile-table {
   display: flex;
   flex-direction: column;
+  max-height: 520px;
+  overflow-y: auto;
+  border-top: 1px solid var(--color-tint-light);
+  border-bottom: 1px solid var(--color-tint-light);
 }
 
 .profile-table__row {
@@ -357,6 +421,9 @@
 }
 
 .profile-table__row--head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: var(--color-tint-light);
   color: var(--color-heading);
   font-weight: 700;
@@ -372,23 +439,48 @@
 }
 
 .profile-table__cell--type {
-  flex: 2.1;
-}
-
-.profile-table__cell--court {
-  flex: 1.1;
+  flex: 2.4;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .profile-table__cell--time {
-  flex: 2.3;
+  flex: 1.8;
 }
 
 .profile-table__cell--status {
-  flex: 1.9;
+  flex: 1.7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.profile-table__cell--amount {
+  flex: 1.3;
+  font-weight: 700;
+  color: var(--color-heading);
 }
 
 .profile-table__cell--date {
-  flex: 2;
+  flex: 1.6;
+}
+
+.profile-table__primary {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.profile-table__secondary {
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.profile-table__code {
+  font-size: 0.78rem;
+  color: var(--color-faint-purple);
+  font-family: monospace;
 }
 
 .profile-status {
@@ -400,9 +492,15 @@
   white-space: nowrap;
 }
 
-.profile-status--booked {
-  background: var(--color-tint-light);
-  color: var(--color-primary);
+.profile-status--booked,
+.profile-status--waiting {
+  background: #e7e2ff;
+  color: #5a3fc0;
+}
+
+.profile-status--confirmed {
+  background: #dbeeff;
+  color: #1a5fa8;
 }
 
 .profile-status--success {
@@ -416,8 +514,72 @@
 }
 
 .profile-status--cancelled {
+  background: #ece7f3;
+  color: #6b6478;
+}
+
+.profile-status--rejected {
   background: #fde2e2;
   color: #9c2b2b;
+}
+
+.profile-status--upcoming {
+  background: #dcf3ee;
+  color: #16785f;
+}
+
+.profile-status--review {
+  background: #ffe6cf;
+  color: #b35c00;
+}
+
+.profile-status--no_show {
+  background: #eee3da;
+  color: #7a5a3d;
+}
+
+/* แท็บกรองสถานะประวัติการจอง */
+.profile-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0 2rem 1.5rem;
+}
+
+.profile-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fbf9ff;
+  border: 2px solid var(--color-tint-light);
+  color: var(--color-muted-purple);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-filter:hover {
+  border-color: var(--color-primary);
+}
+
+.profile-filter--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.profile-filter__count {
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  font-size: 0.78rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.profile-filter--active .profile-filter__count {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Empty / loading states */
@@ -477,10 +639,33 @@
 .profile-notifications {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-height: 520px;
+  overflow-y: auto;
+  border: 2px solid var(--color-tint-light);
+  border-radius: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary) transparent;
+}
+
+.profile-notifications::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-notifications::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.profile-notifications::-webkit-scrollbar-thumb {
+  background: var(--color-tint-light);
+  border-radius: 8px;
+}
+
+.profile-notifications::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }
 
 .profile-notification {
@@ -489,6 +674,7 @@
   border-left-width: 6px;
   border-radius: 20px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .profile-notification--unread {
@@ -515,10 +701,26 @@
 }
 
 .profile-notification__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   margin: 0;
   color: var(--color-heading);
   font-weight: 700;
   font-size: 1rem;
+}
+
+/* ใบที่ยังมีงานค้าง (รอรีวิว / รอกดยืนยันรับของ) — อ่านแล้วก็ยังไม่หาย
+   ป้ายนี้บอกว่าทำไม ดูคู่กับ app-header__bell-item-tag ที่กระดิ่ง */
+.profile-notification__tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .profile-notification__time {
@@ -544,33 +746,11 @@
   font-size: 0.95rem;
 }
 
-@media (max-width: 900px) {
-  .profile-fields {
-    grid-template-columns: 1fr;
-  }
 
-  .profile-table__row {
-    flex-wrap: wrap;
-    gap: 0.4rem 1rem;
-  }
 
-  .profile-table__cell {
-    flex: 1 1 45%;
-  }
-}
 
-@media (max-width: 600px) {
-  .profile-card {
-    padding: 1.75rem;
-    border-radius: 32px;
-  }
 
-  .profile-history__header,
-  .profile-table__row,
-  .profile-history__footer {
-    padding: 1.25rem;
-  }
-}
+
 
 /* แถวประวัติการจองกดเข้าไปดูใบเสร็จได้ ต้องมีสัญญาณว่ากดได้ */
 .profile-table__row--link {
@@ -597,4 +777,180 @@
 
 .profile-more:hover {
   background: var(--color-card-tint);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 900px) {
+  .profile-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-table__row {
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+  }
+
+  .profile-table__cell {
+    flex: 1 1 45%;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile__main {
+    padding: 1.25rem 0.85rem 2.5rem;
+  }
+
+  .profile__layout {
+    gap: 1.25rem;
+  }
+
+  /* สองคอลัมน์นี้ขอความกว้างขั้นต่ำ 280px และ 320px ซึ่งบนจอ 360px (หักระยะ
+     ขอบแล้วเหลือ ~310px) กลายเป็นตัวดันให้ทั้งหน้าเลื่อนซ้ายขวาได้ */
+  .profile__sidebar,
+  .profile__content {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .profile__sidebar {
+    border-radius: 28px;
+  }
+
+  .profile__sidebar-body {
+    padding: 0 1.1rem 1.5rem;
+  }
+
+  .profile__content {
+    gap: 1.25rem;
+  }
+
+  .profile-card {
+    padding: 1.35rem;
+    border-radius: 28px;
+    gap: 1.15rem;
+  }
+
+  .profile-card__title {
+    font-size: 1.25rem;
+  }
+
+  /* คำอธิบายท้ายหัวข้อเคยห้ามตกบรรทัด พอจอแคบมันเลยไปเบียดหัวข้อจนหักคำ */
+  .profile-card__hint {
+    white-space: normal;
+  }
+
+  .profile-card__header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .profile-history__header,
+  .profile-table__row,
+  .profile-history__footer {
+    padding: 1rem 1.1rem;
+  }
+
+  .profile-filter-bar {
+    padding: 0 1.1rem 1.1rem;
+    gap: 0.45rem;
+  }
+
+  .profile-filter {
+    font-size: 0.82rem;
+    padding: 0.4rem 0.85rem;
+  }
+
+  .profile-notifications,
+  .profile-table {
+    max-height: 420px;
+  }
+
+  /* ตารางประวัติ 5 คอลัมน์ไม่มีทางอ่านออกบนจอมือถือ — หัวตารางถูกถอดทิ้ง
+     แล้วแต่ละรายการกลายเป็นการ์ดที่เรียงข้อมูลลงล่าง (ชนิด/เวลา/สถานะ/ยอด/
+     วันที่) แทนการบีบห้าช่องให้อยู่ในบรรทัดเดียว */
+  .profile-table__row--head {
+    display: none;
+  }
+
+  .profile-table__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .profile-table__row + .profile-table__row {
+    border-top: 1px solid var(--color-tint-light);
+  }
+
+  .profile-table__cell {
+    flex: none;
+    width: 100%;
+    font-size: 0.95rem;
+  }
+
+  .profile-table__cell--amount {
+    font-size: 1.05rem;
+  }
+
+  .profile-setting {
+    padding: 1rem 1.1rem;
+    gap: 0.75rem;
+  }
+
+  .profile-card__actions {
+    flex-direction: column-reverse;
+  }
+
+  .profile-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profile-btn--small {
+    width: auto;
+  }
+
+  .profile-notification__body {
+    padding: 0.85rem 1rem;
+  }
+
+  .profile-notification__head {
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .profile__main {
+    padding: 1rem 0.6rem 2.5rem;
+  }
+
+  .profile-card {
+    padding: 1.1rem;
+    border-radius: 22px;
+  }
+
+  .profile__avatar {
+    width: 92px;
+    height: 92px;
+    font-size: 2.4rem;
+  }
+
+  /* สามช่องสถิติเรียงข้างกันเหลือช่องละ ~90px ตัวเลขหลักพันจะตกบรรทัด */
+  .profile__stats {
+    flex-wrap: wrap;
+  }
+
+  .profile__stat {
+    flex: 1 1 45%;
+  }
 }

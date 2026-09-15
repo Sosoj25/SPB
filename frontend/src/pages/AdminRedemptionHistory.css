@@ -1,0 +1,140 @@
+/* ประวัติการแลกรางวัลฝั่งแอดมิน — ตารางกว้าง 7 คอลัมน์ที่ต้องอ่านเทียบกันเป็น
+   แถว จึงใช้ table จริงแทนการ์ดแบบหน้าคำขอแลกรางวัล */
+
+/* แถว KPI ชุดที่สองเป็นตัวเลขรอง (หมดอายุ/ยกเลิก/แต้ม/สมาชิก) — ย่อลงมาให้
+   ไม่แย่งสายตากับสี่ช่องบนที่เป็นคำถามหลักของหน้านี้ */
+.admin-redeem__kpi-secondary {
+  margin-top: -0.5rem;
+  opacity: 0.9;
+}
+
+.admin-redeem__card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-redeem__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.admin-redeem__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+/* ตารางกว้างกว่าจอแคบเสมอ — ให้เลื่อนในกล่องของตัวเอง ไม่ใช่ดันทั้งหน้าให้
+   เลื่อนแนวนอน */
+.admin-redeem__scroll {
+  overflow-x: auto;
+}
+
+.admin-redeem__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-redeem__table th,
+.admin-redeem__table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.admin-redeem__table th {
+  background: var(--color-surface-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-muted-purple);
+}
+
+.admin-redeem__table tbody tr + tr {
+  border-top: 1px solid #f2ecfd;
+}
+
+.admin-redeem__table tbody tr:hover {
+  background: #fbf9ff;
+}
+
+.admin-redeem__who,
+.admin-redeem__reward {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.admin-redeem__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-tint-light);
+  flex-shrink: 0;
+}
+
+.admin-redeem__name {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.admin-redeem__sub {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-redeem__code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ความคืบหน้าเป็นข้อความอิสระ (เลขพัสดุ ชื่อขนส่ง หรือ used_note ที่ระบบเขียน
+   ให้) — ตัดที่ความกว้างคงที่ ไม่ให้คอลัมน์เดียวดันตารางยาวออกไปเรื่อย ๆ */
+.admin-redeem__progress {
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-muted-purple);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .admin-redeem__head {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem 1.1rem;
+  }
+
+  .admin-redeem__table th,
+  .admin-redeem__table td {
+    padding: 0.7rem 0.8rem;
+  }
+
+  /* คอลัมน์ความคืบหน้าเดิมกว้างได้ถึง 20rem ซึ่งบนมือถือแปลว่าต้องปัดผ่าน
+     คอลัมน์เดียวนี้เกือบทั้งจอ */
+  .admin-redeem__progress {
+    max-width: 11rem;
+  }
+
+  .admin-redeem__kpi-secondary {
+    margin-top: 0;
+  }
+}

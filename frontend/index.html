@@ -4,6 +4,45 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/webp" href="/favicon.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#6610f2" />
+
+    <!--
+      description + OG tag มีไว้ให้ลิงก์ที่แชร์ลง LINE / Facebook / X ขึ้นเป็น
+      การ์ดพรีวิวที่มีข้อความ ไม่ใช่กล่องเปล่าที่มีแต่ URL
+      (หน้า Landing เป็นหน้าสาธารณะ จึงเป็นหน้าที่ถูกแชร์จริง)
+    -->
+    <meta
+      name="description"
+      content="จองสนามกีฬาออนไลน์ล่วงหน้า เลือกสนาม เลือกเวลา จ่ายผ่านพร้อมเพย์หรือโอนธนาคาร พร้อมสะสมแต้มแลกของรางวัล"
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="th_TH" />
+    <meta property="og:site_name" content="SPORTSBOOKING" />
+    <meta property="og:title" content="SPORTSBOOKING — จองสนามกีฬาออนไลน์" />
+    <meta
+      property="og:description"
+      content="จองสนามกีฬาออนไลน์ล่วงหน้า เลือกสนาม เลือกเวลา จ่ายผ่านพร้อมเพย์หรือโอนธนาคาร พร้อมสะสมแต้มแลกของรางวัล"
+    />
+
+    <!--
+      og:url กับ og:image ยังไม่ได้ใส่เพราะทั้งคู่ต้องเป็น URL เต็มที่ขึ้นต้นด้วย
+      โดเมนจริง (crawler ไม่ resolve path เปล่า ๆ ให้) ซึ่งยังไม่มีที่ไหนในโปรเจกต์
+      บอกไว้ว่าโดเมน production คืออะไร
+      เมื่อรู้โดเมนแล้วให้เติมสองบรรทัดนี้ พร้อมวางรูปขนาด 1200x630 ไว้ที่
+      public/og-cover.webp:
+        <meta property="og:url"   content="https://<โดเมนจริง>/" />
+        <meta property="og:image" content="https://<โดเมนจริง>/og-cover.webp" />
+      ระหว่างที่ยังไม่มีรูป การ์ดพรีวิวจะขึ้นเป็นแบบข้อความล้วน
+    -->
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="SPORTSBOOKING — จองสนามกีฬาออนไลน์" />
+    <meta
+      name="twitter:description"
+      content="จองสนามกีฬาออนไลน์ล่วงหน้า เลือกสนาม เลือกเวลา จ่ายผ่านพร้อมเพย์หรือโอนธนาคาร พร้อมสะสมแต้มแลกของรางวัล"
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -1,0 +1,273 @@
+/* กล่องเขียน/แก้ไขโพสต์ชุมชน */
+
+.cp-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(26, 10, 54, 0.45);
+}
+
+.cp-dialog {
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.cp-dialog__head {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+}
+
+.cp-dialog__head-spacer {
+  width: 2rem;
+}
+
+.cp-dialog__title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-heading);
+}
+
+.cp-dialog__close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.cp-dialog__close:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.cp-dialog__close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cp-dialog__divider {
+  border: none;
+  border-top: 1px solid #efe6fb;
+  margin: 0;
+}
+
+.cp-dialog__body {
+  padding: 1.1rem 1.25rem 1.4rem;
+}
+
+.cp-dialog__author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.cp-dialog__author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cp-dialog__category-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.cp-dialog__category {
+  appearance: none;
+  padding: 0.25rem 1.5rem 0.25rem 0.75rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cp-dialog__category-caret {
+  position: absolute;
+  top: 50%;
+  right: 0.65rem;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: var(--color-primary);
+  pointer-events: none;
+}
+
+.cp-dialog__textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.cp-dialog__textarea::placeholder {
+  color: var(--color-muted-purple);
+}
+
+.cp-dialog__textarea:focus {
+  outline: none;
+}
+
+.cp-dialog__image-single,
+.cp-dialog__image-grid {
+  margin-top: 0.5rem;
+}
+
+.cp-dialog__image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.cp-dialog__image {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.cp-dialog__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 360px;
+  object-fit: cover;
+}
+
+.cp-dialog__image-grid .cp-dialog__image img {
+  aspect-ratio: 1 / 1;
+  max-height: none;
+}
+
+.cp-dialog__image-remove {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(26, 10, 54, 0.6);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.cp-dialog__image-remove:hover {
+  background: rgba(26, 10, 54, 0.8);
+}
+
+.cp-dialog__attach {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2d3f5;
+  border-radius: 14px;
+}
+
+.cp-dialog__attach-label {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.cp-dialog__attach-btn {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  background: var(--color-surface-soft);
+  font-size: 1.2rem;
+}
+
+.cp-dialog__attach-btn:hover:not(:disabled) {
+  background: var(--color-tint-light);
+}
+
+.cp-dialog__attach-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cp-dialog__error {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+.cp-dialog__submit {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cp-dialog__submit:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.cp-dialog__submit:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .cp-dialog__backdrop {
+    padding: 0.5rem;
+  }
+
+  .cp-dialog {
+    max-height: 94vh;
+  }
+
+  .cp-dialog__head {
+    padding: 0.85rem 1rem;
+  }
+
+  .cp-dialog__body {
+    padding: 0.9rem 1rem 1.15rem;
+  }
+
+  /* ตัวอย่างรูปสองคอลัมน์เหลือช่องละ ~150px ซึ่งพอดูออกอยู่ จึงคงจำนวนคอลัมน์
+     ไว้ แต่รูปเดี่ยวสูงได้ถึง 360px ซึ่งบนมือถือกินจนช่องพิมพ์กับปุ่มโพสต์
+     หลุดพ้นขอบล่างไปหมด */
+  .cp-dialog__image img {
+    max-height: 240px;
+  }
+}

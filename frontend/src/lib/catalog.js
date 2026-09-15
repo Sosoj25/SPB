@@ -1,6 +1,10 @@
+// แคตตาล็อกกีฬา/สนาม และการถามว่าช่วงเวลาไหนยังว่าง — มุมมองฝั่งลูกค้า
+//
+// ส่วนของ "ความว่าง" ต้องผ่าน RPC เสมอ (เหตุผลอยู่ที่หัวข้อคั่นด้านล่าง)
+// ส่วนงานแก้ตารางเวลาของแอดมินอยู่ที่ lib/schedule.js
 import { supabase } from "./supabase";
 import { toHhMm } from "./bookings";
-import { assertImageFile, imageExt } from "./uploads";
+import { assertImageFile, imageExt, removeStorageFolder } from "./uploads";
 import {
   sportBasketball,
   sportFootball,
@@ -8,8 +12,8 @@ import {
   sportVolleyball,
 } from "../assets/images";
 
-// facility_images ยังว่างอยู่ (ยังไม่มีหน้าแอดมินให้อัปโหลดรูปสนามจริง)
-// จนกว่าจะมี ใช้ภาพประจำกีฬาเป็นตัวแทนไปก่อน
+// รูปสำรองสุดท้ายของสนาม เมื่อทั้ง facility_images และ sports.icon_url ว่าง
+// (ลำดับการเลือกรูปจริงอยู่ใน toFacility ข้างล่าง)
 //
 // แม็ปด้วย "ชื่อกีฬา" ไม่ใช่ sports.id เพราะ id เป็น identity column —
 // เลขบนเครื่อง dev กับบน production ไม่รับประกันว่าตรงกัน
@@ -89,6 +93,80 @@ export async function fetchSportCatalog() {
       };
     })
     .filter((sport) => sport.courtCount > 0);
+}
+
+// รายชื่อกีฬาทั้งหมดสำหรับหน้าแอดมิน — ต่างจาก fetchSportCatalog (หน้าลูกค้า)
+// ตรงที่ไม่กรองกีฬาที่ยังไม่มีสนามเปิดจองออก ไม่งั้นกีฬาที่เพิ่งสร้างใหม่จะไม่
+// โผล่ให้เลือกเพื่อเพิ่มสนามแรกของมันได้เลย (ไก่กับไข่ — สร้างกีฬาไม่มีสนาม
+// เลยไม่โผล่ ไม่โผล่เลยเลือกไม่ได้เพื่อเพิ่มสนาม)
+export async function fetchAdminSports() {
+  const { data, error } = await supabase
+    .from("sports")
+    .select("id, name, description, icon_url")
+    .order("id");
+
+  if (error) throw error;
+
+  return (data ?? []).map((sport) => ({
+    id: sport.id,
+    name: sport.name,
+    description: sport.description ?? "",
+    image: sport.icon_url || sportImage(sport.name),
+  }));
+}
+
+// รายชื่อกีฬาทั้งหมดให้ผู้ใช้เลือกตอนแก้ไขโปรไฟล์ — ไม่กรอง courtCount เหมือน
+// fetchSportCatalog เพราะแค่ให้เลือก "กีฬาที่เล่น" ไม่เกี่ยวกับว่าจองได้จริงไหม
+export async function fetchSportNames() {
+  const { data, error } = await supabase
+    .from("sports")
+    .select("name")
+    .eq("is_active", true)
+    .order("id");
+
+  if (error) throw error;
+
+  return (data ?? []).map((sport) => sport.name);
+}
+
+// เพิ่มกีฬาใหม่เข้าตาราง sports — sports_admin_manage (0000) ให้สิทธิ์ admin
+// insert อยู่แล้ว กีฬาที่เพิ่งสร้างจะยังไม่โผล่ในหน้าเลือกกีฬาของลูกค้า
+// (fetchSportCatalog กรอง courtCount > 0) จนกว่าจะมีสนามที่เปิดจองได้แล้ว
+export async function createSport({ name, description }) {
+  const { data, error } = await supabase
+    .from("sports")
+    .insert({ name, description: description || null })
+    .select("id, name, description, icon_url")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") throw new Error(`มีกีฬาชื่อ "${name}" อยู่แล้ว กรุณาใช้ชื่ออื่น`);
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description ?? "",
+    image: data.icon_url || sportImage(data.name),
+  };
+}
+
+// ลบกีฬาทิ้ง — facilities.sport_id เป็น on delete restrict (0000) จึงลบไม่ได้
+// ถ้ายังมีสนามผูกอยู่แม้แต่สนามเดียว (แม้สนามนั้นจะปิดให้บริการแล้วก็ตาม)
+// ต้องลบสนามทั้งหมดของกีฬานี้ก่อน — ดักโค้ด 23503 (foreign_key_violation)
+// ไว้บอกเหตุผลเป็นภาษาไทยแทนข้อความ Postgres ดิบ
+export async function deleteSport(sportId) {
+  const { error } = await supabase.from("sports").delete().eq("id", sportId);
+
+  if (error) {
+    if (error.code === "23503") {
+      throw new Error("ลบไม่ได้ เพราะกีฬานี้ยังมีสนามผูกอยู่ กรุณาลบสนามทั้งหมดของกีฬานี้ก่อน");
+    }
+    throw error;
+  }
+
+  await removeStorageFolder("sport-images", sportId);
 }
 
 // ---------- Admin: รูปภาพประจำกีฬา ----------

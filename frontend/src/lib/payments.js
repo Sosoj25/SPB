@@ -1,10 +1,12 @@
+// การชำระเงินของการจอง — ทั้งฝั่งลูกค้าจ่ายและฝั่งแอดมินตรวจสอบ
+//
+// มีทางจ่ายอยู่ 3 ทาง แยกเป็นหัวข้อข้างล่าง: พร้อมเพย์ QR (ยืนยันอัตโนมัติ),
+// โอนเข้าบัญชี+แนบสลิป (แอดมินตรวจ) และยอดสุทธิ 0 บาท
 import { supabase } from "./supabase";
 import { assertImageFile, imageExt } from "./uploads";
 
-// ช่องทางที่ "ใช้ได้จริง" สองแบบเท่านั้น — ตัดบัตรเครดิต/เดบิตและ TrueMoney
-// ที่เคยมีในดีไซน์ออกไป เพราะมันไม่เคยมีอะไรรองรับจริง (ทั้งคู่แมปไปที่ enum
-// 'other' เดียวกันแบบไม่มีทางแยกแยะ) การโชว์ตัวเลือกที่กดแล้วไม่มีอะไรเกิดขึ้น
-// จริงเป็นเรื่องหลอกผู้ใช้ยิ่งกว่าไม่มีตัวเลือกนั้นเสียอีก
+// ตัวเลือกที่ลูกค้าเลือกเองได้มีสองแบบเท่านั้น — ทุกตัวเลือกในนี้ต้องมีของ
+// รองรับจริง ห้ามเพิ่มช่องทางที่กดแล้วไม่มีอะไรเกิดขึ้น
 export const PAYMENT_METHODS = [
   {
     key: "qr",
@@ -21,6 +23,11 @@ export const PAYMENT_METHODS = [
 const METHOD_LABELS = {
   qr: "พร้อมเพย์ (QR Code)",
   bank_transfer: "โอนผ่านบัญชีธนาคาร",
+  // เงินสด/บัตร รับที่เคาน์เตอร์เท่านั้น (หน้า Walk-in, enum เพิ่มใน 0063) —
+  // ลูกค้าเลือกเองไม่ได้จึงไม่อยู่ใน PAYMENT_METHODS แต่ต้องมีชื่อไทยไว้
+  // เพราะใบเสร็จที่พิมพ์ตอนเช็คอินโชว์ช่องทางที่จ่ายจริง
+  cash: "เงินสด (เคาน์เตอร์)",
+  card: "บัตรเครดิต/เดบิต (เคาน์เตอร์)",
   other: "ช่องทางอื่น",
 };
 
@@ -29,7 +36,7 @@ export const describeMethod = (method) => METHOD_LABELS[method] ?? "—";
 export const describeGateway = (gateway) =>
   gateway === "plernpay" ? "ยืนยันอัตโนมัติ" : "ตรวจสอบโดยแอดมิน";
 
-// ---------- เส้นทางที่ 1: พร้อมเพย์ผ่าน PlernPay ----------
+// ---------- ทางจ่าย: พร้อมเพย์ QR ผ่าน PlernPay ----------
 //
 // สร้าง QR จริงผ่าน Edge Function create-plernpay-charge (ต้องใช้
 // X-Client-Secret ของ PlernPay ซึ่งอยู่ฝั่งเซิร์ฟเวอร์เท่านั้น) แล้วให้หน้าเว็บ
@@ -57,7 +64,21 @@ export const createPlernpayCharge = (bookingId) =>
 export const checkPlernpayPayment = (paymentId) =>
   invokeEdgeFunction("check-plernpay-payment", { paymentId });
 
-// ---------- เส้นทางที่ 2: โอนผ่านบัญชีธนาคาร + แนบสลิป ----------
+// ---------- ทางจ่าย: ยอดสุทธิ 0 บาท ----------
+//
+// เกิดได้จากโปรโมชั่นของสนามที่ลดจนหมด หรือคูปองที่มูลค่าคลุมค่าสนามพอดี
+// (ดู 0054) — ไม่ใช่การ "ข้ามขั้นตอนชำระเงิน" แต่ยังออกแถว payments ยังยืนยัน
+// การจอง และยังตัดคูปองให้ครบเหมือนอีกสองทาง
+export async function confirmZeroAmountBooking(bookingId) {
+  const { data, error } = await supabase.rpc("confirm_zero_amount_booking", {
+    p_booking_id: bookingId,
+  });
+
+  if (error) throw error;
+  return Array.isArray(data) ? data[0] : data;
+}
+
+// ---------- ทางจ่าย: โอนผ่านบัญชีธนาคาร + แนบสลิป ----------
 
 // path แบบเดียวกับ avatars: <user_id>/<booking_id>/<timestamp>.<ext> — โฟลเดอร์
 // แรกต้องเป็นเจ้าของเสมอ เพราะ RLS ของ bucket payment-slips (0023) เช็คจากตรงนั้น
@@ -96,12 +117,11 @@ export async function submitBankTransferPayment(bookingId, slipPath) {
 }
 
 // ให้แอดมินเทียบชื่อบัญชีที่ลูกค้ากรอกตอนขอคืนเงิน (AdminRefunds.jsx) กับสลิป
-// การชำระเงินเดิมจริง ๆ — เอาแถวที่จ่ายสำเร็จ (status='approved') ล่าสุดของ
-// การจองนี้ ต่างจากเดิมที่กรองด้วย .not("slip_url", "is", null) เพราะการจ่าย
-// ผ่านพร้อมเพย์ QR (gateway='plernpay') ไม่เคยมีสลิปเลย — กรองแบบเดิมทำให้
-// แอดมินเจอ "ไม่พบสลิป" เสมอสำหรับบุ๊กกิ้งที่จ่ายผ่าน QR ทั้งที่จ่ายเงินจริง
-// แล้ว ต้องคืนข้อมูลพอให้แอดมินรู้ว่าเป็นการจ่ายช่องทางไหน ไม่ใช่แค่ path
-// ของสลิปอย่างเดียว
+// การชำระเงินเดิม — เอาแถวที่จ่ายสำเร็จ (status='approved') ล่าสุดของการจองนี้
+//
+// ห้ามกรองด้วย "ต้องมี slip_url" เพราะการจ่ายผ่าน QR (gateway='plernpay')
+// ไม่เคยมีสลิป จะกลายเป็น "ไม่พบสลิป" ทั้งที่จ่ายเงินจริงแล้ว — จึงคืน
+// gateway/ช่องทางมาด้วย ให้แอดมินรู้ว่าเป็นการจ่ายแบบไหน
 export async function fetchLatestPaymentInfo(bookingId) {
   const { data, error } = await supabase
     .from("payments")

@@ -1,0 +1,156 @@
+/* แกลเลอรีรูปในหน้ารายละเอียดโพสต์ */
+
+.post-carousel {
+  margin-bottom: 1rem;
+}
+
+/* พื้นเข้มหลังรูปเพราะใช้ object-fit: contain — เห็นรูปเต็มใบไม่โดนครอบตัด
+   (ต่างจากโมเสกในฟีดที่ครอบให้ช่องเท่ากันสวยงามกว่า) */
+.post-carousel__frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #1a0a36;
+}
+
+.post-carousel__frame:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.post-carousel__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  animation-duration: 0.3s;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+.post-carousel__photo--next {
+  animation-name: post-carousel-in-next;
+}
+
+.post-carousel__photo--prev {
+  animation-name: post-carousel-in-prev;
+}
+
+@keyframes post-carousel-in-next {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes post-carousel-in-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+
+.post-carousel__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--color-heading);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.post-carousel__nav:hover,
+.post-carousel__nav:focus-visible {
+  background: #fff;
+}
+
+.post-carousel__nav--prev {
+  left: 0.75rem;
+}
+
+.post-carousel__nav--next {
+  right: 0.75rem;
+}
+
+.post-carousel__counter {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-pill);
+  background: rgba(26, 10, 54, 0.6);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.post-carousel__dots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.post-carousel__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #d9cdf0;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.post-carousel__dot--active {
+  background: var(--color-primary);
+  transform: scale(1.3);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .post-carousel__nav {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-carousel__photo {
+    animation: none;
+  }
+}

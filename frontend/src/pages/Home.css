@@ -1,5 +1,8 @@
+/* หน้าแรกหลังล็อกอิน — ฮีโร่ การ์ดการจองถัดไป และแถบตัวเลขสถิติ */
+
 .home {
-  min-height: 100vh;
+  /* 100dvh = ความสูงที่เห็นจริงบนมือถือ (ดูเหตุผลเต็มใน index.css) */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-size: cover;
@@ -89,6 +92,7 @@
 .home__cta-icon {
   width: 26px;
   height: 26px;
+  transform: scaleX(-1);
 }
 
 .home__secondary {
@@ -192,9 +196,42 @@
   margin: 0;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
+}
+
+.home__booking-countdown {
   color: var(--color-muted-purple);
   font-size: 0.95rem;
+}
+
+.home__payment-badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.home__payment-badge--paid {
+  background: #def5e3;
+  color: #1c733d;
+}
+
+.home__payment-badge--pending {
+  background: #fff2d1;
+  color: #996605;
+}
+
+.home__payment-badge--rejected {
+  background: #fde2e2;
+  color: #9c2b2b;
+}
+
+.home__payment-badge--unpaid {
+  background: #ffe6cf;
+  color: #b35c00;
 }
 
 .home__booking-actions {
@@ -237,9 +274,125 @@
   transform: translateY(-2px);
 }
 
-@media (max-width: 700px) {
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .home__main {
+    padding: 2rem 1.25rem;
+  }
+
   .home__hero {
-    padding: 2.25rem 1.5rem;
+    padding: 2.5rem 2rem;
+    border-radius: 44px;
+    gap: 2rem;
+  }
+
+  /* คอลัมน์ซ้ายเดิมขอพื้นที่ขั้นต่ำ 480px ซึ่งบวกกับการ์ดจอง 400px แล้วเกิน
+     จอแท็บเล็ต — ลดขั้นต่ำลงให้มันยอมพับลงบรรทัดล่างแทนที่จะดันจนล้น */
+  .home__copy {
+    flex: 1 1 340px;
+  }
+
+  .home__booking {
+    flex: 1 1 340px;
+    padding: 1.85rem;
     border-radius: 32px;
+  }
+}
+
+@media (max-width: 700px) {
+  .home__main {
+    padding: 1.5rem 0.9rem;
+  }
+
+  .home__hero {
+    padding: 2rem 1.25rem;
+    border-radius: 32px;
+    gap: 1.75rem;
+  }
+
+  .home__copy {
+    gap: 1.15rem;
+  }
+
+  .home__badge {
+    font-size: 0.95rem;
+    padding: 0.55rem 1.15rem;
+  }
+
+  .home__desc {
+    font-size: 1rem;
+  }
+
+  .home__stats {
+    gap: 1.25rem 2rem;
+  }
+
+  .home__booking {
+    padding: 1.35rem;
+    border-radius: 26px;
+  }
+
+  .home__booking-card {
+    padding: 1.1rem;
+    border-radius: 18px;
+  }
+}
+
+/* มือถือ — ปุ่มหลักสองปุ่มบนหน้านี้เรียงข้างกันไม่พอกว้าง ให้เต็มแถวทั้งคู่
+   จะได้เป็นเป้ากดใหญ่ ๆ สองอันเรียงลงมาแทนปุ่มแคบ ๆ ที่ถูกบีบข้างกัน */
+@media (max-width: 640px) {
+  .home__actions {
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .home__cta,
+  .home__secondary {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.05rem;
+    padding: 0.9rem 1.25rem;
+  }
+
+  .home__stat-value {
+    font-size: 1.25rem;
+  }
+
+  .home__booking-header h2 {
+    font-size: 1.15rem;
+  }
+
+  .home__booking-primary,
+  .home__booking-outline {
+    padding: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .home__hero {
+    padding: 1.5rem 0.9rem;
+    border-radius: 24px;
+  }
+
+  .home__booking {
+    padding: 1.1rem;
+  }
+
+  /* สามตัวเลขสถิติเรียงข้างกันบนจอ 360px จะเหลือคอลัมน์ละไม่ถึงนิ้ว —
+     แบ่งเป็นสองคอลัมน์แทนเพื่อให้ตัวเลขกับคำอธิบายยังอยู่บรรทัดเดียวกัน */
+  .home__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
   }
 }

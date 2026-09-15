@@ -1,0 +1,192 @@
+/* กล่องรายงานเนื้อหา — รายการเหตุผลแบบเลือกได้หลายข้อ */
+
+.report-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(26, 10, 54, 0.45);
+}
+
+.report-dialog {
+  width: min(460px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.report-dialog__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.report-dialog__hint {
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+.report-dialog__quota {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.report-dialog__group {
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+}
+
+.report-dialog__group-title {
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.report-dialog__group-desc {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.82rem;
+  color: var(--color-muted-purple);
+}
+
+.report-dialog__reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.report-dialog__reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.report-dialog__reason:hover {
+  background: var(--color-tint-light);
+}
+
+.report-dialog__reason--on {
+  border-color: var(--color-primary);
+  background: var(--color-tint-light);
+}
+
+/* ครบ 3 ข้อแล้ว — ข้อที่เหลือยังอ่านได้แต่กดไม่ได้ ไม่ซ่อนทิ้งเพราะผู้ใช้ต้อง
+   เห็นว่ามีอะไรให้เลือกบ้างก่อนตัดสินใจสลับข้อ */
+.report-dialog__reason--off {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.report-dialog__reason input {
+  margin-top: 0.2rem;
+  accent-color: var(--color-primary);
+}
+
+.report-dialog__reason-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.report-dialog__reason-label {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.report-dialog__reason-hint {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--color-muted-purple);
+}
+
+.report-dialog__note {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e2d3f5;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.report-dialog__note:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.report-dialog__error {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+.report-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.report-dialog__cancel,
+.report-dialog__submit {
+  padding: 0.65rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.report-dialog__cancel {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.report-dialog__submit {
+  background: var(--color-danger-text);
+  color: #fff;
+}
+
+.report-dialog__submit:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .report-dialog__backdrop {
+    padding: 0.6rem;
+  }
+
+  .report-dialog {
+    padding: 1.15rem;
+    max-height: 94vh;
+  }
+}

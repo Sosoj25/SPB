@@ -1,7 +1,16 @@
+// ตารางเวลาของสนามฝั่งแอดมิน — ดู/เพิ่ม/ลบ/เปิด-ปิดช่วงเวลาที่เปิดให้จอง
+//
+// คู่กับ lib/catalog.js ที่เป็นมุมมองฝั่งลูกค้าของข้อมูลชุดเดียวกัน
 import { supabase } from "./supabase";
 import { hoursBetween, toISODate } from "./bookings";
 
-const ACTIVE_BOOKING_STATUSES = ["pending", "confirmed", "completed"];
+const ACTIVE_BOOKING_STATUSES = [
+  "pending",
+  "confirmed",
+  "awaiting_review",
+  "no_show",
+  "completed",
+];
 
 // แอดมินเห็นทุกแถวของ facility_time_slots ผ่าน RLS admin manage (0010) อยู่แล้ว
 // ไม่ต้องผ่าน RPC เหมือน fetchDayAvailability ฝั่งลูกค้าใน lib/catalog.js ที่ต้อง

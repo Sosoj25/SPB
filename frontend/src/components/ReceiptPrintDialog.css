@@ -1,0 +1,409 @@
+/* กล่องตั้งค่าและพรีวิวใบเสร็จก่อนพิมพ์ (สไตล์ของตัวใบอยู่ใน lib/receiptPrint.js) */
+
+.receipt-print-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(26, 10, 54, 0.45);
+}
+
+.receipt-print-dialog {
+  width: min(60rem, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.receipt-print-dialog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 1.75rem 1.25rem;
+  border-bottom: 1px solid var(--color-tint-light);
+}
+
+.receipt-print-dialog__head h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--color-heading);
+}
+
+.receipt-print-dialog__head p {
+  margin: 0.3rem 0 0;
+  color: var(--color-muted-purple);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.receipt-print-dialog__close {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.receipt-print-dialog__body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  gap: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  overflow-y: auto;
+}
+
+/* Preview */
+
+/* ช่องตั้งค่ายาวกว่าตัวอย่างมาก — ตรึงตัวอย่างไว้ให้เลื่อนตามตอนไปปรับค่า
+   ด้านล่าง จะได้เห็นผลทันทีโดยไม่ต้องเลื่อนขึ้นมาดูใหม่ทุกครั้ง
+   (align-self: start จำเป็น ไม่งั้น grid item จะยืดเต็มความสูงแล้ว sticky
+   ไม่มีที่ให้เลื่อน) */
+.receipt-print-dialog__preview {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+  padding-bottom: 0.5rem;
+  background: #fff;
+}
+
+.receipt-print-dialog__preview-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.receipt-print-dialog__preview-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--color-heading);
+}
+
+.receipt-print-dialog__preview-head span {
+  color: var(--color-faint-purple);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ความสูงตรึงไว้ ไม่ยืดตามใบเสร็จ — ตัวย่อ (scale) อ่านขนาดช่องนี้ไปคำนวณ
+   ถ้าช่องยืดตามเนื้อหาที่ย่อแล้ว ทั้งคู่จะไล่กันไปมาไม่จบ */
+.receipt-print-dialog__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* เตี้ยกว่าครึ่งจอนิดหน่อย เผื่อที่ให้คำอธิบาย/คำเตือนใต้ตัวอย่าง แล้วทั้ง
+     คอลัมน์ยังสูงไม่เกินพื้นที่ที่เลื่อนได้ — ไม่งั้นตรึงไว้ก็ยังเห็นไม่ครบ */
+  height: min(52vh, 26rem);
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  background: var(--color-page-bg);
+  border: 1px solid var(--color-tint-light);
+  overflow: hidden;
+}
+
+/* กล่องกระดาษถูกย่อด้วย transform — ตัวมันเองต้องถือขนาด "หลังย่อ" ไว้เอง
+   ไม่งั้นเงา/กรอบจะกินพื้นที่เท่าขนาดจริงก่อนย่อ */
+.receipt-print-dialog__paper {
+  position: relative;
+  flex-shrink: 0;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(43, 10, 99, 0.16);
+  overflow: hidden;
+}
+
+.receipt-print-dialog__paper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.receipt-print-dialog__warn {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.receipt-print-dialog__preview-note {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* Settings */
+
+.receipt-print-dialog__settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.receipt-print-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-muted-purple);
+}
+
+.receipt-print-dialog__field select,
+.receipt-print-dialog__field input[type="number"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid #e2d3f5;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.receipt-print-dialog__field input:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+}
+
+.receipt-print-dialog__field input[type="range"] {
+  width: 100%;
+  accent-color: var(--color-primary);
+}
+
+.receipt-print-dialog__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.receipt-print-dialog__hint {
+  margin: -0.5rem 0 0;
+  color: var(--color-faint-purple);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.receipt-print-dialog__choices {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.receipt-print-dialog__choices + .receipt-print-dialog__choices {
+  margin-top: 0.4rem;
+}
+
+.receipt-print-dialog__choice {
+  flex: 1;
+  padding: 0.55rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.receipt-print-dialog__choice--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.receipt-print-dialog__choice:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.receipt-print-dialog__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.receipt-print-dialog__check input {
+  margin-top: 0.15rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-primary);
+}
+
+.receipt-print-dialog__reset {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-page-bg);
+  border: 1.5px solid var(--color-tint-light);
+  color: var(--color-muted-purple);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* Footer */
+
+.receipt-print-dialog__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.1rem 1.75rem;
+  border-top: 1px solid var(--color-tint-light);
+  background: var(--color-surface-soft);
+}
+
+.receipt-print-dialog__saved {
+  margin-right: auto;
+  color: var(--color-success-text);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.receipt-print-dialog__ghost,
+.receipt-print-dialog__print {
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.receipt-print-dialog__ghost {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.receipt-print-dialog__print {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.receipt-print-dialog__print:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 900px) {
+  .receipt-print-dialog__body {
+    grid-template-columns: 1fr;
+  }
+
+  /* จอแคบวางตัวอย่างซ้อนบนช่องตั้งค่า ถ้าตรึงไว้จะกินพื้นที่จนแทบไม่เหลือ
+     ที่ให้ปรับค่า */
+  .receipt-print-dialog__preview {
+    position: static;
+  }
+
+  .receipt-print-dialog__backdrop {
+    padding: 1rem;
+  }
+
+  .receipt-print-dialog__head {
+    padding: 1.15rem 1.25rem 1rem;
+  }
+
+  .receipt-print-dialog__body {
+    padding: 1.15rem 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .receipt-print-dialog__backdrop {
+    padding: 0.6rem;
+  }
+
+  .receipt-print-dialog__head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  .receipt-print-dialog__head h2 {
+    font-size: 1.15rem;
+  }
+
+  .receipt-print-dialog__body {
+    padding: 1rem;
+    gap: 1.15rem;
+  }
+
+  .receipt-print-dialog__stage {
+    height: min(42vh, 20rem);
+    padding: 0.85rem;
+  }
+
+  /* ช่องตั้งค่าสองคอลัมน์บีบจนป้ายกำกับตกบรรทัดกลางคำ */
+  .receipt-print-dialog__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* กฎกัน iOS ซูมตอนโฟกัสช่องกรอกใน index.css เสมอกับกฎข้างบนพอดีที่ (0,2,1)
+     แล้วแพ้เพราะไฟล์นี้ถูกโหลดทีหลัง — ตั้งซ้ำตรงนี้ให้ครบ */
+  .receipt-print-dialog__field select,
+  .receipt-print-dialog__field input[type="number"] {
+    font-size: max(16px, 1rem);
+  }
+
+  .receipt-print-dialog__choices {
+    flex-wrap: wrap;
+  }
+
+  /* ปุ่มพิมพ์/ยกเลิกท้ายกล่อง — เต็มแถวทั้งคู่ให้กดไม่พลาด */
+  .receipt-print-dialog__foot {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .receipt-print-dialog__saved {
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+
+  .receipt-print-dialog__print,
+  .receipt-print-dialog__ghost {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+}

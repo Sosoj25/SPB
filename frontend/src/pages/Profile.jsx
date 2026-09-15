@@ -1,3 +1,4 @@
+// หน้าโปรไฟล์ของผู้ใช้ — ประวัติการจอง การแจ้งเตือน และข้อมูลบัญชี (แยกเป็นแท็บ)
 import { useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
@@ -6,15 +7,21 @@ import { useUserBookings } from "../hooks/useBookings";
 import { useNotifications } from "../hooks/useNotifications";
 import { supabase } from "../lib/supabase";
 import {
+  bookingStatusKey,
   describeFacility,
+  describePayment,
   describeSport,
   describeStatus,
+  formatBaht,
   formatBookingDate,
   formatTimeRange,
   BOOKING_PAGE_SIZE,
+  STATUS_FILTERS,
 } from "../lib/bookings";
 import {
+  ACTION_REQUIRED_NOTIFICATION_TYPES,
   formatNotificationTime,
+  isActionRequiredNotification,
   markAllNotificationsRead,
   markNotificationRead,
   notificationLink,
@@ -62,7 +69,25 @@ function InfoPanel({ user, profile }) {
 function HistoryPanel() {
   // ขยายทีละหน้าแทนการดึงประวัติทั้งหมดตั้งแต่เปิดหน้า
   const [limit, setLimit] = useState(BOOKING_PAGE_SIZE);
+  const [statusFilter, setStatusFilter] = useState("all");
   const { bookings, hasMore, loading, error } = useUserBookings(limit);
+
+  // แท็บกรองนับจากข้อมูลที่โหลดมาแล้วเท่านั้น — กด "ดูเพิ่มเติม" อาจทำให้
+  // ตัวเลขในแท็บขยับ แต่ยังถูกต้องเสมอเพราะนับจากชุดข้อมูลจริงที่อยู่ในมือ
+  const counts = bookings.reduce((acc, booking) => {
+    const key = bookingStatusKey(booking);
+    acc[key] = (acc[key] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const visibleFilters = STATUS_FILTERS.filter(
+    (filter) => filter.key === "all" || counts[filter.key] > 0
+  );
+
+  const filteredBookings =
+    statusFilter === "all"
+      ? bookings
+      : bookings.filter((booking) => bookingStatusKey(booking) === statusFilter);
 
   return (
     <section className="profile-card profile-card--flush">
@@ -76,6 +101,26 @@ function HistoryPanel() {
           </span>
         )}
       </div>
+
+      {!loading && !error && bookings.length > 0 && (
+        <div className="profile-filter-bar">
+          {visibleFilters.map((filter) => (
+            <button
+              key={filter.key}
+              type="button"
+              className={`profile-filter ${
+                statusFilter === filter.key ? "profile-filter--active" : ""
+              }`}
+              onClick={() => setStatusFilter(filter.key)}
+            >
+              {filter.label}
+              {filter.key !== "all" && (
+                <span className="profile-filter__count">{counts[filter.key] ?? 0}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {loading && <p className="profile-empty">กำลังโหลดประวัติการจอง...</p>}
 
@@ -94,18 +139,26 @@ function HistoryPanel() {
         </div>
       )}
 
-      {!loading && !error && bookings.length > 0 && (
+      {!loading && !error && bookings.length > 0 && filteredBookings.length === 0 && (
+        <div className="profile-empty">
+          <p className="profile-empty__title">ไม่มีรายการในสถานะนี้</p>
+        </div>
+      )}
+
+      {!loading && !error && filteredBookings.length > 0 && (
         <div className="profile-table">
           <div className="profile-table__row profile-table__row--head">
             <span className="profile-table__cell profile-table__cell--type">ประเภท</span>
-            <span className="profile-table__cell profile-table__cell--court">สนาม</span>
             <span className="profile-table__cell profile-table__cell--time">เวลา</span>
             <span className="profile-table__cell profile-table__cell--status">สถานะ</span>
+            <span className="profile-table__cell profile-table__cell--amount">ยอดชำระ</span>
             <span className="profile-table__cell profile-table__cell--date">วันที่</span>
           </div>
 
-          {bookings.map((booking, i) => {
+          {filteredBookings.map((booking, i) => {
             const status = describeStatus(booking);
+            const showPaymentHint =
+              bookingStatusKey(booking) !== "unpaid" && booking.payment_status !== "paid";
 
             return (
               <Link
@@ -116,10 +169,11 @@ function HistoryPanel() {
                 }`}
               >
                 <span className="profile-table__cell profile-table__cell--type">
-                  {describeSport(booking)}
-                </span>
-                <span className="profile-table__cell profile-table__cell--court">
-                  {describeFacility(booking)}
+                  <span className="profile-table__primary">{describeSport(booking)}</span>
+                  <span className="profile-table__secondary">{describeFacility(booking)}</span>
+                  {booking.booking_code && (
+                    <span className="profile-table__code">#{booking.booking_code}</span>
+                  )}
                 </span>
                 <span className="profile-table__cell profile-table__cell--time">
                   {formatTimeRange(booking.start_time, booking.end_time)}
@@ -128,6 +182,12 @@ function HistoryPanel() {
                   <span className={`profile-status profile-status--${status.tone}`}>
                     {status.label}
                   </span>
+                  {showPaymentHint && (
+                    <span className="profile-table__secondary">{describePayment(booking)}</span>
+                  )}
+                </span>
+                <span className="profile-table__cell profile-table__cell--amount">
+                  {formatBaht(booking.total_amount)}
                 </span>
                 <span className="profile-table__cell profile-table__cell--date">
                   {formatBookingDate(booking.booking_date)}
@@ -227,10 +287,17 @@ function SecurityPanel({ user, isVerified }) {
 function NotificationsPanel({ userId }) {
   const [reloadKey, setReloadKey] = useState(0);
   const { notifications, loading, error } = useNotifications(userId, reloadKey);
-  const hasUnread = notifications.some((item) => !item.is_read);
+  // ปุ่มเคลียร์ทั้งหมดไม่แตะใบที่ยังมีงานค้าง จึงไม่ควรโผล่มาให้กดถ้าเหลือแต่
+  // ใบพวกนั้น — กดแล้วไม่มีอะไรเปลี่ยนจะดูเหมือนปุ่มเสีย
+  const hasUnread = notifications.some(
+    (item) => !item.is_read && !isActionRequiredNotification(item),
+  );
 
+  // ใบที่ยังมีงานค้างอยู่ที่ลูกค้า (รอรีวิว / รอกดยืนยันรับของ) ไม่ปิดตัวเอง
+  // ตอนกดดูและไม่ถูกปุ่ม "อ่านแล้วทั้งหมด" เคลียร์ — ฐานข้อมูลปิดให้เองเมื่อ
+  // งานนั้นเสร็จจริง (trigger ใน 0107)
   async function handleOpen(item) {
-    if (!item.is_read) {
+    if (!item.is_read && !isActionRequiredNotification(item)) {
       try {
         await markNotificationRead(item.id);
         setReloadKey((k) => k + 1);
@@ -242,7 +309,7 @@ function NotificationsPanel({ userId }) {
 
   async function handleMarkAllRead() {
     try {
-      await markAllNotificationsRead(userId);
+      await markAllNotificationsRead(userId, ACTION_REQUIRED_NOTIFICATION_TYPES);
       setReloadKey((k) => k + 1);
     } catch (err) {
       console.error("markAllNotificationsRead failed:", err);
@@ -282,7 +349,12 @@ function NotificationsPanel({ userId }) {
             const content = (
               <>
                 <div className="profile-notification__head">
-                  <p className="profile-notification__title">{item.title}</p>
+                  <p className="profile-notification__title">
+                    {item.title}
+                    {isActionRequiredNotification(item) && (
+                      <span className="profile-notification__tag">ต้องดำเนินการ</span>
+                    )}
+                  </p>
                   <span className="profile-notification__time">
                     {formatNotificationTime(item.created_at)}
                   </span>
@@ -341,7 +413,10 @@ export default function Profile() {
       <main className="profile__main">
         <div className="profile__layout">
           <aside className="profile__sidebar">
-            <div className="profile__sidebar-banner" />
+            <div
+              className="profile__sidebar-banner"
+              style={profile?.cover_url ? { backgroundImage: `url(${profile.cover_url})` } : undefined}
+            />
             <div className="profile__sidebar-body">
               <div className="profile__avatar" aria-hidden="true">
                 {profile?.avatar_url ? (

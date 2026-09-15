@@ -1,3 +1,6 @@
+// ตั้งค่าการรับเงิน — บัญชีปลายทางสำหรับโอน และสวิตช์เปิด/ปิดแต่ละช่องทาง
+//
+// บัญชีที่ตั้งเป็น "บัญชีหลัก" คือบัญชีที่หน้าชำระเงินของลูกค้าเอาไปแสดง
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Switch } from "../components/DashboardWidgets";
@@ -21,6 +24,7 @@ function AccountForm({ initial, busy, onCancel, onSubmit, submitLabel }) {
   return (
     <div className="payset__account-form">
       <input
+        aria-label="ธนาคาร"
         className="dash-input"
         placeholder="ธนาคาร เช่น ธนาคารกสิกรไทย"
         value={form.bankName}
@@ -28,12 +32,14 @@ function AccountForm({ initial, busy, onCancel, onSubmit, submitLabel }) {
         autoFocus
       />
       <input
+        aria-label="เลขบัญชี"
         className="dash-input"
         placeholder="เลขบัญชี"
         value={form.accountNumber}
         onChange={(e) => setForm((f) => ({ ...f, accountNumber: e.target.value }))}
       />
       <input
+        aria-label="ชื่อบัญชี"
         className="dash-input"
         placeholder="ชื่อบัญชี"
         value={form.accountName}

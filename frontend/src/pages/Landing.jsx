@@ -1,3 +1,4 @@
+// หน้าแรกก่อนล็อกอิน (/) — ปุ่มเดียวคือพาไปหน้าเข้าสู่ระบบ
 import { Link } from "react-router-dom";
 import { bgField, logoShield, playIcon } from "../assets/images";
 import NavHeader from "../components/NavHeader";
@@ -13,11 +14,11 @@ export default function Landing() {
           <h1 className="landing__heading">
             จองสนามกีฬาง่ายๆ กับเรา
             <br />
-            SPORTSBOOKING.com
+            SPORTSBOOKING.COM
           </h1>
           <Link to="/login" className="landing__cta">
-            <img src={playIcon} alt="" className="landing__cta-icon" />
             จองเลยตอนนี้
+            <img src={playIcon} alt="" className="landing__cta-icon" />
           </Link>
         </div>
       </main>

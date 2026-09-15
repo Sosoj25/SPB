@@ -1,9 +1,12 @@
+// ขั้นที่ 3 ของการจอง — เลือกวันจากปฏิทินและช่วงเวลา (เลือกได้หลายช่วงถ้าต่อกัน)
 import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import AlertDialog from "../components/AlertDialog";
 import BookingSteps from "../components/BookingSteps";
 import { Badge } from "../components/DashboardWidgets";
 import { useAsyncData } from "../hooks/useAsyncData";
+import { useBookingWindow } from "../hooks/useBookings";
 import { fetchDayAvailability, fetchFacility, fetchFacilitySlots } from "../lib/catalog";
 import { fetchFacilityPricePreview } from "../lib/pricing";
 import {
@@ -57,7 +60,16 @@ export default function BookingSchedule() {
   const hasFacility = Number.isFinite(facilityId) && facilityId > 0;
 
   const today = todayISO();
-  const lastBookable = addDaysISO(today, BOOKING_WINDOW_DAYS);
+
+  // เพดานจริงมาจากเซิร์ฟเวอร์ (0055) — ฐาน 30 วันตามที่แอดมินตั้ง บวกสิทธิ์
+  // จองล่วงหน้าที่ลูกค้าคนนี้แลกไว้ ปฏิทินจึงเปิดกว้างไม่เท่ากันในแต่ละบัญชี
+  const { window: bookingWindow } = useBookingWindow();
+  // ปฏิทินยังขอความว่างทีเดียวได้ไม่เกิน BOOKING_WINDOW_DAYS อยู่ดี (0009)
+  // ถ้าสิทธิ์พิเศษดันเพดานเกินนั้น ตัดกลับมาที่ขีดของ API
+  const lastBookable =
+    bookingWindow.lastDate < addDaysISO(today, BOOKING_WINDOW_DAYS)
+      ? bookingWindow.lastDate
+      : addDaysISO(today, BOOKING_WINDOW_DAYS);
 
   // วันที่, ช่วงเวลาที่เลือก และ error ของการกดยืนยัน อยู่ก้อนเดียวกันโดยตั้งใจ:
   // ทั้งสามอย่างมีความหมายเฉพาะกับวันนั้นวันเดียว เก็บรวมกันแล้วเซ็ตพร้อมกัน
@@ -77,6 +89,7 @@ export default function BookingSchedule() {
   const { date: selectedDate, slotIds: selectedSlotIds, error: submitError } = pick;
 
   const [month, setMonth] = useState(() => monthKey(pick.date));
+  const [confirming, setConfirming] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -149,6 +162,9 @@ export default function BookingSchedule() {
       console.error("create_booking failed:", err);
       setPick((prev) => ({ ...prev, slotIds: [], error: errorMessage(err) }));
       setSubmitting(false);
+      // ช่วงเวลาที่เลือกถูกล้างทิ้งแล้ว กล่องยืนยันจึงสรุปอะไรไม่ได้อีก —
+      // ปิดกลับไปให้ผู้ใช้อ่าน error กับตารางที่ดึงใหม่บนหน้าหลัก
+      setConfirming(false);
       // ถ้าพลาดเพราะมีคนจองตัดหน้า ตารางบนจอตอนนี้เก่าแล้ว — ดึงใหม่
       setReloadKey((key) => key + 1);
     }
@@ -314,24 +330,15 @@ export default function BookingSchedule() {
 
               <div className="booking-legend">
                 <span className="booking-legend__item">
-                  <span
-                    className="booking-legend__swatch"
-                    style={{ background: "var(--color-tint-light)" }}
-                  />
+                  <span className="booking-legend__swatch booking-legend__swatch--free" />
                   ว่าง
                 </span>
                 <span className="booking-legend__item">
-                  <span
-                    className="booking-legend__swatch"
-                    style={{ background: "var(--color-disabled-bg)" }}
-                  />
+                  <span className="booking-legend__swatch booking-legend__swatch--full" />
                   เต็ม / ยังไม่เปิดจอง
                 </span>
                 <span className="booking-legend__item">
-                  <span
-                    className="booking-legend__swatch"
-                    style={{ background: "var(--color-primary)" }}
-                  />
+                  <span className="booking-legend__swatch booking-legend__swatch--selected" />
                   วันที่เลือก
                 </span>
               </div>
@@ -436,7 +443,10 @@ export default function BookingSchedule() {
                   type="button"
                   className="booking-btn booking-btn--block"
                   disabled={!firstSlot || submitting}
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    setPick((prev) => ({ ...prev, error: "" }));
+                    setConfirming(true);
+                  }}
                 >
                   {submitting ? "กำลังสร้างรายการจอง..." : "ถัดไป: ยืนยันการจอง"}
                 </button>
@@ -456,6 +466,31 @@ export default function BookingSchedule() {
           </div>
         )}
       </main>
+
+      {/* กดปุ่มแล้วสร้างรายการจองทันทีเลยไม่ได้: create_booking() กันช่วงเวลา
+          ไว้จริงและเริ่มนับเวลาชำระเงินตั้งแต่วินาทีนั้น ถ้ากดพลาดคนอื่นก็จอง
+          ช่วงนั้นไม่ได้จนกว่าจะหมดเวลากัน — สรุปสิ่งที่กำลังจะจอง (รวมราคาจริง
+          จาก compute_facility_price) ให้อ่านก่อนหนึ่งจอ เหมือนกล่องยืนยันแลก
+          ของรางวัลใน RewardDetail */}
+      {confirming && firstSlot && (
+        <AlertDialog
+          icon="🏟"
+          title="ยืนยันการจอง"
+          description="ระบบจะกันช่วงเวลานี้ไว้ให้ทันทีแล้วพาไปหน้าชำระเงิน ถ้าไม่ชำระภายในเวลาที่กำหนด ช่วงเวลาจะถูกปล่อยคืนให้คนอื่นจองต่อ"
+          facts={[
+            { label: "กีฬา", value: facility.sportName },
+            { label: "สนาม", value: `${facility.name} · ${facility.venueName}` },
+            { label: "วันที่", value: formatBookingDate(selectedDate) },
+            { label: "เวลา", value: `${firstSlot.start} – ${lastSlot.end} น. (${hours} ชม.)` },
+            { label: "รวมทั้งหมด", value: formatBaht(total) },
+          ]}
+          busy={submitting}
+          confirmLabel={submitting ? "กำลังสร้างรายการจอง..." : "ยืนยันการจอง"}
+          cancelLabel="ยกเลิก"
+          onConfirm={handleSubmit}
+          onClose={() => setConfirming(false)}
+        />
+      )}
     </div>
   );
 }

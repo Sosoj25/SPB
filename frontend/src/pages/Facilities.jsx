@@ -1,18 +1,38 @@
+// หน้าสิ่งอำนวยความสะดวก (/facilities) — ข้อมูลคลับ สิ่งอำนวยความสะดวก
+// และตัวเลขสถิติจริงของระบบ
 import AppHeader from "../components/AppHeader";
 import founderPhoto from "../assets/facilities/founder.png";
 import { usePublicAmenities, useFacilitiesPageSettings } from "../hooks/useAmenities";
+import { usePlatformStats } from "../hooks/useStats";
 import "./Facilities.css";
 
-const STATS = [
-  { value: "120+", label: "สนามพันธมิตร" },
-  { value: "8,400+", label: "การจองต่อเดือน" },
-  { value: "4.8", label: "คะแนนผู้ใช้เฉลี่ย" },
-  { value: "2024", label: "ปีที่ก่อตั้ง" },
-];
+const numberFormat = new Intl.NumberFormat("th-TH");
+
+// ตัวเลขสี่ช่องท้ายหน้ามาจาก platform_stats() ตัวเดียวกับหน้าแรก
+// ทุกตัวต้องเป็นค่าจริงจาก DB ห้ามพิมพ์ตัวเลขเองให้ดูดี
+function statCards(stats) {
+  return [
+    // ช่องแรกใช้ตัวนับเดียวกับช่อง "การจองต่อเดือน" บนหน้าแรก (นับเฉพาะ
+    // confirmed / awaiting_review / no_show / completed — ที่ยกเลิกกับที่ถูกปฏิเสธไม่นับ)
+    { value: numberFormat.format(stats.bookingsThisMonth), label: "การจองต่อเดือน" },
+    { value: numberFormat.format(stats.facilities), label: "สนามให้เลือกจอง" },
+    { value: numberFormat.format(stats.sports), label: "ประเภทกีฬา" },
+
+    // ดาวเฉลี่ยโชว์ได้ต่อเมื่อมีรีวิวที่เผยแพร่แล้วจริง ๆ เท่านั้น —
+    // ระหว่างที่ยังไม่มีรีวิว ใช้ยอดจองสะสมทั้งหมดแทน
+    stats.reviewsCount > 0
+      ? {
+          value: `${stats.avgRating.toFixed(1)}★`,
+          label: `คะแนนเฉลี่ยจาก ${numberFormat.format(stats.reviewsCount)} รีวิว`,
+        }
+      : { value: numberFormat.format(stats.bookingsTotal), label: "การจองทั้งหมด" },
+  ];
+}
 
 export default function Facilities() {
   const { amenities, loading } = usePublicAmenities();
   const { settings } = useFacilitiesPageSettings();
+  const { stats } = usePlatformStats();
 
   return (
     <div className="facilities">
@@ -35,7 +55,7 @@ export default function Facilities() {
           <>
             <section className="facilities__index">
               {amenities.map((item, index) => (
-                <div key={item.id} className="facilities__index-item">
+                <div key={item.id} className="facilities__index-item" data-category={item.category}>
                   <p className="facilities__index-no">{String(index + 1).padStart(2, "0")}</p>
                   <p className="facilities__index-title">{item.name}</p>
                   <p className="facilities__index-desc">{item.category}</p>
@@ -49,13 +69,22 @@ export default function Facilities() {
               <section
                 key={item.id}
                 className={`facilities__feature ${index % 2 === 1 ? "facilities__feature--reverse" : ""}`}
+                data-category={item.category}
               >
                 <div className="facilities__feature-photo">
-                  {item.imageUrl && <img src={item.imageUrl} alt={item.name} />}
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.name} />
+                  ) : (
+                    <span className="facilities__feature-no facilities__feature-no--photo">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  )}
                 </div>
                 <div className="facilities__feature-copy">
                   <p className="facilities__feature-no">{String(index + 1).padStart(2, "0")}</p>
-                  <p className="facilities__feature-eyebrow">{item.category}</p>
+                  {item.category && (
+                    <p className="facilities__feature-eyebrow">{item.category}</p>
+                  )}
                   <h2 className="facilities__feature-title">{item.name}</h2>
                   <p className="facilities__feature-desc">{item.description}</p>
                   {item.facts.length > 0 && (
@@ -90,25 +119,33 @@ export default function Facilities() {
               <div className="facilities__rule" />
               <p className="facilities__founder-name">ศุภพล อนุกูล</p>
               <p className="facilities__founder-role">CEO &amp; FOUNDER — SPORTSBOOKING</p>
+
+              {/* ประโยคท้ายดึงจำนวนจากตัวนับเดียวกับช่องสถิติ และหายไปทั้ง
+                  ประโยคถ้าโหลดตัวเลขไม่ได้ — ห้ามเขียนจำนวนสนามค้างไว้เอง */}
               <p className="facilities__founder-bio">
                 อายุ 24 ปี จบการศึกษาจากมหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ
-                ก่อตั้ง SPORTSBOOKING ในปี 2024 ปัจจุบันให้บริการสนามพันธมิตรกว่า 120 แห่ง
-                ทั่วกรุงเทพฯ และปริมณฑล
+                ก่อตั้ง SPORTSBOOKING ในปี 2026
+                {stats &&
+                  ` ปัจจุบันเปิดให้บริการ ${numberFormat.format(stats.venues)} สถานที่ รวม ${numberFormat.format(stats.facilities)} สนาม ครอบคลุม ${numberFormat.format(stats.sports)} ประเภทกีฬา`}
               </p>
             </div>
           </div>
         </section>
 
-        <div className="facilities__rule facilities__rule--strong" />
+        {stats && (
+          <>
+            <div className="facilities__rule facilities__rule--strong" />
 
-        <section className="facilities__stats">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="facilities__stat">
-              <p className="facilities__stat-value">{stat.value}</p>
-              <p className="facilities__stat-label">{stat.label}</p>
-            </div>
-          ))}
-        </section>
+            <section className="facilities__stats">
+              {statCards(stats).map((stat) => (
+                <div key={stat.label} className="facilities__stat">
+                  <p className="facilities__stat-value">{stat.value}</p>
+                  <p className="facilities__stat-label">{stat.label}</p>
+                </div>
+              ))}
+            </section>
+          </>
+        )}
 
         <div className="facilities__rule" />
       </main>

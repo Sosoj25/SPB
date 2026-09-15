@@ -1,3 +1,4 @@
+// คิวคำขอคืนเงินของแอดมิน — ตรวจสอบ อนุมัติ/ปฏิเสธ แนบสลิปโอนคืน และแก้นโยบาย
 import { useRef, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pagination, Pill, StatCard } from "../components/DashboardWidgets";
@@ -25,9 +26,9 @@ import {
 import { errorMessage } from "../lib/errors";
 import "./AdminRefunds.css";
 
-// ระบบคืนเงินใช้ Supabase จริงแล้ว (0034_refund_requests.sql) — ลูกค้ายกเลิก
-// การจองที่จ่ายเงินแล้วขอคืนเงินได้จากหน้า BookingReceipt.jsx คำนวณยอดตาม
-// นโยบายอัตโนมัติ แอดมินหน้านี้อนุมัติ/ปฏิเสธ แล้วแนบสลิปโอนคืนเพื่อปิดงาน
+// ลูกค้าขอคืนเงินจากหน้าใบเสร็จ (BookingReceipt.jsx) ระบบคำนวณยอดตามนโยบาย
+// ให้อัตโนมัติ แอดมินหน้านี้อนุมัติ/ปฏิเสธ แล้วแนบสลิปโอนคืนเพื่อปิดงาน
+// (ดู 0034_refund_requests.sql)
 //
 // ส่วนนโยบายคืนเงิน (PolicyReference ด้านล่าง) ผูกกับ refund_policy_settings
 // (0033) อยู่แล้ว แอดมินแก้ตัวเลขได้จากปุ่ม "แก้ไขนโยบาย"

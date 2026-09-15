@@ -1,3 +1,4 @@
+// รายการจองทั้งระบบสำหรับแอดมิน — กรองตามสถานะ/วันที่ และดูรายละเอียดแต่ละรายการ
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, SearchBox, Pill, Pagination } from "../components/DashboardWidgets";
@@ -13,18 +14,31 @@ import {
   formatBookingDate,
   formatTimeRange,
 } from "../lib/bookings";
+import { formatDateTime } from "../lib/payments";
 import { errorMessage } from "../lib/errors";
+
+// ชื่อแอดมิน/ผู้ใช้ที่ join มาจาก profiles — full_name อาจว่างถ้ายังไม่ได้กรอก
+const describePerson = (profile) => profile?.full_name || profile?.username || "—";
+
+// payments เรียงล่าสุดก่อนแล้ว (order created_at desc ที่ fetchAdminBookings) —
+// หยิบแถวปฏิเสธล่าสุดมาโชว์เหตุผล ถ้าลูกค้าโดนปฏิเสธแล้วจ่ายใหม่จนผ่านไปแล้ว
+// ก็ยังเห็นประวัติเดิมได้ในหน้ารายละเอียด
+const latestRejectedPayment = (booking) =>
+  (booking.payments ?? []).find((p) => p.status === "rejected") ?? null;
 
 const FILTERS = [
   { key: "", label: "ทั้งหมด" },
   { key: "pending", label: "รอชำระเงิน" },
   { key: "confirmed", label: "จองแล้ว" },
+  { key: "awaiting_review", label: "รอรีวิว" },
   { key: "completed", label: "สำเร็จ" },
+  { key: "no_show", label: "ไม่ได้ไป" },
   { key: "cancelled", label: "ยกเลิก" },
 ];
 
 function BookingDetailModal({ booking, onClose }) {
   const status = describeStatus(booking);
+  const rejectedPayment = latestRejectedPayment(booking);
 
   return (
     <div className="dash-modal-overlay" onClick={onClose}>
@@ -39,7 +53,16 @@ function BookingDetailModal({ booking, onClose }) {
         <dl className="dash-modal__facts">
           <div>
             <dt>ผู้จอง</dt>
-            <dd>{booking.profiles?.full_name || booking.profiles?.username || "—"}</dd>
+            <dd>
+              {describePerson(booking.profiles)}
+              {booking.is_walk_in && (
+                <p className="dash-field__hint">
+                  รับที่เคาน์เตอร์ (Walk-in)
+                  {booking.walk_in_name ? ` · ${booking.walk_in_name}` : ""}
+                  {booking.walk_in_phone ? ` · ${booking.walk_in_phone}` : ""}
+                </p>
+              )}
+            </dd>
           </div>
           <div>
             <dt>สนาม</dt>
@@ -65,7 +88,20 @@ function BookingDetailModal({ booking, onClose }) {
           </div>
           <div>
             <dt>การชำระเงิน</dt>
-            <dd>{describePayment(booking)}</dd>
+            <dd>
+              {describePayment(booking)}
+              {rejectedPayment && (
+                <p className="dash-field__hint">
+                  ปฏิเสธโดย {describePerson(rejectedPayment.rejected_by_profile)}
+                  {rejectedPayment.verified_at
+                    ? ` · ${formatDateTime(rejectedPayment.verified_at)}`
+                    : ""}
+                  {rejectedPayment.rejection_reason
+                    ? ` · เหตุผล: ${rejectedPayment.rejection_reason}`
+                    : ""}
+                </p>
+              )}
+            </dd>
           </div>
           <div>
             <dt>ยอดชำระ</dt>
@@ -75,6 +111,36 @@ function BookingDetailModal({ booking, onClose }) {
             <div>
               <dt>หมายเหตุ</dt>
               <dd>{booking.note}</dd>
+            </div>
+          )}
+          {booking.checked_in_at && (
+            <div>
+              <dt>เช็คอิน</dt>
+              <dd>
+                {formatDateTime(booking.checked_in_at)} · โดย{" "}
+                {describePerson(booking.checked_in_by_profile)}
+              </dd>
+            </div>
+          )}
+          {booking.checked_out_at && (
+            <div>
+              <dt>เช็คเอาต์</dt>
+              <dd>
+                {formatDateTime(booking.checked_out_at)} · โดย{" "}
+                {describePerson(booking.checked_out_by_profile)}
+              </dd>
+            </div>
+          )}
+          {booking.status === "cancelled" && booking.cancelled_at && (
+            <div>
+              <dt>ยกเลิกโดย</dt>
+              <dd>
+                {describePerson(booking.cancelled_by_profile)} ·{" "}
+                {formatDateTime(booking.cancelled_at)}
+                {booking.cancel_reason && (
+                  <p className="dash-field__hint">เหตุผล: {booking.cancel_reason}</p>
+                )}
+              </dd>
             </div>
           )}
         </dl>
@@ -102,12 +168,20 @@ export default function AdminBookings() {
     setPage(1);
   }
 
-  async function handleCancel(bookingId) {
+  async function handleCancel(booking) {
+    // เหตุผลไม่บังคับ แต่กด "ยกเลิก" บน prompt = ไม่ทำอะไรต่อ (คนละความหมาย
+    // กับกด OK ทั้งที่ช่องว่าง) — เหมือน handleReject ใน AdminPayments.jsx
+    const reason = window.prompt(
+      `เหตุผลที่ยกเลิกการจอง ${booking.booking_code} (ไม่บังคับ)`,
+      "",
+    );
+    if (reason === null) return;
+
     setActionError("");
-    setCancellingId(bookingId);
+    setCancellingId(booking.id);
 
     try {
-      await cancelBooking(bookingId);
+      await cancelBooking(booking.id, reason);
       setReloadKey((key) => key + 1);
     } catch (err) {
       console.error("cancel_booking failed:", err);
@@ -120,7 +194,7 @@ export default function AdminBookings() {
   return (
     <DashboardLayout
       variant="admin"
-      title="จัดการการจอง"
+      title="การจองทั้งหมด"
       subtitle="ตรวจสอบและยกเลิกการจองของลูกค้า"
       headerExtra={<SearchBox />}
     >
@@ -166,6 +240,10 @@ export default function AdminBookings() {
                 <tbody>
                   {bookings.map((booking) => {
                     const status = describeStatus(booking);
+                    const rejectedPayment =
+                      booking.payment_status === "rejected"
+                        ? latestRejectedPayment(booking)
+                        : null;
 
                     return (
                       <tr key={booking.id}>
@@ -173,9 +251,30 @@ export default function AdminBookings() {
                         <td>{describeSport(booking)}</td>
                         <td>{describeFacility(booking)}</td>
                         <td>{formatTimeRange(booking.start_time, booking.end_time)}</td>
-                        <td>{booking.profiles?.full_name || booking.profiles?.username || "—"}</td>
+                        <td>
+                          {describePerson(booking.profiles)}
+                          {booking.is_walk_in && (
+                            <p className="dash-field__hint">Walk-in</p>
+                          )}
+                        </td>
                         <td>
                           <Badge tone={status.tone}>{status.label}</Badge>
+                          {booking.status === "cancelled" &&
+                            (booking.cancelled_by_profile || booking.cancel_reason) && (
+                              <p className="dash-field__hint">
+                                {booking.cancelled_by_profile &&
+                                  `โดย ${describePerson(booking.cancelled_by_profile)}`}
+                                {booking.cancel_reason ? ` · ${booking.cancel_reason}` : ""}
+                              </p>
+                            )}
+                          {rejectedPayment && (
+                            <p className="dash-field__hint">
+                              ปฏิเสธชำระเงินโดย {describePerson(rejectedPayment.rejected_by_profile)}
+                              {rejectedPayment.rejection_reason
+                                ? ` · ${rejectedPayment.rejection_reason}`
+                                : ""}
+                            </p>
+                          )}
                         </td>
                         <td>{formatBaht(booking.total_amount)}</td>
                         <td>
@@ -192,7 +291,7 @@ export default function AdminBookings() {
                                 type="button"
                                 className="dash-btn dash-btn--cancel"
                                 disabled={cancellingId === booking.id}
-                                onClick={() => handleCancel(booking.id)}
+                                onClick={() => handleCancel(booking)}
                               >
                                 {cancellingId === booking.id ? "กำลังยกเลิก..." : "ยกเลิก"}
                               </button>

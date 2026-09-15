@@ -1,5 +1,8 @@
+/* โครงหน้าเข้าสู่ระบบ/สมัครสมาชิก — พื้นหลังสนามและการ์ดฟอร์มตรงกลาง */
+
 .auth-layout {
-    min-height: 100vh;
+    /* 100dvh = ความสูงที่เห็นจริงบนมือถือ (ดูเหตุผลเต็มใน index.css) */
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     background-size: cover;
@@ -25,25 +28,7 @@
     text-align: center;
 }
 
-@media (max-width: 480px) {
-    .auth-layout__main {
-        padding: 1.5rem 1rem;
-    }
 
-    .auth-card {
-        padding: 1.75rem 1.25rem;
-        border-radius: var(--radius-md, 12px);
-    }
-
-    .auth-card__title {
-        font-size: 1.4rem;
-    }
-
-    .auth-card__subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 1.25rem;
-    }
-}
 
 .auth-card__title {
     font-size: 1.75rem;
@@ -104,4 +89,34 @@
     padding: 0;
     font-size: 0.9rem;
     cursor: pointer;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 480px) {
+    .auth-layout__main {
+        padding: 1.5rem 1rem;
+    }
+
+    .auth-card {
+        padding: 1.75rem 1.25rem;
+        border-radius: var(--radius-md, 12px);
+    }
+
+    .auth-card__title {
+        font-size: 1.4rem;
+    }
+
+    .auth-card__subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+    }
 }

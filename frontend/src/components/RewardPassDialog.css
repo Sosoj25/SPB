@@ -1,0 +1,251 @@
+/* บัตรรับของรางวัล (QR + รหัสคูปอง) — ดู RewardPassDialog.jsx */
+
+.reward-pass__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(26, 10, 54, 0.55);
+  overflow-y: auto;
+}
+
+.reward-pass {
+  width: min(25rem, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.reward-pass__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--color-tint-light);
+}
+
+/* กรอบรูปของรางวัลในหัวบัตร — RewardMedia ยืดเต็มกล่องที่ครอบมัน ขนาดจึงต้อง
+   มาจากตรงนี้ */
+.reward-pass__thumb {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.reward-pass__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.reward-pass__title h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--color-heading);
+  /* ชื่อของรางวัลที่แอดมินตั้งเองยาวแค่ไหนก็ได้ และบางชื่อเป็นคำเดียวยาว ๆ
+     ที่เบราว์เซอร์ตัดบรรทัดให้ไม่ได้ — ปล่อยไว้จะดันหัวบัตรจนปุ่มปิดหลุดขอบ */
+  overflow-wrap: anywhere;
+}
+
+.reward-pass__title p {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-pass__close {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reward-pass__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.25rem 1.5rem;
+  text-align: center;
+}
+
+/* พื้นขาวล้วนรอบ QR — โค้ดที่ลอยอยู่บนพื้นสีอ่อนของแอปทำให้กล้องบางรุ่น
+   หาขอบไม่เจอ (quiet zone ไม่พอ) */
+.reward-pass__qr {
+  display: grid;
+  place-items: center;
+  width: min(17.5rem, 72vw);
+  aspect-ratio: 1;
+  padding: 0.75rem;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #eee4fb;
+}
+
+.reward-pass__qr img {
+  width: 100%;
+  height: 100%;
+}
+
+.reward-pass__qr-loading,
+.reward-pass__qr-error {
+  margin: 0;
+  padding: 0 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+.reward-pass__qr-error {
+  color: var(--color-danger-text);
+}
+
+/* โหมดจัดส่ง: กล่องนี้แทนที่ QR — บอกสถานะปัจจุบันแทนสิ่งที่เอาไปยื่นไม่ได้ */
+.reward-pass__ship {
+  width: 100%;
+  padding: 1.25rem 1rem;
+  border-radius: 20px;
+  background: var(--color-tint-light);
+}
+
+.reward-pass__ship-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.reward-pass__ship-status {
+  margin: 0.5rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-pass__ship-text {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+.reward-pass__address {
+  /* ที่อยู่ที่ลูกค้าพิมพ์เองมีขึ้นบรรทัดใหม่ได้ ต้องคงไว้ ไม่งั้นอ่านยากทั้งก้อน */
+  white-space: pre-wrap;
+}
+
+.reward-pass__code-label {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-pass__code {
+  margin: 0;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--color-heading);
+  /* รหัสคือสิ่งที่ต้องอ่าน/พิมพ์ตามได้ตรงตัว — เลือกคลุมทั้งก้อนด้วยการดับเบิลคลิก */
+  user-select: all;
+  word-break: break-all;
+}
+
+.reward-pass__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.reward-pass__action {
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.reward-pass__action:hover {
+  background: var(--color-card-tint);
+}
+
+.reward-pass__warn {
+  width: 100%;
+  margin: 0.25rem 0 0;
+  padding: 0.6rem 0.85rem;
+  border-radius: 14px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.reward-pass__facts {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  margin: 0.5rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  background: var(--color-surface-soft);
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.reward-pass__facts dt {
+  color: var(--color-muted-purple);
+}
+
+.reward-pass__facts dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.reward-pass__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* จอเตี้ย (มือถือแนวนอน/หน้าต่างเล็ก) — ย่อ QR ลงแทนที่จะดันปุ่มคัดลอกกับ
+   รหัสให้ตกไปอยู่นอกจอ ซึ่งเป็นสองอย่างที่ต้องใช้แน่ ๆ หน้าเคาน์เตอร์ */
+@media (max-height: 700px) {
+  .reward-pass__qr {
+    width: min(12.5rem, 60vw);
+  }
+
+  .reward-pass__code {
+    font-size: 1.3rem;
+  }
+}

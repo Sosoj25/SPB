@@ -1,12 +1,13 @@
+// หน้าแรกหลังล็อกอิน — การ์ดการจองรายการถัดไป ตัวเลขสถิติ และทางลัดไปจองสนาม
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
-import { useAsyncData } from "../hooks/useAsyncData";
 import { useNextBooking } from "../hooks/useBookings";
-import { fetchPlatformStats } from "../lib/stats";
+import { usePlatformStats } from "../hooks/useStats";
 import {
   describeCountdown,
   describeFacility,
   describePayment,
+  describePaymentTone,
   formatBookingDate,
   formatTimeRange,
 } from "../lib/bookings";
@@ -15,26 +16,28 @@ import "./Home.css";
 
 const numberFormat = new Intl.NumberFormat("th-TH");
 
-// ตัวเลขทุกตัวมาจาก DB จริง
-//
-// ของเดิมเป็นค่าที่พิมพ์ไว้ตั้งแต่ตอนทำดีไซน์ ("120+ สนามพันธมิตร" ทั้งที่มี
-// 3 สนาม, "8,400+ การจองต่อเดือน" ทั้งที่มีหลักหน่วย, "4.8 ดาว" ทั้งที่ยัง
-// ไม่มีรีวิวสักอัน) ซึ่งเป็นการอ้างตัวเลขที่ไม่จริงกับผู้ใช้จริง
+// ตัวเลขอวดสถิติบนหน้าแรก — ทุกตัวต้องมาจาก DB จริงเท่านั้น
+// ห้ามใส่ตัวเลขที่พิมพ์ไว้เองให้ดูดี เพราะเป็นการอ้างตัวเลขที่ไม่จริงกับผู้ใช้
 function statCards(stats) {
   return [
     { value: numberFormat.format(stats.facilities), label: "สนามให้เลือกจอง" },
-    { value: numberFormat.format(stats.openSlots), label: "ช่วงเวลาที่เปิดจอง" },
+
+    // จำนวนช่องเวลาที่เปิดจองเป็นเลขจริงก็จริง แต่มันคือผลคูณของ "สนาม ×
+    // ช่องเวลาต่อวัน × จำนวนวันที่เปิดล่วงหน้า" เลขเลยโตเป็นหลักหมื่นโดยที่ไม่ได้แปลว่า
+    // ระบบใหญ่จริง จึงสลับมาโชว์ยอดจองของเดือนปัจจุบันแทน (นับเฉพาะ confirmed /
+    // awaiting_review / no_show / completed — ที่ยกเลิกกับที่ถูกปฏิเสธไม่ถูกนับ)
+    { value: numberFormat.format(stats.bookingsThisMonth), label: "การจองต่อเดือน" },
 
     // ดาวเฉลี่ยโชว์ได้ต่อเมื่อมีรีวิวจริงเท่านั้น ไม่งั้นก็กลับไปเป็น
     // ตัวเลขที่แต่งขึ้นแบบเดิม — ระหว่างที่ยังไม่มี ใช้จำนวนกีฬาแทน
     stats.reviewsCount > 0
-      ? { value: `${stats.avgRating}★`, label: `จาก ${numberFormat.format(stats.reviewsCount)} รีวิว` }
+      ? { value: `${stats.avgRating.toFixed(1)}★`, label: `จาก ${numberFormat.format(stats.reviewsCount)} รีวิว` }
       : { value: numberFormat.format(stats.sports), label: "ประเภทกีฬา" },
   ];
 }
 
 function PlatformStats() {
-  const { data: stats } = useAsyncData(fetchPlatformStats, "platform-stats");
+  const { stats } = usePlatformStats();
 
   // ยังโหลดไม่เสร็จหรือโหลดไม่ได้ = ไม่ต้องโชว์อะไร ดีกว่าโชว์เลขศูนย์
   if (!stats) return null;
@@ -94,8 +97,14 @@ function NextBookingCard() {
       </div>
 
       <p className="home__booking-status">
-        <span aria-hidden="true">🕘</span> {describeCountdown(booking.booking_date)} ·{" "}
-        {describePayment(booking)}
+        <span className="home__booking-countdown">
+          <span aria-hidden="true">🕘</span> {describeCountdown(booking.booking_date)}
+        </span>
+        <span
+          className={`home__payment-badge home__payment-badge--${describePaymentTone(booking)}`}
+        >
+          {describePayment(booking)}
+        </span>
       </p>
 
       <div className="home__booking-actions">
@@ -133,8 +142,8 @@ export default function Home() {
 
             <div className="home__actions">
               <Link to="/booking/sport" className="home__cta">
-                <img src={playIcon} alt="" className="home__cta-icon" />
                 จองเลยตอนนี้
+                <img src={playIcon} alt="" className="home__cta-icon" />
               </Link>
               <Link to="/booking/sport" className="home__secondary">
                 ดูสนามทั้งหมด

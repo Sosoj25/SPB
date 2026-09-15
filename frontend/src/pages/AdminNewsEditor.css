@@ -1,3 +1,5 @@
+/* หน้าเขียน/แก้ไขข่าว — แถบเครื่องมือจัดรูปแบบและกล่องเขียนเนื้อหา */
+
 .admin-editor__back {
   display: block;
   font-weight: 700;
@@ -153,8 +155,74 @@
   color: var(--color-muted-purple);
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
 @media (max-width: 1200px) {
   .admin-editor {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-editor,
+  .admin-editor__side {
+    gap: 1.25rem;
+  }
+
+  .admin-editor__section h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-editor__thumb {
+    width: 128px;
+    height: 88px;
+  }
+
+  .admin-editor__thumb--preview {
+    width: 176px;
+    height: 104px;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-editor__actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-editor__section {
+    gap: 1rem;
+  }
+
+  .admin-editor__thumb {
+    width: 104px;
+    height: 72px;
+  }
+
+  .admin-editor__thumb--preview {
+    width: 100%;
+    height: 150px;
+  }
+
+  /* แถวสวิตช์: คำอธิบาย | สวิตช์ — คำอธิบายยาว ๆ บีบสวิตช์จนเกือบหาย */
+  .admin-editor__toggle-row {
+    flex-wrap: wrap;
+    padding: 0.85rem 1rem;
+  }
+
+  .admin-editor__toggle-row p {
+    flex: 1 1 100%;
+  }
+
+  .admin-editor__row {
+    flex-wrap: wrap;
+    font-size: 0.98rem;
   }
 }

@@ -1,10 +1,9 @@
+// หน้า 404 ของ route "*" — พิมพ์ URL ผิดแล้วต้องมีทางกลับ ไม่ใช่จอขาวเปล่า
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { logoShield } from "../assets/images";
 import "./NotFound.css";
 
-// เดิมไม่มี route "*" เลย พิมพ์ URL ผิดแล้วได้จอขาวเปล่า ๆ ไม่มีอะไรบอก
-// และกลับหน้าแรกไม่ได้นอกจากแก้ URL เอง
 export default function NotFound() {
   const { user } = useAuth();
 

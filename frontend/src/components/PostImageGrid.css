@@ -1,0 +1,79 @@
+/* เลย์เอาต์รูปหลายรูปแบบเฟซบุ๊ก
+   ความสูงของทุกช่องมาจาก aspect-ratio ของช่องเอง ไม่มีความสูงตายตัวบนตัวกริด
+   — เวอร์ชันก่อนหน้าใช้ height:340px คู่กับ overflow:hidden แล้วแถวที่สองโดน
+   ตัดหายไปทั้งแถว (รูปอยู่ใน DOM ครบแต่มองไม่เห็น) */
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+  margin-bottom: 1rem;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.post-grid__tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.post-grid__tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* รูปเดียว — เต็มความกว้าง สูงตามสัดส่วนภาพจริงแต่ไม่เกินเพดาน */
+.post-grid--1 {
+  grid-template-columns: 1fr;
+}
+
+.post-grid--1 .post-grid__tile {
+  aspect-ratio: auto;
+}
+
+.post-grid--1 .post-grid__tile img {
+  height: auto;
+  max-height: 480px;
+}
+
+/* 3 รูป — รูปแรกใหญ่ครองสองคอลัมน์สองแถว อีกสองรูปเรียงซ้อนทางขวา
+   ความสูงลงตัวพอดีเพราะช่องเล็กเป็นจัตุรัสกว้าง 1/3 สองช่องซ้อนกัน
+   เท่ากับความกว้างของช่องใหญ่ที่กิน 2/3 พอดี */
+.post-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.post-grid--3 .post-grid__tile:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* 5 รูปขึ้นไป — แถวบน 2 รูปครึ่งความกว้าง แถวล่าง 3 รูปเท่ากัน
+   (ใช้กริด 6 คอลัมน์เป็นตัวหารร่วม: แถวบน 3+3 แถวล่าง 2+2+2 เต็มแถวพอดี) */
+.post-grid--5 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.post-grid--5 .post-grid__tile:nth-child(1),
+.post-grid--5 .post-grid__tile:nth-child(2) {
+  grid-column: span 3;
+  aspect-ratio: 4 / 3;
+}
+
+.post-grid--5 .post-grid__tile:nth-child(n + 3) {
+  grid-column: span 2;
+}
+
+/* ป้ายบอกจำนวนรูปที่เหลือ ทับบนช่องสุดท้าย */
+.post-grid__more {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(26, 10, 54, 0.55);
+  color: #fff;
+  font-size: 1.75rem;
+  font-weight: 700;
+}

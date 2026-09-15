@@ -1,11 +1,31 @@
+/* ธีมสีเดียวกับหน้าข่าว (News.css) — พื้นหลังไล่สีจางๆ ม่วง/ทอง + สีเน้นแบบ
+   color-mix เจือจาง ไม่ใช้บล็อกสีทึบเต็มพื้นที่ ให้ยังรู้สึกเป็นเว็บเดียวกัน */
 .facilities {
   --editorial-serif: "Noto Serif Thai", var(--font-main);
   --editorial-sans: "Sarabun", var(--font-main);
   --editorial-text: #1a1a1c;
   --editorial-muted: #6b6b73;
   --editorial-rule: #e3e3e5;
+  --facilities-gold: #c9a227;
+  --facilities-violet: #8b5cf6;
+  --facilities-accent: var(--color-primary);
   min-height: 100%;
-  background: #fff;
+  background: radial-gradient(circle at 12% 0%, rgba(102, 16, 242, 0.05), transparent 42%),
+    radial-gradient(circle at 88% 6%, rgba(201, 162, 39, 0.06), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(102, 16, 242, 0.03), transparent 45%),
+    #fdfcf9;
+}
+
+/* หมวดหมู่ของแต่ละสิ่งอำนวยความสะดวกมีสีประจำตัว (ผูกผ่าน data-category ที่
+   แอดมินกรอกจริง) โทนเดียวกับที่หน้าข่าวใช้แยกหมวดข่าว */
+.facilities [data-category="สนามกีฬา"] {
+  --facilities-accent: var(--color-primary);
+}
+.facilities [data-category="สิ่งอำนวยความสะดวก"] {
+  --facilities-accent: var(--facilities-gold);
+}
+.facilities [data-category="ไลฟ์สไตล์"] {
+  --facilities-accent: var(--facilities-violet);
 }
 
 .facilities__main {
@@ -21,7 +41,20 @@
 }
 
 .facilities__rule--strong {
+  position: relative;
   border-top: 2px solid var(--editorial-text);
+}
+
+.facilities__rule--strong::after {
+  content: "◆";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+  background: #fdfcf9;
+  color: var(--facilities-gold);
+  font-size: 0.85rem;
+  padding: 0 0.85rem;
 }
 
 /* Masthead */
@@ -69,11 +102,19 @@
 }
 
 .facilities__index-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--facilities-accent) 12%, transparent);
   font-family: var(--editorial-serif);
   font-weight: 600;
-  font-size: 1.15rem;
-  color: #c7c7cc;
-  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--facilities-accent);
+  margin: 0 0 0.6rem;
 }
 
 .facilities__index-title {
@@ -109,7 +150,14 @@
   aspect-ratio: 700 / 520;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #f2f0f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--facilities-accent) 35%, #f2f0f7),
+    color-mix(in srgb, var(--facilities-accent) 10%, #fff)
+  );
 }
 
 .facilities__feature-photo img {
@@ -119,21 +167,36 @@
   display: block;
 }
 
-.facilities__feature-no {
+/* ยังไม่มีรูปจริง — ใช้เลขลำดับตัวใหญ่แทนกล่องเทาว่างๆ */
+.facilities__feature-no--photo {
   font-family: var(--editorial-serif);
   font-weight: 600;
-  font-size: 1.6rem;
-  color: #c7c7cc;
-  margin: 0 0 0.5rem;
+  font-size: 6rem;
+  color: color-mix(in srgb, var(--facilities-accent) 55%, #fff);
+}
+
+.facilities__feature-no {
+  font-family: var(--editorial-serif);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--facilities-accent) 70%, var(--editorial-text));
+  margin: 0 0 0.6rem;
 }
 
 .facilities__feature-eyebrow {
+  display: inline-flex;
   font-family: var(--editorial-sans);
   font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.14em;
-  color: var(--color-primary);
-  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--facilities-accent) 10%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--facilities-accent) 30%, transparent);
+  color: var(--facilities-accent);
+  margin: 0 0 0.9rem;
 }
 
 .facilities__feature-title {
@@ -160,18 +223,32 @@
 
 .facilities__fact {
   display: flex;
+  align-items: baseline;
   gap: 1rem;
   padding: 0.75rem 0;
   border-top: 1px solid var(--editorial-rule);
 }
 
 .facilities__fact dt {
+  position: relative;
   font-family: var(--editorial-sans);
   font-size: 0.9rem;
   letter-spacing: 0.02em;
   color: var(--editorial-muted);
   width: 140px;
   flex-shrink: 0;
+  padding-left: 1rem;
+}
+
+.facilities__fact dt::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--facilities-accent);
 }
 
 .facilities__fact dd {
@@ -184,12 +261,24 @@
 
 /* Founder */
 .facilities__section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--editorial-sans);
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.14em;
   color: var(--editorial-text);
   margin: 0 0 2rem;
+}
+
+.facilities__section-label::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), var(--facilities-violet), var(--facilities-gold));
 }
 
 .facilities__founder-grid {
@@ -204,6 +293,7 @@
   border-radius: 50%;
   overflow: hidden;
   background: #f2f0f7;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 .facilities__founder-photo img {
@@ -219,6 +309,8 @@
   line-height: 1.5;
   color: var(--editorial-text);
   margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  border-left: 3px solid var(--facilities-gold);
 }
 
 .facilities__founder-name {
@@ -277,6 +369,30 @@
   margin: 0;
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .facilities__main {
+    padding: 2.5rem 1.5rem 3.5rem;
+  }
+
+  .facilities__feature {
+    gap: 2.5rem;
+  }
+
+  .facilities__founder-grid {
+    gap: 2.5rem;
+  }
+}
+
 @media (max-width: 900px) {
   .facilities__index {
     grid-template-columns: repeat(2, 1fr);
@@ -312,5 +428,132 @@
   .facilities__stat:nth-child(2n + 1) {
     border-left: none;
     padding-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  /* clamp เดิมมีพื้นที่ต่ำสุด 2.2rem (≈35px) ซึ่งบนจอ 360px เหลือแค่
+     ~10 ตัวอักษรต่อบรรทัด หัวข้อภาษาไทยยาว ๆ เลยแตกเป็นห้าหกบรรทัด */
+  .facilities__title {
+    font-size: clamp(1.7rem, 7vw, 2.4rem);
+  }
+
+  .facilities__main {
+    padding: 1.75rem 0.9rem 2.5rem;
+  }
+
+  .facilities__rule {
+    margin: 2rem 0;
+  }
+
+  .facilities__eyebrow {
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+  }
+
+  .facilities__intro {
+    font-size: 1rem;
+  }
+
+  /* ดัชนีสองคอลัมน์ยังบีบชื่อหมวดจนตกบรรทัดกลางคำบนจอ 360px — เหลือคอลัมน์
+     เดียว แล้วเปลี่ยนเส้นคั่นจากด้านซ้ายมาเป็นด้านบนให้ตรงกับทิศที่มันเรียง */
+  .facilities__index {
+    grid-template-columns: 1fr;
+    row-gap: 0;
+  }
+
+  .facilities__index-item {
+    padding: 0.9rem 0;
+    border-left: none;
+    border-top: 1px solid var(--editorial-rule);
+  }
+
+  .facilities__index-item:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .facilities__feature {
+    gap: 1.25rem;
+    padding: 1.5rem 0;
+  }
+
+  .facilities__feature-title {
+    font-size: 1.6rem;
+  }
+
+  .facilities__feature-desc {
+    font-size: 1rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .facilities__feature-no--photo {
+    font-size: 4rem;
+  }
+
+  /* หัวข้อกับค่าของ "ข้อเท็จจริง" เคยอยู่สองคอลัมน์ (หัวข้อกว้างตายตัว 140px)
+     ซึ่งเหลือที่ให้ค่าไม่ถึงครึ่งจอ — เรียงลงล่างแทน */
+  .facilities__fact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .facilities__fact dt {
+    width: auto;
+  }
+
+  .facilities__section-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+  }
+
+  .facilities__founder-grid {
+    gap: 1.75rem;
+  }
+
+  .facilities__founder-photo {
+    max-width: 200px;
+  }
+
+  .facilities__quote {
+    font-size: 1.2rem;
+    padding-left: 0.9rem;
+  }
+
+  .facilities__founder-name {
+    font-size: 1.2rem;
+  }
+
+  .facilities__stat {
+    padding: 1rem 1rem 1rem 0;
+  }
+
+  .facilities__stat-value {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .facilities__main {
+    padding: 1.5rem 0.6rem 2.5rem;
+  }
+
+  /* สี่ตัวเลขสถิติที่เหลือสองคอลัมน์ยังแน่นอยู่ — คอลัมน์เดียวไปเลย */
+  .facilities__stats {
+    grid-template-columns: 1fr;
+    row-gap: 0;
+  }
+
+  .facilities__stat {
+    padding: 0.9rem 0;
+    border-left: none;
+    border-top: 1px solid var(--editorial-rule);
+  }
+
+  .facilities__stat:first-child {
+    border-top: none;
+    padding-top: 0;
   }
 }

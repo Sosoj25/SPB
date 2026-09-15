@@ -1,3 +1,8 @@
+// เข้าสู่ระบบ/ขอรีเซ็ตรหัสผ่านด้วย "ชื่อผู้ใช้" ผ่าน Edge Function
+//
+// ทั้งสองอย่างต้องแปลง username เป็น email ก่อน และการแปลงนั้นต้องเกิดฝั่ง
+// server เท่านั้น — ถ้าเปิด RPC ให้ client แปลงเอง ใครถือ anon key ก็ยิงถาม
+// อีเมลจริงของบัญชีคนอื่นได้โดยไม่ต้องรู้รหัสผ่าน
 import { supabase } from "./supabase";
 
 const INVALID = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
@@ -14,12 +19,7 @@ async function messageFrom(error, fallback) {
   }
 }
 
-// เข้าสู่ระบบด้วยชื่อผู้ใช้ (หรืออีเมล) ผ่าน Edge Function
-//
-// เดิมหน้า Login ทำสองขั้นเองจากเบราว์เซอร์: แปลง username เป็น email ด้วย
-// get_email_by_username() แล้วค่อย signInWithPassword() ซึ่งแปลว่าใครก็ตาม
-// ที่มี anon key ยิง RPC ตัวนั้นแล้วได้อีเมลจริงของบัญชีคนอื่นกลับมาได้เลย
-// โดยไม่ต้องรู้รหัสผ่าน — ตอนนี้การแปลงเกิดที่ฝั่ง server ทั้งหมด
+// เข้าสู่ระบบด้วยชื่อผู้ใช้ (หรืออีเมล) — รับได้ทั้งสองแบบ ฝั่ง server แยกเอง
 export async function loginWithUsername(username, password) {
   const { data, error } = await supabase.functions.invoke("login-with-username", {
     body: { username, password },

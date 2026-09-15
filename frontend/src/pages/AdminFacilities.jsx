@@ -1,3 +1,4 @@
+// จัดการกีฬาและสนาม — เพิ่ม/แก้/ลบ จัดลำดับ และตั้งค่าหน้าสิ่งอำนวยความสะดวก
 import { useEffect, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Switch } from "../components/DashboardWidgets";
@@ -263,17 +264,17 @@ function AmenityEditPanel({
         เปลี่ยนรูปภาพ
       </label>
 
-      <div className="dash-field">
-        <label className="dash-field__label">ชื่อ</label>
+      <label className="dash-field">
+        <span className="dash-field__label">ชื่อ</span>
         <input
           className="dash-input"
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
         />
-      </div>
+      </label>
 
-      <div className="dash-field">
-        <label className="dash-field__label">หมวดหมู่</label>
+      <label className="dash-field">
+        <span className="dash-field__label">หมวดหมู่</span>
         <input
           className="dash-input"
           list="admin-facilities-categories"
@@ -285,17 +286,17 @@ function AmenityEditPanel({
             <option key={c} value={c} />
           ))}
         </datalist>
-      </div>
+      </label>
 
-      <div className="dash-field">
-        <label className="dash-field__label">คำอธิบาย</label>
+      <label className="dash-field">
+        <span className="dash-field__label">คำอธิบาย</span>
         <textarea
           className="dash-textarea"
           rows={3}
           value={form.description}
           onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
         />
-      </div>
+      </label>
 
       <p className="admin-facilities__facts-label">ข้อมูลรายละเอียด</p>
       {factError && <div className="dash-message dash-message--error">{factError}</div>}
@@ -323,12 +324,14 @@ function AmenityEditPanel({
             <>
               <input
                 className="dash-input admin-facilities__fact-input admin-facilities__fact-input--label"
+                aria-label="ชื่อรายการ"
                 value={factDraft.label}
                 onChange={(e) => setFactDraft((f) => ({ ...f, label: e.target.value }))}
                 autoFocus
               />
               <input
                 className="dash-input admin-facilities__fact-input admin-facilities__fact-input--value"
+                aria-label="รายละเอียดของรายการ"
                 value={factDraft.value}
                 onChange={(e) => setFactDraft((f) => ({ ...f, value: e.target.value }))}
               />
@@ -401,6 +404,7 @@ function AmenityEditPanel({
       {addingFact ? (
         <div className="admin-facilities__fact-add-form">
           <input
+            aria-label="ชื่อรายการ"
             className="dash-input"
             placeholder="ชื่อรายการ เช่น ตำแหน่ง, เวลาเปิด"
             value={newFact.label}
@@ -408,6 +412,7 @@ function AmenityEditPanel({
             autoFocus
           />
           <input
+            aria-label="รายละเอียด"
             className="dash-input"
             placeholder="รายละเอียด"
             value={newFact.value}
@@ -624,31 +629,31 @@ export default function AdminFacilities() {
         <div className="admin-facilities__main">
           <section className="dash-card admin-facilities__section">
             <h2>ส่วนหัวของหน้า</h2>
-            <div className="dash-field">
-              <label className="dash-field__label">ป้ายกำกับ (eyebrow)</label>
+            <label className="dash-field">
+              <span className="dash-field__label">ป้ายกำกับ (eyebrow)</span>
               <input
                 className="dash-input"
                 value={header.eyebrow}
                 onChange={(e) => setHeaderDraft({ ...header, eyebrow: e.target.value })}
               />
-            </div>
-            <div className="dash-field">
-              <label className="dash-field__label">หัวข้อหลัก</label>
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">หัวข้อหลัก</span>
               <input
                 className="dash-input"
                 value={header.heading}
                 onChange={(e) => setHeaderDraft({ ...header, heading: e.target.value })}
               />
-            </div>
-            <div className="dash-field">
-              <label className="dash-field__label">คำโปรย</label>
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">คำโปรย</span>
               <textarea
                 className="dash-textarea"
                 rows={3}
                 value={header.intro}
                 onChange={(e) => setHeaderDraft({ ...header, intro: e.target.value })}
               />
-            </div>
+            </label>
             <button
               type="button"
               className="dash-btn dash-btn--add admin-facilities__header-save"

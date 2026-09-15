@@ -1,0 +1,14 @@
+/* กล่องปรับแต้มลูกค้า — ใช้โครง .prompt-dialog__* ของ TextPromptDialog.css
+   เพิ่มเฉพาะส่วนที่ต่างกัน (สองช่องกรอก) */
+
+.adjust-points-dialog__balance {
+  margin: -0.75rem 0 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-muted-purple);
+}
+
+.adjust-points-dialog__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}

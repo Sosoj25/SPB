@@ -1,0 +1,361 @@
+/* จัดการรางวัล — สองคอลัมน์เหมือนหน้าคืนเงิน: รายการซ้าย 980 + แผงแก้ไข
+   ขวา 440 ตามแบบ Figma */
+.admin-rewards__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-rewards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.admin-rewards__list {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-rewards__list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--color-tint-light);
+  padding: 1.5rem 1.9rem;
+}
+
+.admin-rewards__list-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}
+
+.admin-rewards__row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.35rem 1.9rem;
+  border-top: 1px solid #f2ecfd;
+}
+
+.admin-rewards__row:nth-child(odd) {
+  background: #fbf9ff;
+}
+
+.admin-rewards__row--selected {
+  background: var(--color-tint-light);
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.admin-rewards__thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.admin-rewards__row-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.admin-rewards__row-name {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-heading);
+}
+
+/* ป้าย "ปิดอยู่" — รางวัลที่ปิดยังอยู่ในรายการของแอดมิน (RLS ปล่อยให้แอดมิน
+   เห็นทั้งหมด) ต้องแยกออกจากของที่ลูกค้าเห็นจริงได้ด้วยตาทันที */
+.admin-rewards__off {
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-bg);
+  color: var(--color-faint-purple);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.admin-rewards__row-meta {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-rewards__row-points {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.admin-rewards__row-points p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.admin-rewards__row-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.admin-rewards__row-actions .dash-btn {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.5rem;
+}
+
+/* แผงขวา */
+.admin-rewards__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-rewards__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.admin-rewards__panel-title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--color-heading);
+}
+
+.admin-rewards__preview {
+  height: 160px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.admin-rewards__preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-rewards__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.admin-rewards__limit-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-rewards__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.3rem;
+  border-radius: 1rem;
+  background: var(--color-page-bg);
+  border: 2px solid var(--color-tint-light);
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.admin-rewards__panel-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.admin-rewards__panel-actions .dash-btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* กล่องเตือนสต๊อก — โทนเหลืองเดียวกับ badge--warning */
+.admin-rewards__alert {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.admin-rewards__alert-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.admin-rewards__alert-body {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.admin-rewards__alert .dash-btn {
+  width: 100%;
+  text-align: center;
+}
+
+
+
+/* ปุ่มลบของรางวัล — โทนแดงอ่อนให้ต่างจากปุ่มแก้ไข/ปิดใช้งานที่กดผิดแล้วกู้ได้ */
+.admin-rewards__delete {
+  color: var(--color-danger-text);
+}
+
+.admin-rewards__delete:hover {
+  background: var(--color-danger-bg);
+}
+
+/* ปรับแต้มลูกค้า — ค้นหาแล้วเลือกจากผลลัพธ์แทนหน้ารายชื่อแยก (รายชื่อผู้ใช้
+   ทั้งหมดอยู่ที่ /superadmin/users ซึ่งจำกัดสิทธิ์ super_admin เท่านั้น
+   ส่วนนี้เปิดให้ admin ธรรมดาปรับแต้มลูกค้าได้จากหน้าจัดการรางวัล) */
+.admin-points {
+  margin-bottom: 1.75rem;
+}
+
+.admin-points__body {
+  padding: 1.5rem 1.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-points__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid #f2ecfd;
+}
+
+.admin-points__row:first-of-type {
+  border-top: none;
+}
+
+.admin-points__balance {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.admin-points__balance p {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1280px) {
+  .admin-rewards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-rewards,
+  .admin-rewards__side {
+    gap: 1.25rem;
+  }
+
+  .admin-rewards__list-header,
+  .admin-rewards__row {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .admin-rewards__list-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-rewards__panel-title {
+    font-size: 1.18rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-rewards__header-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-rewards__list-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  /* แถวของรางวัล: รูป | ชื่อ | แต้ม(140px) | ปุ่ม(120px) — สี่ช่องนี้รวมกัน
+     กว้างกว่าจอมือถือ ให้ชื่อกินเต็มแถวบนสุด แล้วแต้มกับปุ่มลงแถวล่าง */
+  .admin-rewards__row {
+    flex-wrap: wrap;
+    gap: 0.6rem 0.85rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .admin-rewards__row-info {
+    flex: 1 1 100%;
+    order: 1;
+  }
+
+  .admin-rewards__thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .admin-rewards__row-points,
+  .admin-rewards__row-actions {
+    width: auto;
+  }
+
+  .admin-rewards__row-actions {
+    flex: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .admin-rewards__row-actions .dash-btn {
+    flex: 1;
+    width: auto;
+  }
+
+  .admin-rewards__row-name {
+    font-size: 1.05rem;
+  }
+}

@@ -2,7 +2,8 @@
 
 .booking {
   position: relative;
-  min-height: 100vh;
+  /* 100dvh = ความสูงที่เห็นจริงบนมือถือ (ดูเหตุผลเต็มใน index.css) */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--color-page-bg);
@@ -83,6 +84,12 @@
   flex-direction: column;
 }
 
+.booking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -12px rgba(43, 10, 99, 0.32);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
 .booking-card__media {
   position: relative;
   /* ภาพในการ์ดคือ 740x380 ตามดีไซน์ */
@@ -101,6 +108,11 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.booking-card:hover .booking-card__img {
+  transform: scale(1.04);
+  transition: transform 0.3s ease;
 }
 
 .booking-card__badge {
@@ -203,12 +215,12 @@
   padding: 0.95rem 2.2rem;
   border-radius: var(--radius-pill);
   white-space: nowrap;
-  transition: background-color 0.15s ease, transform 0.18s ease;
 }
 
 .booking-btn:hover {
   background: var(--color-primary-dark);
   transform: translateY(-2px);
+  transition: background-color 0.15s ease, transform 0.18s ease;
 }
 
 .booking-btn--block {
@@ -480,7 +492,8 @@
   gap: 0.25rem;
   padding: 0;
   border-radius: 18px;
-  background: var(--color-tint-light);
+  background: var(--color-slot-free-bg);
+  border: 1.5px solid var(--color-slot-free-border);
   transition: transform 0.15s ease;
 }
 
@@ -495,12 +508,16 @@
 }
 
 .booking-day__state {
-  color: var(--color-muted-purple);
+  color: var(--color-slot-free-text);
+  font-weight: 600;
   font-size: 0.72rem;
 }
 
 .booking-day--full {
-  background: var(--color-disabled-bg);
+  background-color: var(--color-slot-full-bg);
+  background-image: var(--color-slot-full-stripe);
+  border-style: dashed;
+  border-color: var(--color-slot-full-border);
   cursor: not-allowed;
 }
 
@@ -510,11 +527,15 @@
 
 .booking-day--full .booking-day__num,
 .booking-day--full .booking-day__state {
-  color: var(--color-disabled-text);
+  color: var(--color-slot-full-text);
 }
 
+/* วันที่เต็มแล้วยังถูกเลือกค้างอยู่ได้ (ตารางถูกดึงใหม่หลังมีคนจองตัดหน้า) —
+   ทับเส้นประของสถานะเต็มให้กลับเป็นเส้นทึบ ไม่งั้นช่องที่เลือกจะขอบแหว่ง */
 .booking-day--selected {
   background: var(--color-primary);
+  border-style: solid;
+  border-color: var(--color-primary-dark);
 }
 
 .booking-day--selected .booking-day__num {
@@ -527,6 +548,7 @@
 
 .booking-day--empty {
   background: none;
+  border-color: transparent;
   cursor: default;
 }
 
@@ -549,10 +571,30 @@
   font-size: 0.95rem;
 }
 
+/* ป้ายสีต้องหยิบสีจากตัวแปรชุดเดียวกับช่องปฏิทินจริง ไม่ใช่ hardcode ซ้ำ
+   ไม่งั้นแก้สีปฏิทินแล้วคำอธิบายด้านล่างจะโกหกทันที */
 .booking-legend__swatch {
   width: 20px;
   height: 20px;
   border-radius: 7px;
+  border: 1.5px solid transparent;
+}
+
+.booking-legend__swatch--free {
+  background: var(--color-slot-free-bg);
+  border-color: var(--color-slot-free-border);
+}
+
+.booking-legend__swatch--full {
+  background-color: var(--color-slot-full-bg);
+  background-image: var(--color-slot-full-stripe);
+  border-style: dashed;
+  border-color: var(--color-slot-full-border);
+}
+
+.booking-legend__swatch--selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary-dark);
 }
 
 .booking-slot {
@@ -563,7 +605,8 @@
   width: 100%;
   padding: 1rem 1.2rem;
   border-radius: 14px;
-  background: var(--color-tint-light);
+  background: var(--color-slot-free-bg);
+  border: 1.5px solid var(--color-slot-free-border);
   text-align: left;
 }
 
@@ -574,22 +617,28 @@
 }
 
 .booking-slot__state {
-  color: var(--color-muted-purple);
+  color: var(--color-slot-free-text);
+  font-weight: 600;
   font-size: 0.88rem;
 }
 
 .booking-slot--full {
-  background: var(--color-disabled-bg);
+  background-color: var(--color-slot-full-bg);
+  background-image: var(--color-slot-full-stripe);
+  border-style: dashed;
+  border-color: var(--color-slot-full-border);
   cursor: not-allowed;
 }
 
 .booking-slot--full .booking-slot__time,
 .booking-slot--full .booking-slot__state {
-  color: var(--color-disabled-text);
+  color: var(--color-slot-full-text);
 }
 
 .booking-slot--selected {
   background: var(--color-primary);
+  border-style: solid;
+  border-color: var(--color-primary-dark);
 }
 
 .booking-slot--selected .booking-slot__time {
@@ -889,40 +938,17 @@
 
 /* ---------- responsive ---------- */
 
-@media (max-width: 1000px) {
-  .booking-schedule,
-  .booking-payment {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 
-@media (max-width: 900px) {
-  .booking__grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
 
-  .booking__intro {
-    padding: 1.5rem;
-    border-radius: 28px;
-  }
-}
 
-@media (max-width: 600px) {
-  .booking-day__num {
-    font-size: 1rem;
-  }
 
-  .booking-day__state {
-    display: none;
-  }
 
-  .booking-pass,
-  .booking-actions,
-  .booking-form__row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
+
+
+
+
+
+
 
 
 /* ---------- สถานะการโหลด / ข้อความแจ้งเตือน ---------- */
@@ -1071,7 +1097,427 @@
   cursor: not-allowed;
 }
 
-/* เวลาพิมพ์ใบเสร็จ เอาเฉพาะเนื้อใบเสร็จ ไม่ต้องมีเมนูกับปุ่มติดไปด้วย */
+
+
+/* ข้อความเตือนบนหน้าจอที่ต้องอ่านออกชัดกว่า booking-note ธรรมดา */
+.booking-note--warn {
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-weight: 600;
+}
+
+/* แบนเนอร์นับถอยหลังเวลากันช่วงเวลาไว้บนหน้าชำระเงิน — margin ให้ห่างจาก
+   ส่วนหัวด้านบนและเนื้อหาด้านล่าง เพราะ booking-note--warn เดิมไม่มี margin
+   มาให้ (ใช้แทรกในบล็อกอื่นที่คุมระยะห่างเองอยู่แล้ว) */
+.booking-hold-banner {
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.booking-hold-banner--urgent {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+/* ใบเสร็จของรายการที่ยังไม่จ่าย/ถูกยกเลิก ไม่ควรใช้เครื่องหมายถูกสีเขียว */
+.booking-success__mark--muted {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+/* ---------- รีวิว ---------- */
+
+.booking-review__stars {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.booking-review__star {
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-disabled-bg);
+}
+
+button.booking-review__star:hover {
+  color: var(--color-warning-text);
+}
+
+.booking-review__star--filled {
+  color: var(--color-warning-text);
+}
+
+/* ป้ายบอกแต้มที่จะได้จากการเขียนรีวิว — จำนวนอ่านจาก reward_settings ที่แอดมิน
+   ตั้งเอง (0106) ตั้งเป็น 0 หรือปิดไว้แล้วบรรทัดนี้จะไม่ขึ้นเลย ไม่ใช่ขึ้นว่า
+   "รับ 0 แต้ม" */
+.booking-review__bonus {
+  margin: 0;
+  align-self: flex-start;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* การ์ดสรุปแต้มที่เพิ่งได้หลังกดส่งรีวิว — ขึ้นเฉพาะรอบที่ผู้ใช้กดส่งเอง จึง
+   ตีกรอบทองให้เด่นกว่าแผงอื่นในใบเสร็จ */
+.booking-points {
+  border: 2px solid var(--color-gold);
+  background: linear-gradient(180deg, #fffaf0 0%, #fff 60%);
+}
+
+.review-popup__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(26, 10, 54, 0.45);
+}
+
+.review-popup {
+  width: min(480px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+}
+
+.review-popup__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-popup__head .booking-panel__title {
+  margin: 0;
+}
+
+.review-popup__close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.review-popup__close:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.review-popup__close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .booking__main {
+    padding: 1.75rem 1.25rem 3rem;
+  }
+
+  .booking__intro {
+    padding: 1.75rem 1.9rem;
+    margin-bottom: 2rem;
+    border-radius: 32px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .booking-schedule,
+  .booking-payment {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .booking__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .booking__intro {
+    padding: 1.5rem;
+    border-radius: 28px;
+  }
+
+  /* แถบภาพหัวหน้าสูงตามสัดส่วน 1920x620 แต่มี min-height 320px ค้ำไว้ ซึ่งบน
+     จอสูง-แคบมันกลายเป็นแถบทึบครึ่งจอก่อนถึงเนื้อหาจริง */
+  .booking__band {
+    min-height: 210px;
+  }
+
+  .booking__lead {
+    font-size: 1.05rem;
+  }
+
+  .booking-panel {
+    padding: 1.4rem;
+    border-radius: 24px;
+  }
+
+  .booking-card {
+    border-radius: 24px;
+  }
+
+  .booking-card__body {
+    padding: 1.3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .booking__main {
+    padding: 1.25rem 0.85rem 2.5rem;
+  }
+
+  .booking__band {
+    min-height: 150px;
+  }
+
+  /* หัวเรื่องเดิมเล็กสุดที่ 1.9rem ซึ่งยังกินสามบรรทัดบนจอ 360px */
+  .booking__title {
+    font-size: clamp(1.45rem, 6vw, 1.9rem);
+  }
+
+  .booking__lead {
+    font-size: 0.98rem;
+  }
+
+  .booking__intro {
+    padding: 1.15rem;
+    margin-bottom: 1.5rem;
+    border-radius: 22px;
+  }
+
+  .booking-panel {
+    padding: 1.1rem;
+    border-radius: 20px;
+  }
+
+  .booking-panel__title {
+    font-size: 1.12rem;
+  }
+
+  .booking-card__body {
+    padding: 1.1rem;
+    gap: 0.75rem;
+  }
+
+  /* ชื่อสนามกับราคา/ปุ่มเคยอยู่คนละฝั่งของแถวเดียวกัน พอจอแคบชื่อยาว ๆ จะบีบ
+     ปุ่มจนเหลือไม่กี่ตัวอักษร — ให้ตกลงมาเรียงกันแทน แล้วปุ่มเต็มความกว้าง */
+  .booking-card__head,
+  .booking-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .booking-card__name {
+    font-size: 1.3rem;
+  }
+
+  .booking-card__meta {
+    white-space: normal;
+  }
+
+  .booking-card__desc {
+    font-size: 0.98rem;
+  }
+
+  .booking-card__foot .booking-btn {
+    width: 100%;
+  }
+
+  .booking-btn {
+    font-size: 1rem;
+    padding: 0.85rem 1.4rem;
+    white-space: normal;
+  }
+
+  .booking-card__badge {
+    top: 12px;
+    left: 12px;
+  }
+
+  /* ปฏิทินเจ็ดช่องบนจอ 360px เหลือช่องละ ~34px — ต้องถอยทั้งระยะห่างและ
+     ขอบมนลง ไม่งั้นตัวเลขวันไม่มีที่เหลือให้แสดง */
+  .booking-calendar__grid {
+    gap: 0.3rem;
+  }
+
+  .booking-day {
+    border-radius: 12px;
+  }
+
+  .booking-calendar__month {
+    font-size: 1.2rem;
+  }
+
+  .booking-calendar__arrow {
+    padding: 0.5rem 0.85rem;
+  }
+
+  .booking-legend {
+    gap: 0.6rem 1rem;
+  }
+
+  .booking-legend__item {
+    font-size: 0.88rem;
+  }
+
+  .booking-slot {
+    padding: 0.85rem 1rem;
+  }
+
+  .booking-receipt__head,
+  .booking-receipt__body {
+    padding: 1.15rem;
+  }
+
+  .booking-row--total .booking-row__value {
+    font-size: 1.25rem;
+  }
+
+  .booking-total__value {
+    font-size: 1.35rem;
+  }
+
+  .booking-success__mark {
+    width: 72px;
+    height: 72px;
+    font-size: 2.1rem;
+  }
+
+  .booking-method {
+    padding: 0.9rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .booking-form {
+    padding: 1rem;
+  }
+
+  .booking-detail {
+    gap: 0.9rem;
+  }
+
+  .booking-detail__thumb {
+    width: 80px;
+    height: 60px;
+  }
+
+  .booking-filters {
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .booking-filter {
+    font-size: 0.88rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* ตัวเลือกวันที่เดิมเป็นแถบเดียวเรียงข้างกัน บนมือถือช่องวันที่ถูกบีบจน
+     อ่านไม่ครบ — ให้ทั้งก้อนเต็มความกว้างแล้วดันช่องวันที่ไปชิดขวา */
+  .booking-datepick {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+  }
+
+  .booking-qr {
+    padding: 1.15rem;
+  }
+
+  .booking-review__star {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-day__num {
+    font-size: 1rem;
+  }
+
+  .booking-day__state {
+    display: none;
+  }
+
+  .booking-pass,
+  .booking-actions,
+  .booking-form__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .booking-pass {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .booking__main {
+    padding: 1rem 0.6rem 2.5rem;
+  }
+
+  .booking__intro {
+    padding: 0.9rem;
+  }
+
+  .booking-panel {
+    padding: 0.9rem;
+  }
+
+  .booking-card__body {
+    padding: 0.9rem;
+  }
+
+  .booking-calendar__grid {
+    gap: 0.2rem;
+  }
+
+  .booking-day {
+    border-radius: 9px;
+  }
+
+  .booking-day__num {
+    font-size: 0.9rem;
+  }
+
+  /* ป้ายกับค่าในแถวสรุปเริ่มชนกันแล้วที่ความกว้างนี้ ปล่อยให้ค่าตกลงบรรทัด
+     ใหม่ชิดซ้ายแทนการบีบตัวอักษรจนหักคำกลางคำ */
+  .booking-row {
+    flex-wrap: wrap;
+    gap: 0.15rem 0.75rem;
+  }
+
+  .booking-row__value {
+    text-align: left;
+  }
+}
+
+/* เวลาพิมพ์หน้าจองอื่น ๆ เอาเฉพาะเนื้อหา ไม่ต้องมีเมนูกับปุ่มติดไปด้วย */
 @media print {
   .app-header,
   .booking__band,
@@ -1088,10 +1534,25 @@
     box-shadow: none;
     border: 1px solid #ddd;
   }
-}
 
-/* ใบเสร็จของรายการที่ยังไม่จ่าย/ถูกยกเลิก ไม่ควรใช้เครื่องหมายถูกสีเขียว */
-.booking-success__mark--muted {
-  background: var(--color-warning-bg);
-  color: var(--color-warning-text);
+  /* ใบเสร็จฝั่งลูกค้าสั่งพิมพ์ไม่ได้เลย ไม่ว่าจ่ายเงินแล้วหรือยัง — ใบที่เป็น
+     กระดาษต้องออกจากเครื่องพิมพ์ของเคาน์เตอร์ที่เดียว (หน้า /admin/checkin)
+     จะได้ควบคุมได้ว่าใบเสร็จตัวจริงมีกี่ใบและออกให้ใคร ฝั่งนี้บันทึกเป็น
+     ไฟล์รูปได้แทน (lib/receiptImage.js)
+
+     ซ่อนแค่ปุ่มไม่พอ เพราะ Ctrl+P กับเมนู "พิมพ์" ของเบราว์เซอร์ไม่ได้ผ่าน
+     ปุ่มนั้น ตรงนี้เลยเปลี่ยนเนื้อหาที่จะออกกระดาษเป็นข้อความแจ้งแทน */
+  .booking--no-print .booking__main > * {
+    display: none !important;
+  }
+
+  .booking--no-print .booking__main::before {
+    content: attr(data-print-note);
+    display: block;
+    padding: 2rem;
+    border: 1px dashed #999;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+  }
 }

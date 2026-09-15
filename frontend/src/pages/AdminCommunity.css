@@ -1,0 +1,508 @@
+/* หน้าจัดการชุมชน — คิวรายงาน ตารางโพสต์/ความคิดเห็น และแผงหมวดหมู่ */
+
+.admin-cm__refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.admin-cm__kpi--primary {
+  color: var(--color-primary);
+}
+
+.admin-cm__kpi--danger {
+  color: var(--color-danger-text);
+}
+
+.admin-cm__kpi--warning {
+  color: var(--color-warning-text);
+}
+
+.admin-cm__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-cm__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-cm__card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+/* ---------- รายการโพสต์ ---------- */
+
+.admin-cm__posts {
+  padding: 1.75rem;
+}
+
+.admin-cm__post {
+  padding: 1.1rem 1.15rem;
+  border-radius: 1.25rem;
+  border: 1px solid #efe6fb;
+}
+
+.admin-cm__post + .admin-cm__post {
+  margin-top: 0.85rem;
+}
+
+/* โพสต์ที่มีรายงานค้างอยู่ย้อมพื้นหลังไว้ให้สะดุดตาตั้งแต่กวาดสายตาผ่าน */
+.admin-cm__post--flagged {
+  border-color: #f7c9cf;
+  background: #fdf1f2;
+}
+
+.admin-cm__post-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.7rem;
+}
+
+.admin-cm__avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+  object-fit: cover;
+}
+
+.admin-cm__post-who {
+  min-width: 0;
+}
+
+.admin-cm__post-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
+  flex-wrap: wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-cm__post-meta {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-cm__post-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.admin-cm__flag {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-danger-text);
+  white-space: nowrap;
+}
+
+.admin-cm__post-body {
+  margin: 0 0 0.85rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  /* ข้อความผู้ใช้ที่ยาวรวดเดียวโดยไม่มีช่องว่างต้องตัดบรรทัดเอง ไม่งั้นจะทะลุออกนอกการ์ดไปทับพาเนลรายงานด้านขวา */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.admin-cm__post-foot {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-cm__stat {
+  font-size: 0.9rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-cm__post-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.admin-cm__pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #efe6fb;
+}
+
+.admin-cm__pager-text {
+  margin: 0;
+  color: var(--color-muted-purple);
+}
+
+/* ---------- แผงด้านขวา ---------- */
+
+.admin-cm__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-cm__panel {
+  padding: 1.5rem;
+}
+
+.admin-cm__panel--alert {
+  border: 1px solid #f7c9cf;
+  background: #fdf1f2;
+}
+
+.admin-cm__panel-title {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.admin-cm__panel--alert .admin-cm__panel-title {
+  color: var(--color-danger-text);
+}
+
+.admin-cm__card-head .admin-cm__panel-title {
+  margin-bottom: 0;
+}
+
+.admin-cm__report {
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.admin-cm__report + .admin-cm__report {
+  margin-top: 0.75rem;
+}
+
+.admin-cm__report-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin-cm__report-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-cm__report-time {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-cm__report-title {
+  margin: 0 0 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-cm__report-content {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-cm__report-meta {
+  margin: 0.2rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-cm__report-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-cm__reason {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.admin-cm__reason-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--color-danger-text);
+  color: #fff;
+  font-size: 0.7rem;
+}
+
+/* คำอธิบายเพิ่มเติมที่ผู้รายงานพิมพ์มาเอง — เป็นข้อความของผู้ใช้ จึงจำกัด
+   ความสูงไว้ ไม่ให้ใบเดียวดันใบอื่นตกจอ */
+.admin-cm__report-note {
+  margin: 0 0 0.6rem;
+  max-height: 3.4rem;
+  overflow: hidden;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--color-muted-purple);
+}
+
+.admin-cm__kpi-new {
+  color: var(--color-danger-text);
+  font-weight: 700;
+}
+
+.admin-cm__live {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+.admin-cm__report-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- หมวดหมู่ ---------- */
+
+.admin-cm__category {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+}
+
+.admin-cm__category + .admin-cm__category {
+  border-top: 1px solid #f1eafb;
+}
+
+.admin-cm__category-name {
+  flex: 1;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.admin-cm__category-count {
+  font-size: 0.9rem;
+  color: var(--color-muted-purple);
+  white-space: nowrap;
+}
+
+.admin-cm__category-edit {
+  background: none;
+  padding: 0.2rem 0.35rem;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.admin-cm__category-edit:hover:not(:disabled) {
+  color: var(--color-primary-dark);
+}
+
+/* ป้ายแทนปุ่มแก้/ลบของหมวดระบบ ("รีวิว") — โทนทองชุดเดียวกับรีวิวในหน้าชุมชน
+   บอกว่าแถวนี้แตะไม่ได้ ไม่ใช่ปุ่มที่บังเอิญกดไม่ติด */
+.admin-cm__category-system {
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-bg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-warning-text);
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* ---------- ผู้ใช้ที่ถูกรายงาน ---------- */
+
+.admin-cm__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+}
+
+.admin-cm__user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-cm__user-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.admin-cm__user-meta {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.dash-btn:disabled,
+.admin-cm__category-edit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+/* แท็บ โพสต์ / ความคิดเห็น */
+.admin-cm__tabs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-cm__category-edit--danger {
+  color: var(--color-danger-text);
+}
+
+.admin-cm__category-edit--danger:hover:not(:disabled) {
+  color: #8f1d28;
+}
+
+/* ปุ่ม "ดูในหน้าโพสต์" เป็น <a> จึงต้องจัดให้เหมือน .dash-btn ตัวอื่นในแถว */
+a.dash-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .admin-cm__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-cm__layout,
+  .admin-cm__side {
+    gap: 1.25rem;
+  }
+
+  .admin-cm__posts {
+    padding: 1.25rem;
+  }
+
+  .admin-cm__card-title {
+    font-size: 1.12rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-cm__post-tags,
+  .admin-cm__post-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .admin-cm__posts {
+    padding: 1rem;
+  }
+
+  .admin-cm__post {
+    padding: 0.9rem 1rem;
+  }
+
+  .admin-cm__card-head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  /* ชื่อผู้โพสต์ + ป้ายกำกับ + ปุ่มจัดการ — บนจอแคบให้แต่ละก้อนขึ้นบรรทัด
+     ของตัวเอง แทนที่จะเบียดกันในบรรทัดเดียวจนชื่อถูกตัด */
+  .admin-cm__post-head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .admin-cm__post-who {
+    flex: 1 1 100%;
+  }
+
+  .admin-cm__post-foot {
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+  }
+
+  .admin-cm__post-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-cm__panel {
+    padding: 1.1rem;
+  }
+
+  .admin-cm__pager {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+}

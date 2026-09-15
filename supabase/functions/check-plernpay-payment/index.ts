@@ -60,13 +60,30 @@ Deno.serve(async (req) => {
     return json({ error: "คำขอไม่ถูกต้อง" }, 400);
   }
 
-  if (!paymentId) return json({ error: "ไม่พบรายการชำระเงินนี้" }, 400);
+  // คอลัมน์ payments.id เป็น uuid — บังคับรูปแบบตั้งแต่ตรงนี้เลย ค่าที่ไม่ใช่
+  // uuid ไม่มีทางตรงกับแถวไหนได้อยู่แล้ว ตอบ 400 กลับไปเลยดีกว่าปล่อยให้ไป
+  // ตายที่ PostgREST แล้วได้ error ภาษาอังกฤษกลับมาแทน
+  //
+  // และที่สำคัญกว่านั้น: ค่านี้ถูกต่อเข้า query string ของ PostgREST ข้างล่าง
+  // ถ้าปล่อยผ่านดิบ ๆ ตัว & หรือ , ที่แทรกมาจะกลายเป็นพารามิเตอร์เพิ่มของ
+  // query นั้น (เช่น &select=* ดึงคอลัมน์ที่ไม่ได้ตั้งใจเปิด) — RLS ยังกันเรื่อง
+  // "แถวของใคร" ไว้อยู่ แต่ไม่ควรให้ผู้ใช้แต่ง query ของเราได้ตั้งแต่แรก
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (!UUID_RE.test(paymentId)) {
+    return json({ error: "ไม่พบรายการชำระเงินนี้" }, 400);
+  }
 
   // อ่านแถวด้วย JWT ของผู้ใช้เอง (ผ่าน anon key) — payments_select_own (RLS)
   // กันไม่ให้เห็นแถวของคนอื่นอยู่แล้ว ถ้า query กลับมาว่างแปลว่าไม่ใช่ของเขา
   // หรือไม่มีอยู่จริง สองกรณีนี้ตอบเหมือนกัน
+  //
+  // encodeURIComponent อีกชั้นถึงจะผ่าน regex มาแล้วก็ตาม — กันไว้เผื่อวันหลัง
+  // มีคนแก้เงื่อนไขข้างบนให้หลวมลงโดยไม่ทันนึกถึงบรรทัดนี้
   const findRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/payments?id=eq.${paymentId}&select=id,status,gateway,gateway_charge_id`,
+    `${SUPABASE_URL}/rest/v1/payments?id=eq.${encodeURIComponent(paymentId)}` +
+      `&select=id,status,gateway,gateway_charge_id`,
     { headers: { apikey: ANON_KEY, Authorization: authHeader } }
   );
 

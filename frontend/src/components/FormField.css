@@ -1,3 +1,5 @@
+/* ช่องกรอกข้อมูลพร้อมป้ายกำกับ รวมสถานะที่แก้ไขไม่ได้ */
+
 .form-field {
   display: flex;
   flex-direction: column;
@@ -5,8 +7,23 @@
 }
 
 .form-field__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.95rem;
   font-weight: 500;
+}
+
+.form-field__lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-tint-light, #f3f1f8);
+  color: var(--color-muted-purple, #8a7ba8);
+  font-size: 0.72rem;
+  font-weight: 600;
 }
 
 .form-field__input {
@@ -23,4 +40,11 @@
 .form-field__input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(102, 16, 242, 0.15);
+}
+
+.form-field__input--readonly {
+  background: var(--color-tint-light, #f3f1f8);
+  color: var(--color-muted-purple, #8a7ba8);
+  box-shadow: none;
+  cursor: not-allowed;
 }

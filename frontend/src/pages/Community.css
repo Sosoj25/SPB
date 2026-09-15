@@ -1,0 +1,1087 @@
+/* หน้าชุมชนทั้ง 4 หน้าใช้หน้าตาชุดเดียวกัน (การ์ด รูปโปรไฟล์ ชิป แถวปุ่มโต้ตอบ)
+   ชิ้นส่วนที่ใช้ร่วมกันจึงอยู่ในไฟล์นี้ภายใต้ prefix .cm-- แล้วอีก 3 หน้า
+   (CommunityPost / CommunityProfile / Messages) import ไฟล์นี้เพิ่มจาก CSS
+   ของตัวเอง จะได้ไม่ต้องก็อปสไตล์เดิมซ้ำ 4 รอบ */
+
+.cm {
+  min-height: 100%;
+  background: #fff;
+}
+
+.cm__main {
+  /* ระยะขอบซ้าย/ขวาของหน้าเก็บเป็นตัวแปร เพราะแถบหมวดหมู่บนมือถือต้องดึงตัวเอง
+     ออกไปชนขอบจอพอดีด้วย margin ติดลบเท่ากับค่านี้ ถ้าเขียนเลขซ้ำสองที่ พอ
+     แก้ระยะขอบที่จุดตัดใดจุดตัดหนึ่งแล้วลืมอีกที่ แถบจะยื่นพ้นจอหรือเว้าเข้ามา */
+  --cm-gutter: 2rem;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 2.5rem var(--cm-gutter) 5rem;
+}
+
+/* ---------- ชิ้นส่วนที่ใช้ร่วมกันทุกหน้า ---------- */
+
+.cm-card {
+  background: #fff;
+  border: 1px solid #efe6fb;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 6px 20px rgba(43, 10, 99, 0.07);
+}
+
+/* ใช้ได้ทั้ง <img> ที่มีรูปจริง และ <span> เปล่าตอนผู้ใช้ยังไม่ตั้งรูปโปรไฟล์ */
+.cm-avatar {
+  object-fit: cover;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-tint-light);
+}
+
+.cm-avatar--sm {
+  width: 40px;
+  height: 40px;
+}
+
+.cm-avatar--xs {
+  width: 30px;
+  height: 30px;
+}
+
+.cm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.cm-chip--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.cm-chip--sm {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.cm-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.cm-time {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.cm-body {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-text);
+  /* ข้อความยาวไม่มีช่องว่าง (ลิงก์ยาว ๆ) ไม่งั้นจะดันล้นกรอบการ์ดแทนที่จะขึ้น
+     บรรทัดใหม่ — pre-wrap ให้ขึ้นบรรทัดตามที่ผู้ใช้พิมพ์เว้นวรรค/Enter จริง
+     ด้วย (ช่องเขียนโพสต์เป็น textarea หลายบรรทัดได้) */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+/* แถบ ถูกใจ / ความคิดเห็น / แชร์ ใต้โพสต์ */
+.cm-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.cm-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.cm-action:hover {
+  color: var(--color-primary-dark);
+}
+
+button.cm-action {
+  font-family: inherit;
+}
+
+.cm-action--on {
+  color: #d6336c;
+}
+
+.cm-action--on:hover {
+  color: #b02a5b;
+}
+
+.cm-action__icon {
+  font-size: 1rem;
+}
+
+/* กล่องรูปสี่เหลี่ยมสีม่วงอ่อนสมัยที่ยังไม่มีรูปจริง — ตอนนี้ไม่มีไฟล์ไหน
+   ใช้คลาสนี้แล้ว รูปในโพสต์ใช้ .post-grid (PostImageGrid.css) แทน */
+.cm-photo {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  background: var(--color-tint-light);
+}
+
+.cm-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.cm-back:hover {
+  text-decoration: underline;
+}
+
+.cm-search {
+  width: 100%;
+  padding: 0.9rem 1.2rem 0.9rem 2.9rem;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236610f2' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.6-3.6'/%3E%3C/svg%3E")
+    no-repeat 1rem center / 1.05rem;
+  font-size: 0.98rem;
+  color: var(--color-text);
+}
+
+.cm-search::placeholder {
+  color: var(--color-muted-purple);
+}
+
+.cm-search:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* ---------- หน้าฟีดชุมชน ---------- */
+
+.cm__layout {
+  display: grid;
+  grid-template-columns: 370px 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+/* แถบข้างเกาะจอไว้ระหว่างเลื่อนฟีด แต่ตัว sticky เองไม่รู้จักขอบจอล่าง พอ
+   เนื้อในแถบสูงกว่าจอ (หมวดหมู่ครบทุกหมวด + ผู้ใช้แนะนำ 15 คน บนจอสูง ~900px
+   ก็เกินแล้ว) ส่วนท้ายจะถูกตรึงค้างอยู่ใต้ขอบจอ เลื่อนหน้ายังไงก็ไม่ขึ้นมา
+   จะโผล่ก็ตอนเลื่อนฟีดจนสุดหน้าเท่านั้น เพราะ sticky ถูกดันขึ้นด้วยก้นกรอบ
+   .cm__layout — เท่ากับ "ผู้ใช้แนะนำ" ที่อยู่ท้ายแถบแทบไม่มีใครได้เห็น
+
+   max-height เท่าความสูงจอ (หักระยะบนล่างของ sticky) แล้วให้แถบเลื่อนในตัวเอง
+   ส่วนท้ายจึงเข้าถึงได้ตลอด ไม่ต้องรอให้ฟีดหมดหน้า */
+.cm__sidebar {
+  position: sticky;
+  top: 1.5rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  /* กันการเลื่อนต่อเนื่องไปลากหน้าข้างหลังตอนแถบเลื่อนสุด */
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 1.5rem;
+  border: 1px solid #efe6fb;
+  border-radius: var(--radius-lg);
+  background: var(--color-panel-tint);
+}
+
+.cm__side-title {
+  margin: 1.5rem 0 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+/* หมวดหมู่เป็นชิปห่อบรรทัด (แบบเดียวกับ .cm__filters) ความกว้างตามเนื้อหา —
+   ถ้าเรียงแนวตั้งเต็มความกว้างทีละอัน แถบข้างจะยาวมากเมื่อมีหลายหมวด */
+.cm__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.cm__category {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.cm__category--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.cm__divider {
+  border: none;
+  border-top: 1px solid #e2d3f5;
+  margin: 1.5rem 0 0;
+}
+
+.cm__user {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.5rem 0;
+}
+
+/* ห้ามทำให้กล่องนี้เลื่อนเอง เพราะมันอยู่ในแถบข้างที่เลื่อนได้อยู่แล้ว
+   (ดู .cm__sidebar) — กล่องเลื่อนซ้อนกันทำให้ล้อเมาส์เหนือรายชื่อเลื่อนแค่
+   รายชื่อ คนที่อยากเลื่อนแถบข้างต้องเอาเมาส์ออกไปนอกกล่องก่อน */
+.cm__suggested-list {
+  overflow: visible;
+}
+
+/* ปุ่มครอบรูปโปรไฟล์ในแถวผู้ใช้ — รีเซ็ตหน้าตาปุ่มทิ้งให้เหลือแค่พื้นที่กด
+   ของรูป (line-height: 0 กันช่องว่างใต้ <img> ที่มาจาก baseline) */
+.cm__user-photo-btn {
+  flex-shrink: 0;
+  display: block;
+  padding: 0;
+  background: none;
+  line-height: 0;
+}
+
+/* .cm-avatar ตั้งแค่ width/height ซึ่งไม่มีผลกับ <span> เปล่า ๆ ตอนผู้ใช้ยัง
+   ไม่มีรูป เพราะ span เป็น inline — ที่นี่มีปุ่มคั่นกลางจึงไม่ได้เป็นลูกโดยตรง
+   ของ flex container ที่จะ blockify ให้เอง ต้องสั่ง display เอง */
+.cm__user-photo {
+  display: block;
+}
+
+/* คนที่ยังไม่ได้ตั้งรูปโปรไฟล์ — กรอบเปล่า ๆ ดูเหมือนรูปโหลดไม่ขึ้น
+   ใส่อักษรตัวแรกของชื่อแทน (ทรงเดียวกับ .dash__profile-avatar ฝั่งแอดมิน) */
+.cm__user-photo--empty {
+  display: grid;
+  place-items: center;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.cm__user-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+/* @username โชว์เฉพาะบนการ์ดของจอแคบที่มีที่ว่างใต้ชื่อพอดีหนึ่งบรรทัด —
+   บนแถบข้างเดสก์ท็อปแต่ละแถวเป็นบรรทัดเดียว ถ้าเพิ่มบรรทัดสองจะเห็นคนได้
+   น้อยลงในกรอบสูงเท่าเดิม */
+.cm__user-handle {
+  display: none;
+}
+
+.cm__user-name {
+  flex: 1;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.cm__user-name:hover {
+  color: var(--color-primary);
+}
+
+.cm__follow {
+  padding: 0.4rem 0.95rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cm__follow:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ช่องเขียนโพสต์ */
+.cm__feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.cm__composer {
+  padding: 1.5rem;
+}
+
+.cm__composer-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* กดรูปแยกจากกดข้อความ — รูปพาไปดูโปรไฟล์ชุมชนของตัวเอง */
+.cm__composer-avatar-btn {
+  flex-shrink: 0;
+  display: block;
+  padding: 0;
+  background: none;
+  line-height: 0;
+  outline: none;
+}
+
+/* แถบ "คุณกำลังคิดอะไรอยู่?" กดแล้วเปิดโมดัลเขียนโพสต์แบบ Facebook —
+   ตัวแถบเองไม่มีช่องพิมพ์จริง แค่เป็นปุ่มเปิดโมดัล */
+.cm__composer-trigger {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  text-align: left;
+  /* ปุ่มไม่มี background ของตัวเองมาก่อน เลยโชว์พื้นหลังปุ่มเริ่มต้นของ
+     เบราว์เซอร์ (เทาจาง ๆ) เป็นกรอบสี่เหลี่ยมรอบวงสีม่วงข้างใน */
+  background: none;
+  /* ปิดกรอบโฟกัสสี่เหลี่ยมของเบราว์เซอร์ทิ้งไปเลย ไม่ต้องมี ring แทน */
+  outline: none;
+}
+
+.cm__composer-placeholder {
+  flex: 1;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-panel-tint);
+  font-size: 1rem;
+  color: var(--color-muted-purple);
+}
+
+.cm__composer-trigger:hover .cm__composer-placeholder {
+  background: var(--color-tint-light);
+}
+
+.cm__composer-divider {
+  border: none;
+  border-top: 1px solid #efe6fb;
+  margin: 1.1rem 0;
+}
+
+.cm__composer-photo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-muted-purple);
+}
+
+.cm__composer-photo-btn:hover {
+  background: var(--color-surface-soft);
+}
+
+.cm__error {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+.cm__filters {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0.25rem 0;
+}
+
+.cm__filter {
+  font-family: inherit;
+}
+
+/* การ์ดโพสต์ในฟีด */
+.cm__post {
+  padding: 1.5rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cm__post:hover {
+  box-shadow: 0 10px 26px rgba(43, 10, 99, 0.13);
+}
+
+.cm__post-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cm__post-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.cm__post-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.cm__post-body {
+  margin-bottom: 1rem;
+}
+
+/* ตัดข้อความยาว (โพสต์/คอมเมนต์) แล้วกด "ดูเพิ่มเติม" ขยายได้ — ComponentText */
+.clamp-text--clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: var(--clamp-lines, 4);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp-text__toggle {
+  margin: -0.4rem 0 0.85rem;
+  background: none;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.clamp-text__toggle:hover {
+  text-decoration: underline;
+}
+
+.cm__empty {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--color-muted-purple);
+}
+
+
+
+
+
+
+
+
+
+/* ---------- เมนู ⋯ บนการ์ดโพสต์ ---------- */
+
+.cm__menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.cm__menu-trigger {
+  background: none;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-pill);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--color-muted-purple);
+}
+
+.cm__menu-trigger:hover {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.cm__menu-panel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  min-width: 170px;
+  padding: 0.35rem;
+  border: 1px solid #efe6fb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.cm__menu-item {
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  background: none;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.cm__menu-item:hover {
+  background: var(--color-surface-soft);
+}
+
+.cm__menu-item--danger {
+  color: var(--color-danger-text);
+}
+
+/* ---------- แบ่งหน้าฟีด ---------- */
+
+.cm__pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.cm__pager-page {
+  font-weight: 700;
+  color: var(--color-muted-purple);
+}
+
+.cm__pager .cm-chip {
+  font-family: inherit;
+}
+
+.cm__pager .cm-chip:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* ---------- โพสต์รีวิว (ระบบสร้างให้ตอนผู้ใช้ส่งรีวิวจากใบเสร็จ) ---------- */
+/* ใช้ร่วมกันระหว่างฟีดและหน้ารายละเอียดโพสต์ — โทนทองแยกจากโพสต์ม่วงทั่วไป
+   ให้กวาดตาเห็นทันทีว่าแถวนี้คือคะแนนสนาม ไม่ใช่โพสต์คุยเล่น */
+
+.cm-review {
+  display: grid;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid #f7e7c6;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffaef 0%, #fff 100%);
+}
+
+.cm-review__score {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.cm-review__stars {
+  display: inline-flex;
+  gap: 0.12rem;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.cm-review__star {
+  color: #e9dff3;
+}
+
+.cm-review__star--on {
+  color: var(--color-gold);
+}
+
+.cm-review__number {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-heading);
+}
+
+.cm-review__of {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-muted-purple);
+}
+
+.cm-review__verdict {
+  padding: 0.22rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-bg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-warning-text);
+}
+
+.cm-review__place {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.cm-review__facility {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.cm-review__venue {
+  font-size: 0.88rem;
+  color: var(--color-muted-purple);
+}
+
+.cm-review__venue::before {
+  content: "📍 ";
+}
+
+/* คำติชมอ้างแบบ blockquote — แยกเสียงของผู้รีวิวออกจากข้อมูลคะแนนด้านบน */
+.cm-review__comment {
+  margin: 0;
+  padding-left: 0.9rem;
+  border-left: 3px solid #f2dfb1;
+}
+
+.cm-review__no-comment {
+  margin: 0;
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--color-faint-purple);
+}
+
+.cm-review__verified {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-success-text);
+}
+
+/* ปุ่ม "ดูเพิ่มเติม" ของคำติชมอยู่นอกกรอบ .cm-review (ClampText วางเป็นพี่น้อง
+   กับย่อหน้า) จึงต้องดึงระยะห่างกลับเองไม่ให้ลอยห่างจากบล็อกรีวิว */
+.cm-review + .clamp-text__toggle {
+  margin-top: -0.6rem;
+}
+
+/* ชิปหมวด "รีวิว" บนหัวการ์ด — สีเดียวกับดาวเพื่อให้เข้าชุดกับบล็อกด้านล่าง */
+.cm-chip--review {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.cm__post--review,
+.cm-post__card--review {
+  border-color: #f4e6cb;
+}
+
+/* ทางเข้าหน้ารีวิวในแถบซ้าย — รีวิวไม่ใช่หมวดหนึ่งของฟีดอีกแล้ว (มีหน้าแยกที่
+   /community/reviews) ปุ่มนี้จึงหน้าตาไม่เหมือนชิปหมวด แต่เป็นแถบลิงก์โทนทอง
+   ชุดเดียวกับการ์ดรีวิว ให้เห็นชัดว่าพาออกไปอีกหน้า ไม่ใช่กรองฟีดตรงนี้ */
+.cm__reviews-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid #f4e2be;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #fffaef 0%, #fff 100%);
+  text-decoration: none;
+}
+
+.cm__reviews-link:hover {
+  border-color: var(--color-gold);
+  box-shadow: 0 6px 18px rgba(245, 185, 66, 0.22);
+}
+
+.cm__reviews-link-star {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-warning-bg);
+  font-size: 1.15rem;
+  color: var(--color-gold);
+}
+
+.cm__reviews-link-text {
+  display: grid;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.cm__reviews-link-text strong {
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.cm__reviews-link-text small {
+  font-size: 0.82rem;
+  color: var(--color-muted-purple);
+}
+
+.cm__reviews-link-go {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .cm__main {
+    --cm-gutter: 1.25rem;
+    padding: 2rem var(--cm-gutter) 3.5rem;
+  }
+
+  .cm__layout {
+    grid-template-columns: 300px 1fr;
+    gap: 1.25rem;
+  }
+}
+
+/* จอแคบ — จุดที่หน้าชุมชนต่างจากหน้าอื่นคือ "ลำดับ" ไม่ใช่แค่ขนาด
+   บนเดสก์ท็อปแถบข้างอยู่คอลัมน์ซ้าย จึงอยู่ก่อนฟีดใน DOM ได้ไม่มีปัญหา แต่พอ
+   พับเหลือคอลัมน์เดียว ลำดับใน DOM กลายเป็นลำดับที่ต้องเลื่อนผ่านจริง ๆ คือ
+   ค้นหา → รีวิวสนาม → หมวดหมู่ → ผู้ใช้แนะนำ (กล่องเลื่อนสูง 280px) แล้วถึง
+   จะเจอกล่องเขียนโพสต์กับโพสต์แรก เท่ากับเปิดหน้าชุมชนมาแล้วไม่เห็นชุมชน
+
+   (ก้อนผู้ใช้แนะนำไม่ได้อยู่ในลำดับนี้แล้ว จอแคบ Community.jsx ย้ายมันไป
+   เรนเดอร์ในฟีดหลังโพสต์ใบแรก กฎหน้าตาของมันข้างล่างยังใช้เหมือนเดิมทุกอย่าง
+   เพราะเลือกด้วยคลาสล้วน ไม่ได้ผูกกับว่าพ่อแม่เป็นใคร)
+
+   display: contents ปลดกรอบ <aside> ออกจากการจัดวาง (พื้นหลัง/ขอบ/ระยะในของ
+   มันหายไปด้วย ซึ่งบนมือถือก็ไม่ได้อยากได้อยู่แล้ว) ก้อนย่อยข้างในจึงเลื่อน
+   ขึ้นมาเป็นลูกของ .cm__layout ตรง ๆ แล้วสั่ง order ได้ทีละก้อน */
+@media (max-width: 1000px) {
+  .cm__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    /* ต้องเขียนทับ align-items: start ของกฎฐานด้วย ไม่ใช่แค่เปลี่ยน display:
+       บน grid สองคอลัมน์ start หมายถึง "ไม่ยืดความสูง" ซึ่งถูกต้อง แต่พอ
+       กลายเป็น flex แนวตั้ง แกนขวางสลับเป็นแนวนอน start จึงกลายเป็น "ไม่ยืด
+       ความกว้าง" — ทุกก้อนเลยกว้างเท่าเนื้อหาตัวเอง แถบหมวดหมู่ที่ห้ามห่อ
+       บรรทัดจึงลากทั้งหน้าให้กว้าง ~500px บนจอ 390px */
+    align-items: stretch;
+  }
+
+  .cm__sidebar {
+    display: contents;
+  }
+
+  /* ลำดับใหม่: เครื่องมือที่ใช้จริง (ค้นหา/หมวด/ทางเข้ารีวิว) อยู่บนสั้น ๆ
+     แล้วฟีดตามมาทันที */
+  .cm__side-block--search {
+    order: 1;
+  }
+
+  .cm__side-block--categories {
+    order: 2;
+  }
+
+  .cm__side-block--reviews {
+    order: 3;
+    margin-top: 0;
+  }
+
+  .cm__feed {
+    order: 4;
+  }
+
+  .cm__side-block--people {
+    --cm-people-pad: 1.1rem;
+    padding: var(--cm-people-pad);
+    border: 1px solid #efe6fb;
+    border-radius: var(--radius-lg);
+    background: var(--color-panel-tint);
+  }
+
+  .cm__side-block--people .cm__divider {
+    display: none;
+  }
+
+  .cm__side-block--people .cm__side-title {
+    margin-top: 0;
+  }
+
+  /* ผู้ใช้แนะนำกลายเป็นแถบการ์ดเลื่อนแนวนอน แทนรายชื่อแนวตั้ง
+     ---------------------------------------------------------------------
+     เดิมเป็นรายการแนวตั้งที่เลื่อนในกรอบสูง 280px ของตัวเอง ซึ่งบนมือถือคือ
+     กล่องเลื่อนซ้อนอยู่ในหน้าที่เลื่อนอยู่แล้ว ปัดนิ้วทีเดียวไม่รู้ว่าอันไหน
+     จะขยับ พอถอดกรอบออกก็กลายเป็นรายชื่อ 15 คนเรียงลงล่างยาวเกือบสองจอ
+     ต่อท้ายหน้า ทั้งที่เป็นส่วนที่ไม่ได้รีบที่สุด
+
+     แนวนอนแก้ทั้งสองอย่างพร้อมกัน: กินความสูงแค่การ์ดเดียว และการปัดซ้ายขวา
+     ไม่ชนกับการเลื่อนหน้าขึ้นลง */
+  .cm__suggested-list {
+    display: flex;
+    gap: 0.6rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    /* ยืดไปชนขอบการ์ดแม่ทั้งสองด้าน แล้วดันเนื้อในกลับเข้ามาเท่าเดิม —
+       การ์ดใบท้ายจะได้ค่อย ๆ หายที่ขอบ เป็นสัญญาณว่ายังปัดต่อได้ */
+    margin: 0 calc(var(--cm-people-pad) * -1);
+    padding: 0.2rem var(--cm-people-pad);
+  }
+
+  .cm__suggested-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cm__user--card {
+    flex: 0 0 auto;
+    width: 9.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem 0.6rem;
+    border: 1px solid #efe6fb;
+    border-radius: 16px;
+    background: #fff;
+    scroll-snap-align: start;
+  }
+
+  .cm__user--card .cm__user-photo-btn {
+    width: 100%;
+  }
+
+  /* รูปกลมเล็กข้างชื่อ กลายเป็นรูปสี่เหลี่ยมมุมมนเต็มความกว้างการ์ด */
+  .cm__user--card .cm__user-photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 12px;
+  }
+
+  .cm__user--card .cm__user-text {
+    flex: none;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* ชื่อยาวตัดที่สองบรรทัด ไม่งั้นการ์ดในแถวเดียวกันสูงไม่เท่ากัน */
+  .cm__user--card .cm__user-name {
+    flex: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .cm__user--card .cm__user-handle {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.76rem;
+    color: var(--color-muted-purple);
+  }
+
+  /* รูปใหญ่ขึ้นมาก อักษรตัวแรกต้องโตตามไม่งั้นลอยเป็นจุดเล็ก ๆ กลางกรอบ */
+  .cm__user--card .cm__user-photo--empty {
+    font-size: 2.4rem;
+  }
+
+  /* การ์ดทุกใบสูงเท่ากันอยู่แล้ว (flex row ยืดให้เท่าใบที่สูงสุด) แต่ใบที่
+     ไม่มี @username จะมีเนื้อหาสั้นกว่าหนึ่งบรรทัด ปุ่มเลยลอยสูงกว่าเพื่อนจน
+     แถวปุ่มไม่ตรงกัน — ดันปุ่มลงไปชนก้นการ์ดเสมอ */
+  .cm__user--card .cm__follow {
+    width: 100%;
+    margin-top: auto;
+    padding: 0.5rem 0.4rem;
+    font-size: 0.82rem;
+  }
+
+  /* หัวข้อที่เป็นชิ้นแรกของก้อนไม่ต้องมีระยะบน (flex gap ของ .cm__layout
+     คุมระยะระหว่างก้อนอยู่แล้ว) ส่วนหัวข้อที่อยู่กลางก้อน เช่น "ผู้ใช้ที่ตรง
+     กับคำค้น" ที่โผล่ใต้ช่องค้นหา ยังต้องมีระยะแยกตัวเองออกจากของข้างบน */
+  .cm__side-block > .cm__side-title:first-child {
+    margin-top: 0;
+  }
+
+  /* หมวดหมู่ห่อบรรทัดแล้วกินสามสี่แถวบนจอแคบ — เปลี่ยนเป็นแถบเลื่อนแนวนอน
+     แถวเดียว (ทรงเดียวกับแถบหมวดของแอปข่าว/โซเชียลทั่วไป) */
+  .cm__categories {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* ยืดออกไปชนขอบจอทั้งสองด้าน แล้วดันเนื้อในกลับเข้ามาเท่าเดิม — ชิปตัว
+       สุดท้ายจะได้ค่อย ๆ เลื่อนหายที่ขอบจอจริง ซึ่งเป็นสัญญาณว่า "ยังเลื่อน
+       ต่อได้" ที่คนอ่านออกโดยไม่ต้องมีลูกศร */
+    margin: 0 calc(var(--cm-gutter) * -1);
+    padding: 0.15rem var(--cm-gutter);
+  }
+
+  .cm__categories::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cm__category {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .cm__main {
+    --cm-gutter: 0.85rem;
+    padding: 1.25rem var(--cm-gutter) 3rem;
+  }
+
+  .cm__composer,
+  .cm__post {
+    padding: 1.1rem;
+  }
+
+  .cm__composer-top {
+    gap: 0.7rem;
+  }
+
+  .cm__composer-placeholder {
+    padding: 0.7rem 1.1rem;
+    font-size: 0.95rem;
+  }
+
+  /* ชื่อผู้โพสต์ เวลา และป้ายหมวดเคยอยู่บรรทัดเดียวกัน โดยป้ายถูกดันไปชิดขวา
+     ด้วย margin-left: auto — บนจอแคบชื่อยาว ๆ จะบีบป้ายจนตกบรรทัดกลางคำ
+     ให้ป้ายลงบรรทัดใหม่ทั้งก้อนแทน */
+  .cm__post-head {
+    flex-wrap: wrap;
+    gap: 0.6rem 0.85rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .cm__post-tags {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* ทั้งการ์ดกดได้ (เปิดโพสต์) ปุ่ม ⋯ จึงต้องอยู่ไกลจากชิปหมวดที่สุดเท่าที่
+     ทำได้ ไม่งั้นนิ้วที่เล็งชิปพลาดไปโดนเมนูแทน */
+  .cm__post-tags .cm__menu {
+    margin-left: auto;
+  }
+
+  .cm__menu-trigger {
+    padding: 0.35rem 0.6rem;
+  }
+
+  .cm__post-title {
+    font-size: 1.08rem;
+  }
+
+  .cm-avatar {
+    width: 46px;
+    height: 46px;
+  }
+
+  .cm-avatar--sm {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* สามปุ่มโต้ตอบเคยห่างกัน 1.6rem ซึ่งบนมือถือดันปุ่ม "แชร์" ตกบรรทัด */
+  .cm-actions {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cm-action {
+    font-size: 0.88rem;
+  }
+
+  .cm__filters {
+    gap: 0.5rem;
+  }
+
+  .cm-chip {
+    padding: 0.42rem 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .cm-body {
+    font-size: 0.98rem;
+  }
+
+  .cm-back {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .cm__main {
+    --cm-gutter: 0.6rem;
+    padding: 1rem var(--cm-gutter) 3rem;
+  }
+
+  .cm__composer,
+  .cm__post,
+  .cm__side-block--people {
+    padding: 0.9rem;
+    border-radius: 18px;
+  }
+
+  /* ต้องขยับตามระยะขอบของการ์ดแม่ที่เพิ่งลดลง ไม่งั้นแถบการ์ดจะยื่นพ้นขอบไป
+     0.2rem (ดูเหตุผลของ margin ติดลบที่บล็อก 1000px) */
+  .cm__side-block--people {
+    --cm-people-pad: 0.9rem;
+  }
+
+  /* จอ 360px ให้เห็นการ์ดสองใบครึ่งพอดี ๆ ไม่ใช่ใบครึ่ง */
+  .cm__user--card {
+    width: 8.75rem;
+  }
+
+  .cm-actions {
+    gap: 0.75rem;
+  }
+}

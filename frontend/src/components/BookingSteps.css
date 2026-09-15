@@ -1,3 +1,5 @@
+/* แถบขั้นตอนการจอง — จอแคบซ่อนเฉพาะชื่อขั้นตอน เหลือตัวเลขเป็นวงกลม */
+
 .booking-steps {
   display: flex;
   align-items: center;
@@ -35,4 +37,80 @@
 .booking-steps__item--active:hover {
   background: var(--color-primary);
   color: #fff;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* จอแคบ — ป้ายสี่ขั้นตอน (พร้อมลูกศรคั่น) รวมกันยาวเกินหนึ่งบรรทัดแน่นอน
+   ปล่อยให้ตกบรรทัดได้อยู่แล้ว (flex-wrap) แค่บีบให้สองแถวจบ ไม่ใช่สี่แถว */
+@media (max-width: 900px) {
+  .booking-steps {
+    gap: 0.4rem;
+  }
+
+  .booking-steps__group {
+    gap: 0.4rem;
+  }
+
+  .booking-steps__item {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .booking-steps__sep {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .booking-steps__item {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.7rem;
+  }
+}
+
+/* มือถือเล็ก — ชื่อขั้นตอนยาว ๆ อย่าง "เลือกวันและเวลา" กินเกือบเต็มบรรทัด
+   เหลือไว้แค่ขั้นที่ยืนอยู่ตอนนี้ ส่วนขั้นอื่นย่อเป็นตัวเลขกลม ๆ ที่ยังกดได้
+   (เนื้อหาเต็มยังอยู่ใน DOM ให้โปรแกรมอ่านหน้าจออ่านครบ) */
+@media (max-width: 420px) {
+  .booking-steps {
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+  }
+
+  .booking-steps__group {
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  /* ซ่อนเฉพาะชื่อ เหลือตัวเลขเป็นวงกลม — ใช้เทคนิคเดียวกับ sr-only คือย้าย
+     ออกนอกสายตาแทน display: none เพื่อให้โปรแกรมอ่านหน้าจอยังอ่านชื่อขั้นได้ */
+  .booking-steps__item:not(.booking-steps__item--active) .booking-steps__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .booking-steps__item:not(.booking-steps__item--active) {
+    min-width: 2rem;
+    padding: 0.4rem 0.6rem;
+    text-align: center;
+  }
+
+  .booking-steps__sep {
+    font-size: 0.9rem;
+  }
 }

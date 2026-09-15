@@ -1,3 +1,4 @@
+// สิ่งอำนวยความสะดวกของคลับ — มุมมองผู้ใช้ทั่วไป มุมมองแอดมิน และข้อความหัวเพจ
 import { useAsyncData } from "./useAsyncData";
 import { fetchAdminAmenities, fetchFacilitiesPageSettings, fetchPublicAmenities } from "../lib/amenities";
 

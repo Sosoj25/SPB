@@ -1,3 +1,5 @@
+/* หน้าตั้งราคาสนาม — การ์ดราคาพื้นฐาน ช่วงราคา ส่วนลด รูปภาพ และกล่องพรีวิว */
+
 .pricing-page__actions {
   display: flex;
   gap: 0.75rem;
@@ -301,18 +303,13 @@
   color: var(--color-faint-purple);
 }
 
-@media (max-width: 1200px) {
-  .pricing-page {
-    grid-template-columns: 1fr;
-  }
 
-  .pricing-rule {
-    grid-template-columns: 1fr 1fr;
-  }
-}
 
-/* ---------- ส่วนรูปภาพ (เดิมอยู่ AdminFacilityImages.css แยกไฟล์ ย้ายมารวม
-   เพราะหน้ารูปภาพถูกรวมเข้ากับหน้าราคาแล้ว) ---------- */
+
+
+
+
+/* ---------- ส่วนรูปภาพของสนาม ---------- */
 
 .photos-page__section-header {
   display: flex;
@@ -531,4 +528,124 @@
   color: var(--color-warning-text);
   justify-content: center;
   text-align: center;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .pricing-page {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-rule {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* พอแถวถูกพับเหลือสองคอลัมน์ หัวตารางหกช่องก็ไม่ตรงกับช่องข้างล่างอีกต่อไป
+     (มันจะอ่านเป็น "ช่วงเวลา | เวลา" แล้ว "จ–ศ | ส–อา" คนละแถวกับของจริง)
+     — ถอดหัวตารางทิ้ง แล้วให้แต่ละช่องราคาพกชื่อคอลัมน์ของตัวเองมาแทน */
+  .pricing-rule--header {
+    display: none;
+  }
+
+  .pricing-rule__price::before {
+    content: attr(data-label);
+    color: var(--color-muted-purple);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .pricing-rule__price {
+    justify-content: space-between;
+  }
+
+  .pricing-rule__price span {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .pricing-page,
+  .pricing-page__main,
+  .pricing-page__side {
+    gap: 1.25rem;
+  }
+
+  .pricing-page h2 {
+    font-size: 1.2rem;
+  }
+
+  .pricing-page__rules-card h2,
+  .pricing-page__rules-card .pricing-page__hint {
+    margin-left: 1.25rem;
+    margin-right: 1.25rem;
+  }
+
+  .pricing-page__rules-card .pricing-page__section-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .pricing-rule {
+    padding: 0.9rem 1.25rem;
+  }
+
+  .photos-gallery {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .photos-gallery__thumb {
+    height: 120px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pricing-page__context {
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .pricing-page__context-field {
+    flex: 1 1 100%;
+    padding: 0.7rem 1rem;
+  }
+
+  .pricing-page__actions {
+    gap: 0.5rem;
+  }
+
+  .pricing-page__section-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  /* สองคอลัมน์ยังบีบช่องกรอกเวลา (input type=time) จนตัวเลขถูกตัด —
+     เหลือคอลัมน์เดียวไปเลย แต่ละช่องจึงเต็มความกว้างและมีชื่อกำกับครบ */
+  .pricing-rule {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .pricing-page__base-grid .dash-field {
+    flex: 1 1 100%;
+  }
+
+  .photos-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .photos-gallery__thumb {
+    height: 100px;
+    border-radius: 0.9rem;
+  }
 }

@@ -1,0 +1,30 @@
+/* กล่องรูปของรางวัล — พื้นม่วงอ่อนเต็มกล่อง ไอคอนอยู่กลาง ขนาดคงที่ตามที่
+   ผู้เรียกส่งมา ส่วนรูปถ่ายจริง (ถ้ามี) ครอบเต็มกล่องแทน */
+.reward-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-tint-light);
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.reward-media__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* width/height มาจาก attribute บน <img> — ไม่ตั้งเป็น % หรือ auto ตรงนี้
+   เพราะ SVG ที่ export จาก Figma ตั้ง preserveAspectRatio="none" ไว้
+   ถ้าปล่อยให้ยืดตามกล่องที่ไม่ใช่จัตุรัส ไอคอนจะบิด */
+.reward-media__icon {
+  display: block;
+  flex-shrink: 0;
+  /* ทับกฎรวม img { max-width: 100% } ใน index.css ด้วยเหตุผลเดียวกับข้างบน:
+     ถ้ายอมให้ย่อความกว้างตามกล่อง แต่ความสูงยังเป็นค่าจาก attribute ไอคอนจะ
+     ถูกบีบจนบิด — กล่องแม่ปิด overflow ไว้แล้ว ส่วนที่เกินจึงถูกตัด ไม่ล้น */
+  max-width: none;
+}

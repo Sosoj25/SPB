@@ -1,0 +1,309 @@
+/* หน้ารายละเอียดโพสต์ — ชิ้นส่วนร่วม (.cm-*) มาจาก Community.css */
+
+.cm-post__main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2rem 5rem;
+}
+
+.cm-post__card {
+  padding: 1.75rem;
+  background: linear-gradient(180deg, #fff 0%, var(--color-surface-soft) 100%);
+}
+
+/* เว้นระยะใต้แถวชื่อคนโพสต์เสมอ ไม่ว่าถัดลงไปจะเป็นหัวข้อ ข้อความ หรือรูป —
+   โพสต์รูปล้วน (ไม่มีข้อความ) เคยทำให้แกลเลอรีชนกับชื่อโปรไฟล์พอดี */
+.cm-post__head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.cm-post__title {
+  margin: 0 0 0.9rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.cm-post__text + .cm-post__text {
+  margin-top: 0.9rem;
+}
+
+/* ชื่อคนโพสต์กดเข้าโปรไฟล์ได้ — เป็น <button> จึงต้องล้างสไตล์ปุ่มทิ้ง */
+.cm-post__author {
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 1.1rem;
+  text-align: left;
+}
+
+.cm-post__author:hover {
+  text-decoration: underline;
+}
+
+.cm-post__foot {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #efe6fb;
+}
+
+/* กล่องเขียนความคิดเห็น */
+.cm-post__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.9rem;
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-panel-tint);
+}
+
+.cm-post__composer-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cm-post__reply-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.cm-post__reply-banner button {
+  margin-left: auto;
+  background: none;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--color-muted-purple);
+}
+
+.cm-post__reply-banner button:hover {
+  color: var(--color-danger-text);
+}
+
+/* textarea ที่โตตามเนื้อหา (JS ปรับ height ตาม scrollHeight) แทน <input>
+   บรรทัดเดียวเดิม — resize:none กันผู้ใช้ลากขยายเองแล้วชนกับความสูงที่ JS คุม
+   overflow:hidden กันแถบเลื่อนโผล่วูบตอน height กำลังปรับ */
+.cm-post__composer-input {
+  width: 100%;
+  padding: 0.85rem 1.4rem;
+  border: none;
+  border-radius: 18px;
+  background: var(--color-tint-light);
+  font-family: inherit;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  resize: none;
+  overflow-y: hidden;
+}
+
+.cm-post__composer-input::placeholder {
+  color: var(--color-muted-purple);
+}
+
+.cm-post__send {
+  padding: 0.6rem 1.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cm-post__send:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.cm-post__send:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* รายการความคิดเห็น */
+.cm-post__comments-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.cm-post__comment {
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+}
+
+/* ความคิดเห็นของเจ้าของโพสต์ไฮไลต์พื้นหลังไว้ให้เห็นว่าเป็นคนเดียวกับโพสต์ */
+.cm-post__comment--author {
+  background: var(--color-panel-tint);
+}
+
+.cm-post__comment-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.cm-post__comment-name {
+  font-weight: 700;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.cm-post__comment-time {
+  font-size: 0.82rem;
+  color: var(--color-muted-purple);
+}
+
+.cm-post__comment-body {
+  margin: 0 0 0.25rem 2.6rem;
+  line-height: 1.65;
+}
+
+.cm-post__reply-to {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* คำตอบของคอมเมนต์ — เยื้องเข้าไปใต้ต้นทาง ย่อไอคอน/ระยะห่างลงเล็กน้อยให้
+   แยกจากคอมเมนต์หลักในสายตา */
+.cm-post__replies {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0 2.6rem;
+  padding-left: 1rem;
+  border-left: 2px solid #efe6fb;
+}
+
+.cm-post__replies .cm-post__comment {
+  padding: 0.75rem 0.9rem;
+}
+
+
+
+
+
+/* ---------- ปุ่มเล็กท้ายหัวความคิดเห็น ---------- */
+
+.cm-post__comment-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-left: auto;
+}
+
+.cm-post__comment-link {
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-muted-purple);
+}
+
+.cm-post__comment-link:hover {
+  color: var(--color-danger-text);
+  text-decoration: underline;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .cm-post__main {
+    padding: 1.25rem 0.85rem 3rem;
+  }
+
+  .cm-post__card {
+    padding: 1.1rem;
+  }
+
+  .cm-post__title {
+    font-size: 1.3rem;
+  }
+
+  .cm-post__head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .cm-post__foot {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cm-post__comment-body {
+    margin-left: 0;
+  }
+
+  .cm-post__replies {
+    margin-left: 0.5rem;
+  }
+
+  .cm-post__comment {
+    padding: 0.85rem 0.9rem;
+  }
+
+  /* รูปโปรไฟล์ | ช่องพิมพ์ | ปุ่มส่ง ยังอยู่แถวเดียวกันได้ที่ 390px แค่บีบ
+     ระยะลง — เคยลองให้ช่องพิมพ์กินเต็มแถวแล้วดันรูปโปรไฟล์ไปนั่งเดี่ยว ๆ
+     อีกแถว ซึ่งกินความสูงเพิ่มโดยไม่ได้อะไรกลับมา */
+  .cm-post__composer {
+    gap: 0.6rem;
+    margin: 1.1rem 0;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .cm-post__send {
+    padding: 0.6rem 1rem;
+  }
+
+  .cm-post__comment-head {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.6rem;
+  }
+
+  .cm-post__comment-tools {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .cm-post__main {
+    padding: 1rem 0.6rem 3rem;
+  }
+
+  .cm-post__card {
+    padding: 0.9rem;
+  }
+
+  .cm-post__replies {
+    margin-left: 0;
+  }
+}

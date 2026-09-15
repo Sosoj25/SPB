@@ -1,0 +1,115 @@
+/* กล่องแจ้งเตือน/ยืนยันกลางจอ — ดู AlertDialog.jsx (กรอบมาจาก TextPromptDialog.css) */
+
+.alert-dialog {
+  text-align: center;
+}
+
+.alert-dialog__icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto 0.9rem;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.alert-dialog--success .alert-dialog__icon {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.alert-dialog__title {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.alert-dialog__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--color-muted-purple);
+}
+
+.alert-dialog__facts {
+  margin: 1.1rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  background: var(--color-surface-soft);
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.alert-dialog__fact {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.alert-dialog__fact + .alert-dialog__fact {
+  margin-top: 0.45rem;
+}
+
+.alert-dialog__fact dt {
+  color: var(--color-muted-purple);
+}
+
+.alert-dialog__fact dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.alert-dialog__error {
+  margin: 1rem 0 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 14px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.alert-dialog__actions {
+  justify-content: center;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  /* หัวข้อ/ค่าในกล่องสรุปเรียงซ้าย-ขวา พอจอแคบค่ายาว ๆ จะถูกบีบจนหักคำ */
+  .alert-dialog__fact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .alert-dialog__fact dd {
+    text-align: left;
+  }
+}
+
+/* จอแคบ: ปุ่มยาวเต็มแถวจะกดพลาดยากกว่าปุ่มสองอันเบียดกันข้างละครึ่ง */
+@media (max-width: 380px) {
+  .alert-dialog__actions {
+    flex-direction: column-reverse;
+  }
+
+  .alert-dialog__actions button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,379 @@
+/* หน้า "ข้อความติดต่อจากลูกค้า" ฝั่งแอดมิน — กล่องข้อความทางซ้าย
+   แผงอ่าน/ตอบกลับทางขวา ตามดีไซน์ (ล็อกแผงขวาไว้กับจอเวลาเลื่อนรายการยาว ๆ) */
+.admin-support__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.admin-support__kpi--primary {
+  color: var(--color-primary);
+}
+
+/* ---------- กล่องข้อความ ---------- */
+
+.admin-support__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-support__list-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--color-tint-light);
+  padding: 1.3rem 1.75rem;
+}
+
+.admin-support__list-title {
+  margin: 0;
+  flex: 1;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-heading);
+}
+
+.admin-support__count {
+  background: #fff;
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-heading);
+  white-space: nowrap;
+}
+
+.admin-support__row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid #f2ecfd;
+  font-family: inherit;
+}
+
+.admin-support__row:hover {
+  background: var(--color-surface-soft);
+}
+
+/* เรื่องที่ยังไม่มีใครตอบต้องเด่นกว่าแถวอื่นตั้งแต่เหลือบแรก — พื้นม่วงอ่อน
+   เหมือนดีไซน์ ส่วนแถวที่กำลังเปิดอ่านใช้เส้นม่วงทางซ้ายแทน จะได้ไม่ชนกัน
+   เวลาแถวหนึ่งเป็นทั้งสองอย่างพร้อมกัน */
+.admin-support__row--new {
+  background: var(--color-tint-light);
+}
+
+.admin-support__row--active {
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.admin-support__avatar {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-on-primary-soft);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.admin-support__avatar--lg {
+  width: 60px;
+  height: 60px;
+}
+
+.admin-support__row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-support__row-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-support__row-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-support__row-time {
+  font-size: 0.85rem;
+  color: var(--color-faint-purple);
+  white-space: nowrap;
+}
+
+.admin-support__row-category {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+/* ข้อความย่อบรรทัดเดียว — คิวยาว ๆ ต้องกวาดตาได้เร็ว เนื้อเต็มอ่านในแผงขวา */
+.admin-support__row-preview {
+  font-size: 1rem;
+  color: var(--color-muted-purple);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-support__row-status {
+  flex-shrink: 0;
+}
+
+/* ---------- แผงอ่าน/ตอบกลับ ---------- */
+
+.admin-support__panel {
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.admin-support__panel--empty {
+  padding: 1rem;
+}
+
+.admin-support__panel-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--color-tint-light);
+  padding: 1.4rem 1.75rem;
+}
+
+.admin-support__panel-who {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-support__panel-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-heading);
+}
+
+.admin-support__panel-contact {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+  overflow-wrap: anywhere;
+}
+
+.admin-support__panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  /* เธรดยาว ๆ ต้องเลื่อนอยู่ในแผงตัวเอง ไม่ดันความสูงจนช่องตอบกลับหลุดจอ */
+  max-height: calc(100vh - 12rem);
+  overflow-y: auto;
+}
+
+.admin-support__panel-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-support__muted {
+  color: var(--color-muted-purple);
+  font-size: 0.9rem;
+}
+
+.admin-support__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.admin-support__msg {
+  border-radius: 1.1rem;
+  padding: 1rem 1.25rem;
+  max-width: 92%;
+}
+
+.admin-support__msg--customer {
+  background: var(--color-surface-soft);
+  border: 2px solid var(--color-tint-light);
+  align-self: flex-start;
+}
+
+.admin-support__msg--staff {
+  background: var(--color-tint-light);
+  align-self: flex-end;
+}
+
+.admin-support__msg-text {
+  margin: 0;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.admin-support__msg-meta {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-faint-purple);
+}
+
+.admin-support__booking {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-support__divider {
+  border: none;
+  border-top: 2px solid var(--color-tint-light);
+  margin: 0;
+  width: 100%;
+}
+
+.admin-support__closed {
+  margin: 0;
+  color: var(--color-muted-purple);
+  line-height: 1.7;
+}
+
+.admin-support__reply {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.admin-support__send {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 1rem;
+  border-radius: var(--radius-pill);
+  width: 100%;
+}
+
+.admin-support__send:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.admin-support__send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-support__resolve {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- กล่องแก้ไขข้อมูลติดต่อ ---------- */
+
+.admin-support__settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.admin-support__settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.admin-support__settings-actions .dash-btn {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .admin-support__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-support__panel {
+    position: static;
+  }
+
+  .admin-support__panel-body {
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-support__row {
+    padding: 1rem 1.1rem;
+    gap: 0.75rem;
+  }
+
+  .admin-support__list-head {
+    flex-wrap: wrap;
+    padding: 1.1rem 1.1rem;
+  }
+
+  .admin-support__panel-head,
+  .admin-support__panel-body {
+    padding: 1.25rem;
+  }
+
+  .admin-support__avatar,
+  .admin-support__avatar--lg {
+    width: 44px;
+    height: 44px;
+    font-size: 1.05rem;
+  }
+
+  /* ชื่อ + เวลา อยู่บรรทัดเดียวกัน พอชื่อยาวมันบีบเวลาจนตกบรรทัดกลางคำ */
+  .admin-support__row-top {
+    flex-wrap: wrap;
+    gap: 0.2rem 0.75rem;
+  }
+
+  .admin-support__row-name {
+    flex: 1 1 100%;
+    font-size: 1rem;
+  }
+
+  .admin-support__row-preview {
+    font-size: 0.95rem;
+  }
+
+  .admin-support__list-title {
+    font-size: 1.1rem;
+  }
+}

@@ -1,6 +1,21 @@
-.admin-revenue {
-  margin-top: 1.5rem;
+/* แดชบอร์ดแอดมิน — การ์ดตัวเลข กราฟรายได้ และตารางการจองล่าสุด */
+
+.admin-overview__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
 }
+
+.admin-overview__main,
+.admin-overview__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+
 
 .admin-revenue__header {
   display: flex;
@@ -16,15 +31,25 @@
   color: var(--color-heading);
 }
 
+.admin-revenue__scales {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .admin-revenue__chart {
   display: flex;
   align-items: flex-end;
+  justify-content: center;
   gap: 1.2rem;
   height: 260px;
 }
 
+/* สเกล "ปี" อาจมีแท่งเดียว (ระบบเพิ่งเปิดปีนี้) — จำกัดความกว้างไว้ไม่ให้
+   แท่งเดียวยืดเต็มการ์ด แล้วจัดกึ่งกลางแทน */
 .admin-revenue__col {
-  flex: 1;
+  flex: 1 1 0;
+  max-width: 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,14 +58,100 @@
   height: 100%;
 }
 
+.admin-revenue__amount {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-muted-purple);
+  white-space: nowrap;
+}
+
+/* แท่งเป็น <button> เพราะกดเพื่อดูรายละเอียดย้อนหลังได้ — ยกเว้นแท่งสุดท้าย
+   (ช่วงปัจจุบันที่ยังไม่สิ้นสุด) ที่ถูก disabled ไว้ */
 .admin-revenue__bar {
   width: 100%;
+  padding: 0;
   border-radius: 1rem;
   background: var(--color-tint-light);
+  transition: background 0.15s ease;
+}
+
+.admin-revenue__bar:hover:not(:disabled),
+.admin-revenue__bar:focus-visible {
+  background: var(--color-primary);
+}
+
+.admin-revenue__bar:disabled {
+  cursor: default;
 }
 
 .admin-revenue__bar--active {
   background: var(--color-primary);
+}
+
+.admin-revenue__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.admin-revenue__pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-revenue__page {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.admin-revenue__page:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.admin-revenue__range {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.admin-revenue__footer-end {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-revenue__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-revenue__detail {
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.admin-revenue__detail:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
 }
 
 .admin-revenue__col p {
@@ -49,3 +160,242 @@
   color: var(--color-muted-purple);
 }
 
+/* การจองล่าสุด */
+.admin-recent__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-recent__header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}
+
+.admin-recent__link {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-primary);
+}
+
+.admin-recent__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-recent__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid #f2ecfd;
+}
+
+.admin-recent__item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.admin-recent__title {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+.admin-recent__meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-recent__end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.admin-recent__amount {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+/* ต้องดำเนินการ */
+.admin-attention__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-attention__header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-heading);
+}
+
+.admin-attention__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-attention__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  background: var(--color-page-bg);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--color-heading);
+}
+
+.admin-attention__item:hover {
+  background: var(--color-tint-light);
+}
+
+.admin-attention__count {
+  flex-shrink: 0;
+  min-width: 1.6rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-warning-text);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ทางลัด */
+.admin-quick h2 {
+  margin: 0 0 1rem;
+  font-size: 1.3rem;
+  color: var(--color-heading);
+}
+
+.admin-quick__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.admin-quick__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 1.25rem;
+  background: var(--color-page-bg);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-heading);
+}
+
+.admin-quick__item:hover {
+  background: var(--color-tint-light);
+}
+
+.admin-quick__icon {
+  font-size: 1.3rem;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .admin-overview__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-overview__grid,
+  .admin-overview__main,
+  .admin-overview__side {
+    gap: 1rem;
+  }
+
+  .admin-revenue__header,
+  .admin-recent__header,
+  .admin-attention__header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-revenue__header h2,
+  .admin-recent__header h2 {
+    font-size: 1.15rem;
+  }
+
+  .admin-attention__header h2,
+  .admin-quick h2 {
+    font-size: 1.1rem;
+  }
+
+  /* กราฟรายได้เดิมสูง 260px และแท่งห่างกัน 1.2rem — บนจอ 360px แท่งเหลือ
+     กว้างไม่ถึง 20px จนตัวเลขยอดบนหัวแท่งทับกัน บีบระยะห่างแล้วลดตัวเลขลง */
+  .admin-revenue__chart {
+    height: 200px;
+    gap: 0.5rem;
+  }
+
+  .admin-revenue__amount {
+    font-size: 0.68rem;
+  }
+
+  .admin-revenue__col p {
+    font-size: 0.85rem;
+  }
+
+  .admin-revenue__footer {
+    flex-wrap: wrap;
+  }
+
+  .admin-recent__item {
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+  }
+
+  .admin-recent__end {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  /* ปุ่มลัดสองคอลัมน์เหลือช่องละ ~150px ซึ่งชื่อปุ่มยาว ๆ จะตกสามบรรทัด */
+  .admin-quick__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-revenue__chart {
+    height: 170px;
+    gap: 0.35rem;
+  }
+}

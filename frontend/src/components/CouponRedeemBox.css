@@ -1,0 +1,30 @@
+/* กล่องตัดคูปองหน้างาน — อยู่ในคอลัมน์ข้างของหน้าเช็คอิน */
+.coupon-redeem {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.coupon-redeem__title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-heading);
+}
+
+.coupon-redeem__hint {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+.coupon-redeem__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.coupon-redeem__submit {
+  width: 100%;
+  text-align: center;
+}

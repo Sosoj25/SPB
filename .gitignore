@@ -10,3 +10,6 @@ frontend.zip
 .idea
 .DS_Store
 Thumbs.db
+
+# Supabase CLI cache
+supabase/.temp

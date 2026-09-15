@@ -1,3 +1,4 @@
+// ตารางเวลาของสนาม — เปิด/ปิดช่วงเวลารับจอง เพิ่มช่วงพิเศษ และเติมช่วงล่วงหน้า
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Switch } from "../components/DashboardWidgets";
@@ -214,6 +215,7 @@ export default function AdminSchedule() {
           <span className="admin-schedule__context-label">กีฬา</span>
           <select
             className="admin-schedule__context-select"
+            aria-label="เลือกกีฬา"
             value={effectiveSportId ?? ""}
             onChange={(e) => {
               setSportId(Number(e.target.value));
@@ -231,6 +233,7 @@ export default function AdminSchedule() {
           <span className="admin-schedule__context-label">สนาม</span>
           <select
             className="admin-schedule__context-select"
+            aria-label="เลือกสนาม"
             value={effectiveFacilityId ?? ""}
             onChange={(e) => setFacilityId(Number(e.target.value))}
           >

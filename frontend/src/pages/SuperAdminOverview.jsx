@@ -1,3 +1,4 @@
+// ภาพรวมทั้งระบบสำหรับซูเปอร์แอดมิน — ตัวเลขรวมและผลประกอบการรายสนาม
 import DashboardLayout from "../components/DashboardLayout";
 import { StatCard, Badge } from "../components/DashboardWidgets";
 import { useSuperAdminOverviewStats } from "../hooks/useAdmin";

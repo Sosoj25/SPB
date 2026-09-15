@@ -1,3 +1,7 @@
+// จัดการผู้ใช้ทั้งระบบ — เปลี่ยนสิทธิ์และระงับ/เปิดใช้งานบัญชี
+//
+// การเปลี่ยน role ยิงผ่าน RPC ที่เช็ค is_super_admin() ฝั่ง server เสมอ
+// ปุ่มที่ปิดไว้ในตารางเป็นแค่การกันพลาด ไม่ใช่ด่านความปลอดภัย
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pill, Pagination, SearchBox } from "../components/DashboardWidgets";
@@ -139,6 +143,8 @@ export default function SuperAdminUsers() {
                 </thead>
                 <tbody>
                   {users.map((user) => {
+                    // ปิดปุ่มจัดการของตัวเอง — กันซูเปอร์แอดมินลดสิทธิ์/ระงับ
+                    // บัญชีตัวเองจนล็อกตัวเองออกจากระบบ
                     const isSelf = user.id === currentUser?.id;
                     const busy = updatingId === user.id;
 

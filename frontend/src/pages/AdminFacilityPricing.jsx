@@ -1,24 +1,41 @@
+// ตั้งราคาและรายละเอียดของสนามหนึ่งสนาม — ราคาพื้นฐาน ราคาตามช่วงเวลา ส่วนลด
+// รูปภาพ และประวัติการแก้ราคา
+//
+// กล่องพรีวิวราคาเรียก compute_facility_price จริงเสมอ ตัวเลขที่แอดมินเห็น
+// จึงเป็นตัวเลขเดียวกับที่ลูกค้าจะถูกเรียกเก็บ
 import { useRef, useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import ImageCropModal from "../components/ImageCropModal";
 import { Switch, Badge } from "../components/DashboardWidgets";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { useFacilityImages } from "../hooks/useFacilityImages";
-import { fetchFacilitiesBySport, fetchSportCatalog, replaceSportIcon, uploadSportIcon } from "../lib/catalog";
+import {
+  createSport,
+  deleteSport,
+  fetchAdminSports,
+  fetchFacilitiesBySport,
+  replaceSportIcon,
+  uploadSportIcon,
+} from "../lib/catalog";
 import { useFacilityPricingConfig, useFacilityPriceHistory } from "../hooks/usePricing";
 import {
   applyBasePriceToSport,
   createDiscount,
+  createFacility,
   createPricingRule,
+  createVenue,
   deleteDiscount,
+  deleteFacility,
   deletePricingRule,
   fetchFacilityPricePreview,
+  fetchVenues,
   logPriceChange,
   updateDiscount,
   updateFacilityBasePrice,
   updatePricingRule,
   updateVenueDetails,
 } from "../lib/pricing";
+import { ensureFutureSlots } from "../lib/schedule";
 import {
   MAX_IMAGES_PER_FACILITY,
   RECOMMENDED_HEIGHT,
@@ -94,6 +111,13 @@ function formatKb(bytes) {
   return `${Math.round(bytes / 1024)} KB`;
 }
 
+
+const PRICE_FIELDS = [
+  { field: "weekdayPrice", label: "จ–ศ" },
+  { field: "weekendPrice", label: "ส–อา" },
+  { field: "holidayPrice", label: "วันหยุดนักขัตฤกษ์" },
+];
+
 function PricingRuleRow({ rule, onCommit, onDelete }) {
   const [draft, setDraft] = useState({
     label: rule.label,
@@ -120,8 +144,12 @@ function PricingRuleRow({ rule, onCommit, onDelete }) {
 
   return (
     <div className="pricing-rule">
+      {/* แถวนี้ซ้ำได้หลายแถว (กฎราคาหนึ่งช่วงเวลาต่อหนึ่งแถว) จึงผูก id/label
+          ไม่ได้ ใช้ aria-label ที่มีชื่อกฎกำกับแทน เพื่อให้โปรแกรมอ่านหน้าจอ
+          แยกออกว่ากำลังแก้ช่องของกฎไหนอยู่ */}
       <input
         className="dash-input pricing-rule__label"
+        aria-label="ชื่อกฎราคา"
         value={draft.label}
         onChange={(e) => setDraft((d) => ({ ...d, label: e.target.value }))}
         onBlur={() => commitField("label", draft.label)}
@@ -131,6 +159,7 @@ function PricingRuleRow({ rule, onCommit, onDelete }) {
         <input
           type="time"
           className="dash-input"
+          aria-label={`เวลาเริ่มของกฎ ${draft.label || "ราคา"}`}
           value={draft.startTime}
           onChange={(e) => setDraft((d) => ({ ...d, startTime: e.target.value }))}
           onBlur={() => commitField("startTime", draft.startTime)}
@@ -140,20 +169,26 @@ function PricingRuleRow({ rule, onCommit, onDelete }) {
         <input
           type="time"
           className="dash-input"
+          aria-label={`เวลาสิ้นสุดของกฎ ${draft.label || "ราคา"}`}
           value={draft.endTime}
           onChange={(e) => setDraft((d) => ({ ...d, endTime: e.target.value }))}
           onBlur={() => commitField("endTime", draft.endTime)}
           disabled={busy}
         />
       </div>
-      {["weekdayPrice", "weekendPrice", "holidayPrice"].map((field) => (
-        <div className="pricing-rule__price" key={field}>
+      {/* data-label คือชื่อคอลัมน์ของช่องราคานั้น — บนจอกว้างชื่อนี้อยู่ที่แถว
+          หัวตาราง แต่พอจอแคบลงจนแถวถูกพับเป็นสองคอลัมน์ หัวตารางจะไม่ตรงกับ
+          ช่องอีกต่อไป (ดู @media ใน AdminFacilityPricing.css) จึงต้องมีชื่อ
+          ติดมากับช่องเอง ไม่งั้นแอดมินไม่รู้ว่ากำลังแก้ราคาวันไหน */}
+      {PRICE_FIELDS.map(({ field, label }) => (
+        <div className="pricing-rule__price" data-label={label} key={field}>
           <span>฿</span>
           <input
             type="number"
             min="0"
             step="1"
             className="pricing-rule__price-input"
+            aria-label={`ราคา${label}`}
             value={draft[field]}
             onChange={(e) => setDraft((d) => ({ ...d, [field]: e.target.value }))}
             onBlur={() => commitField(field, Number(draft[field]))}
@@ -214,9 +249,37 @@ export default function AdminFacilityPricing() {
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [localOrder, setLocalOrder] = useState(null);
 
+  // ฟอร์มเพิ่มกีฬา/สถานที่/สนามใหม่ — เปิดทีละอันจากปุ่มแถวตัวเลือกกีฬา/สนาม
+  const [addingSport, setAddingSport] = useState(false);
+  const [newSport, setNewSport] = useState({ name: "", description: "" });
+  const [savingSport, setSavingSport] = useState(false);
+
+  const [addingFacility, setAddingFacility] = useState(false);
+  const [addingVenue, setAddingVenue] = useState(false);
+  const [newVenue, setNewVenue] = useState({
+    name: "",
+    address: "",
+    phone: "",
+    openingTime: "08:00",
+    closingTime: "22:00",
+  });
+  const [savingVenue, setSavingVenue] = useState(false);
+  const [newFacility, setNewFacility] = useState({
+    venueId: "",
+    name: "",
+    description: "",
+    capacity: "",
+    pricePerHour: "",
+    minBookingHours: "1",
+    depositPercent: "0",
+  });
+  const [savingFacility, setSavingFacility] = useState(false);
+
+  const { data: venues } = useAsyncData(fetchVenues, `pricing-venues:${reloadKey}`, EMPTY_LIST);
+
   // key ผูกกับ reloadKey ด้วย เพื่อให้รูปกีฬาที่เพิ่งอัปโหลด (handleSportIconChange
   // ด้านล่าง) สะท้อนขึ้นพรีวิวทันทีหลังอัปเดต icon_url สำเร็จ
-  const { data: sports } = useAsyncData(fetchSportCatalog, `pricing-sports:${reloadKey}`, EMPTY_LIST);
+  const { data: sports } = useAsyncData(fetchAdminSports, `pricing-sports:${reloadKey}`, EMPTY_LIST);
   const effectiveSportId = sportId ?? sports[0]?.id ?? null;
   const effectiveSport = sports.find((s) => s.id === effectiveSportId) ?? null;
 
@@ -262,6 +325,163 @@ export default function AdminFacilityPricing() {
 
   function reload() {
     setReloadKey((k) => k + 1);
+  }
+
+  async function handleCreateSport() {
+    const name = newSport.name.trim();
+    if (!name) {
+      setActionError("กรุณากรอกชื่อกีฬา");
+      return;
+    }
+
+    setSavingSport(true);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const sport = await createSport({ name, description: newSport.description.trim() });
+      setNewSport({ name: "", description: "" });
+      setAddingSport(false);
+      setSportId(sport.id);
+      setFacilityId(null);
+      setActionMessage(`เพิ่มกีฬา "${sport.name}" แล้ว — เพิ่มสนามให้กีฬานี้ต่อได้เลย`);
+      reload();
+    } catch (err) {
+      console.error("createSport failed:", err);
+      setActionError(errorMessage(err));
+    } finally {
+      setSavingSport(false);
+    }
+  }
+
+  async function handleCreateVenue() {
+    const name = newVenue.name.trim();
+    const address = newVenue.address.trim();
+    if (!name || !address) {
+      setActionError("กรุณากรอกชื่อและที่อยู่ของสถานที่ใหม่");
+      return;
+    }
+
+    setSavingVenue(true);
+    setActionError("");
+    try {
+      const venue = await createVenue({
+        name,
+        address,
+        phone: newVenue.phone.trim(),
+        openingTime: newVenue.openingTime,
+        closingTime: newVenue.closingTime,
+      });
+      setNewVenue({ name: "", address: "", phone: "", openingTime: "08:00", closingTime: "22:00" });
+      setAddingVenue(false);
+      setNewFacility((f) => ({ ...f, venueId: String(venue.id) }));
+      reload();
+    } catch (err) {
+      console.error("createVenue failed:", err);
+      setActionError(errorMessage(err));
+    } finally {
+      setSavingVenue(false);
+    }
+  }
+
+  async function handleCreateFacility() {
+    if (!effectiveSportId) {
+      setActionError("กรุณาเลือกกีฬาก่อน");
+      return;
+    }
+    const name = newFacility.name.trim();
+    if (!newFacility.venueId) {
+      setActionError("กรุณาเลือกสถานที่ของสนามใหม่");
+      return;
+    }
+    if (!name) {
+      setActionError("กรุณากรอกชื่อสนาม");
+      return;
+    }
+    const price = Number(newFacility.pricePerHour);
+    if (!price || price <= 0) {
+      setActionError("กรุณากรอกราคาต่อชั่วโมงให้ถูกต้อง");
+      return;
+    }
+
+    setSavingFacility(true);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const createdFacilityId = await createFacility({
+        venueId: Number(newFacility.venueId),
+        sportId: effectiveSportId,
+        name,
+        description: newFacility.description.trim(),
+        capacity: newFacility.capacity === "" ? null : Number(newFacility.capacity),
+        pricePerHour: price,
+        minBookingHours: Number(newFacility.minBookingHours) || 1,
+        depositPercent: Number(newFacility.depositPercent) || 0,
+      });
+
+      // เปิดตารางเวลาให้จองล่วงหน้าทันที ไม่ต้องรอ cron รอบถัดไป (เหมือนปุ่ม
+      // "เติมช่วงเวลาล่วงหน้า" ในหน้าจัดการตารางเวลา)
+      await ensureFutureSlots(70);
+
+      setNewFacility({
+        venueId: "",
+        name: "",
+        description: "",
+        capacity: "",
+        pricePerHour: "",
+        minBookingHours: "1",
+        depositPercent: "0",
+      });
+      setAddingFacility(false);
+      setFacilityId(createdFacilityId);
+      setActionMessage("เพิ่มสนามใหม่และเปิดตารางเวลาให้จองล่วงหน้าแล้ว");
+      reload();
+    } catch (err) {
+      console.error("createFacility failed:", err);
+      setActionError(errorMessage(err));
+    } finally {
+      setSavingFacility(false);
+    }
+  }
+
+  async function handleDeleteSport() {
+    if (!effectiveSportId || !effectiveSport) return;
+    if (!window.confirm(`ลบกีฬา "${effectiveSport.name}" ทิ้งเลยหรือไม่?`)) return;
+
+    setActionError("");
+    setActionMessage("");
+    try {
+      await deleteSport(effectiveSportId);
+      setSportId(null);
+      setFacilityId(null);
+      setActionMessage(`ลบกีฬา "${effectiveSport.name}" แล้ว`);
+      reload();
+    } catch (err) {
+      console.error("deleteSport failed:", err);
+      setActionError(errorMessage(err));
+    }
+  }
+
+  async function handleDeleteFacility() {
+    if (!effectiveFacilityId || !selectedFacility) return;
+    if (
+      !window.confirm(
+        `ลบสนาม "${selectedFacility.name}" ทิ้งเลยหรือไม่? รูปภาพ ราคา ส่วนลด และตารางเวลาของสนามนี้จะถูกลบไปด้วยทั้งหมด`,
+      )
+    ) {
+      return;
+    }
+
+    setActionError("");
+    setActionMessage("");
+    try {
+      await deleteFacility(effectiveFacilityId);
+      setFacilityId(null);
+      setActionMessage(`ลบสนาม "${selectedFacility.name}" แล้ว`);
+      reload();
+    } catch (err) {
+      console.error("deleteFacility failed:", err);
+      setActionError(errorMessage(err));
+    }
   }
 
   async function handleSaveBasePrice() {
@@ -659,6 +879,7 @@ export default function AdminFacilityPricing() {
           <span className="pricing-page__context-label">กีฬา</span>
           <select
             className="dash-select"
+            aria-label="เลือกกีฬา"
             value={effectiveSportId ?? ""}
             onChange={(e) => {
               setSportId(Number(e.target.value));
@@ -672,11 +893,30 @@ export default function AdminFacilityPricing() {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            className="dash-btn"
+            onClick={() => {
+              setAddingSport((v) => !v);
+              setAddingFacility(false);
+            }}
+          >
+            ＋ กีฬาใหม่
+          </button>
+          <button
+            type="button"
+            className="dash-btn dash-btn--cancel"
+            disabled={!effectiveSportId}
+            onClick={handleDeleteSport}
+          >
+            ลบกีฬานี้
+          </button>
         </div>
         <div className="pricing-page__context-field">
           <span className="pricing-page__context-label">สนาม</span>
           <select
             className="dash-select"
+            aria-label="เลือกสนาม"
             value={effectiveFacilityId ?? ""}
             onChange={(e) => {
               setFacilityId(Number(e.target.value));
@@ -689,12 +929,258 @@ export default function AdminFacilityPricing() {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            className="dash-btn"
+            disabled={!effectiveSportId}
+            onClick={() => {
+              setAddingFacility((v) => !v);
+              setAddingSport(false);
+            }}
+          >
+            ＋ สนามใหม่
+          </button>
+          <button
+            type="button"
+            className="dash-btn dash-btn--cancel"
+            disabled={!effectiveFacilityId}
+            onClick={handleDeleteFacility}
+          >
+            ลบสนามนี้
+          </button>
         </div>
         <div className="dash-filters__spacer" />
         <button type="button" className="dash-pill dash-pill--tint" onClick={handleApplyToSport}>
           ใช้ราคานี้กับทุกสนามในกีฬาเดียวกัน
         </button>
       </div>
+
+      {addingSport && (
+        <section className="dash-card">
+          <h2>เพิ่มกีฬาใหม่</h2>
+          <div className="pricing-page__base-grid">
+            <label className="dash-field">
+              <span className="dash-field__label">ชื่อกีฬา</span>
+              <input
+                type="text"
+                className="dash-input"
+                autoFocus
+                value={newSport.name}
+                onChange={(e) => setNewSport((s) => ({ ...s, name: e.target.value }))}
+              />
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">คำอธิบาย (ไม่บังคับ)</span>
+              <input
+                type="text"
+                className="dash-input"
+                value={newSport.description}
+                onChange={(e) => setNewSport((s) => ({ ...s, description: e.target.value }))}
+              />
+            </label>
+          </div>
+          <div className="pricing-discount-form__actions">
+            <button type="button" className="dash-btn" onClick={() => setAddingSport(false)}>
+              ยกเลิก
+            </button>
+            <button
+              type="button"
+              className="dash-btn dash-btn--add"
+              disabled={savingSport}
+              onClick={handleCreateSport}
+            >
+              {savingSport ? "กำลังบันทึก..." : "เพิ่มกีฬา"}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {addingFacility && (
+        <section className="dash-card">
+          <h2>เพิ่มสนามใหม่{effectiveSport ? ` — ${effectiveSport.name}` : ""}</h2>
+          <div className="pricing-page__base-grid">
+            {/* ช่องนี้ครอบด้วย <label> แบบช่องอื่นในกริดไม่ได้ เพราะมีปุ่ม
+                "เพิ่มสถานที่ใหม่" อยู่ข้างในด้วย — การคลิก label จะส่งโฟกัส/
+                เปิด select ตามไปด้วยทุกครั้งที่กดปุ่มนั้น ใช้ aria-label ที่ตัว
+                select แทน ได้ชื่อให้โปรแกรมอ่านหน้าจอเหมือนกันโดยไม่พ่วงพฤติกรรม */}
+            <div className="dash-field">
+              <span className="dash-field__label">สถานที่</span>
+              <select
+                className="dash-select"
+                aria-label="สถานที่ของสนามใหม่"
+                value={newFacility.venueId}
+                onChange={(e) => setNewFacility((f) => ({ ...f, venueId: e.target.value }))}
+              >
+                <option value="">— เลือกสถานที่ —</option>
+                {venues.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="dash-btn"
+                style={{ marginTop: "0.5rem" }}
+                onClick={() => setAddingVenue((v) => !v)}
+              >
+                ＋ เพิ่มสถานที่ใหม่
+              </button>
+            </div>
+
+            {addingVenue && (
+              <>
+                <label className="dash-field">
+                  <span className="dash-field__label">ชื่อสถานที่ใหม่</span>
+                  <input
+                    type="text"
+                    className="dash-input"
+                    value={newVenue.name}
+                    onChange={(e) => setNewVenue((v) => ({ ...v, name: e.target.value }))}
+                  />
+                </label>
+                <label className="dash-field">
+                  <span className="dash-field__label">ที่อยู่</span>
+                  <input
+                    type="text"
+                    className="dash-input"
+                    value={newVenue.address}
+                    onChange={(e) => setNewVenue((v) => ({ ...v, address: e.target.value }))}
+                  />
+                </label>
+                <label className="dash-field">
+                  <span className="dash-field__label">เบอร์โทร (ไม่บังคับ)</span>
+                  <input
+                    type="text"
+                    className="dash-input"
+                    value={newVenue.phone}
+                    onChange={(e) => setNewVenue((v) => ({ ...v, phone: e.target.value }))}
+                  />
+                </label>
+                {/*
+                  ช่องนี้มีสองอินพุตใต้หัวข้อเดียว จึงครอบด้วย <label> แบบช่องอื่น
+                  ไม่ได้ (label หนึ่งตัวผูกได้กับ control เดียว) ใช้ role="group"
+                  + aria-labelledby แทน แล้วให้แต่ละอินพุตมี aria-label ของตัวเอง
+                  ไม่งั้นโปรแกรมอ่านหน้าจอจะอ่านทั้งคู่เป็น "ช่องเวลา" เฉย ๆ
+                  แยกไม่ออกว่าอันไหนเปิดอันไหนปิด
+                */}
+                <div
+                  className="dash-field"
+                  role="group"
+                  aria-labelledby="new-venue-hours-label"
+                >
+                  <span className="dash-field__label" id="new-venue-hours-label">
+                    เวลาเปิด–ปิด
+                  </span>
+                  <div className="pricing-rule__times">
+                    <input
+                      type="time"
+                      className="dash-input"
+                      aria-label="เวลาเปิด"
+                      value={newVenue.openingTime}
+                      onChange={(e) => setNewVenue((v) => ({ ...v, openingTime: e.target.value }))}
+                    />
+                    <span>–</span>
+                    <input
+                      type="time"
+                      className="dash-input"
+                      aria-label="เวลาปิด"
+                      value={newVenue.closingTime}
+                      onChange={(e) => setNewVenue((v) => ({ ...v, closingTime: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                <div className="dash-field">
+                  <button
+                    type="button"
+                    className="dash-btn dash-btn--add"
+                    disabled={savingVenue}
+                    onClick={handleCreateVenue}
+                  >
+                    {savingVenue ? "กำลังบันทึก..." : "บันทึกสถานที่ใหม่"}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <label className="dash-field">
+              <span className="dash-field__label">ชื่อสนาม</span>
+              <input
+                type="text"
+                className="dash-input"
+                value={newFacility.name}
+                onChange={(e) => setNewFacility((f) => ({ ...f, name: e.target.value }))}
+              />
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">ความจุ (คน, ไม่บังคับ)</span>
+              <input
+                type="number"
+                min="0"
+                className="dash-input"
+                value={newFacility.capacity}
+                onChange={(e) => setNewFacility((f) => ({ ...f, capacity: e.target.value }))}
+              />
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">ราคาต่อชั่วโมง</span>
+              <input
+                type="number"
+                min="0"
+                className="dash-input"
+                value={newFacility.pricePerHour}
+                onChange={(e) => setNewFacility((f) => ({ ...f, pricePerHour: e.target.value }))}
+              />
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">ขั้นต่ำต่อการจอง (ชม.)</span>
+              <input
+                type="number"
+                min="1"
+                className="dash-input"
+                value={newFacility.minBookingHours}
+                onChange={(e) => setNewFacility((f) => ({ ...f, minBookingHours: e.target.value }))}
+              />
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">มัดจำ (%)</span>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                className="dash-input"
+                value={newFacility.depositPercent}
+                onChange={(e) => setNewFacility((f) => ({ ...f, depositPercent: e.target.value }))}
+              />
+            </label>
+            <label className="dash-field">
+              <span className="dash-field__label">คำอธิบาย (ไม่บังคับ)</span>
+              <input
+                type="text"
+                className="dash-input"
+                value={newFacility.description}
+                onChange={(e) => setNewFacility((f) => ({ ...f, description: e.target.value }))}
+              />
+            </label>
+          </div>
+          <p className="pricing-page__hint">
+            หลังบันทึกจะเปิดตารางเวลาให้จองล่วงหน้าอัตโนมัติ 70 วัน ตามเวลาเปิด-ปิดของสถานที่ที่เลือก
+          </p>
+          <div className="pricing-discount-form__actions">
+            <button type="button" className="dash-btn" onClick={() => setAddingFacility(false)}>
+              ยกเลิก
+            </button>
+            <button
+              type="button"
+              className="dash-btn dash-btn--add"
+              disabled={savingFacility}
+              onClick={handleCreateFacility}
+            >
+              {savingFacility ? "กำลังบันทึก..." : "เพิ่มสนาม"}
+            </button>
+          </div>
+        </section>
+      )}
 
       {!effectiveFacilityId ? (
         <p className="dash-empty">ยังไม่มีสนามที่เปิดให้จองสำหรับกีฬานี้</p>
@@ -711,17 +1197,17 @@ export default function AdminFacilityPricing() {
                 <p className="dash-empty">กำลังโหลดข้อมูล...</p>
               ) : (
                 <div className="pricing-page__base-grid">
-                  <div className="dash-field">
-                    <label className="dash-field__label">ชื่อสนาม</label>
+                  <label className="dash-field">
+                    <span className="dash-field__label">ชื่อสนาม</span>
                     <input
                       type="text"
                       className="dash-input"
                       value={base.name}
                       onChange={(e) => setBaseDraft({ ...base, name: e.target.value })}
                     />
-                  </div>
-                  <div className="dash-field">
-                    <label className="dash-field__label">สถานที่</label>
+                  </label>
+                  <label className="dash-field">
+                    <span className="dash-field__label">สถานที่</span>
                     <input
                       type="text"
                       className="dash-input"
@@ -729,9 +1215,9 @@ export default function AdminFacilityPricing() {
                       onChange={(e) => setBaseDraft({ ...base, venueName: e.target.value })}
                     />
                     <p className="dash-field__hint">มีผลกับทุกสนามในสถานที่เดียวกัน</p>
-                  </div>
-                  <div className="dash-field">
-                    <label className="dash-field__label">ที่อยู่</label>
+                  </label>
+                  <label className="dash-field">
+                    <span className="dash-field__label">ที่อยู่</span>
                     <input
                       type="text"
                       className="dash-input"
@@ -739,9 +1225,9 @@ export default function AdminFacilityPricing() {
                       onChange={(e) => setBaseDraft({ ...base, venueAddress: e.target.value })}
                     />
                     <p className="dash-field__hint">มีผลกับทุกสนามในสถานที่เดียวกัน</p>
-                  </div>
-                  <div className="dash-field">
-                    <label className="dash-field__label">ราคาต่อชั่วโมง</label>
+                  </label>
+                  <label className="dash-field">
+                    <span className="dash-field__label">ราคาต่อชั่วโมง</span>
                     <input
                       type="number"
                       min="0"
@@ -751,9 +1237,9 @@ export default function AdminFacilityPricing() {
                         setBaseDraft({ ...base, pricePerHour: e.target.value })
                       }
                     />
-                  </div>
-                  <div className="dash-field">
-                    <label className="dash-field__label">ขั้นต่ำต่อการจอง (ชม.)</label>
+                  </label>
+                  <label className="dash-field">
+                    <span className="dash-field__label">ขั้นต่ำต่อการจอง (ชม.)</span>
                     <input
                       type="number"
                       min="1"
@@ -764,9 +1250,9 @@ export default function AdminFacilityPricing() {
                       }
                     />
                     <p className="dash-field__hint">บันทึกไว้เป็นข้อมูล ยังไม่บังคับที่ขั้นตอนจอง</p>
-                  </div>
-                  <div className="dash-field">
-                    <label className="dash-field__label">มัดจำ (%)</label>
+                  </label>
+                  <label className="dash-field">
+                    <span className="dash-field__label">มัดจำ (%)</span>
                     <input
                       type="number"
                       min="0"
@@ -777,7 +1263,7 @@ export default function AdminFacilityPricing() {
                         setBaseDraft({ ...base, depositPercent: e.target.value })
                       }
                     />
-                  </div>
+                  </label>
                 </div>
               )}
             </section>

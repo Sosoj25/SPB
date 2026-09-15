@@ -1,9 +1,11 @@
+// หน้าตั้งรหัสผ่านใหม่จากลิงก์ในอีเมล
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import Button from "../components/Button";
 import { supabase } from "../lib/supabase";
+import { PASSWORD_HINT, validatePassword } from "../lib/password";
 
 // Supabase ส่งข้อมูลกลับมาทาง URL hash เสมอ (ต้องอ่านตั้งแต่ render แรกสุด
 // ก่อนที่ Supabase client จะประมวลผล token แล้วเคลียร์ hash ทิ้งไปแบบ async)
@@ -90,13 +92,33 @@ export default function ResetPassword() {
   }, [linkError, notAResetLink]);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    const nextForm = { ...form, [name]: value };
+    setForm(nextForm);
+    setMessage("");
+
+    // แจ้งเตือนทันทีระหว่างพิมพ์ ไม่ต้องรอกดยืนยัน
+    if (name === "password") {
+      const passwordError = value && validatePassword(value);
+      if (passwordError) {
+        setError(passwordError);
+        return;
+      }
+
+      if (nextForm.confirmPassword && value !== nextForm.confirmPassword) {
+        setError("รหัสผ่านไม่ตรงกัน");
+        return;
+      }
+    }
+
+    if (name === "confirmPassword") {
+      if (nextForm.password && value && nextForm.password !== value) {
+        setError("รหัสผ่านไม่ตรงกัน");
+        return;
+      }
+    }
 
     setError("");
-    setMessage("");
   };
 
   const handleSubmit = async (e) => {
@@ -110,8 +132,9 @@ export default function ResetPassword() {
       return;
     }
 
-    if (form.password.length < 6) {
-      setError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
@@ -212,6 +235,7 @@ export default function ResetPassword() {
               label="รหัสผ่านใหม่"
               name="password"
               type="password"
+              placeholder={PASSWORD_HINT}
               value={form.password}
               onChange={handleChange}
             />

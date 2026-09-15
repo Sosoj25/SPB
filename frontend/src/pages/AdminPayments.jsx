@@ -1,7 +1,9 @@
+// คิวตรวจสอบการชำระเงินของแอดมิน — ดูสลิป อนุมัติ หรือปฏิเสธพร้อมเหตุผล
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pagination, Pill, StatCard } from "../components/DashboardWidgets";
 import { useAdminPaymentStats, useAdminPayments } from "../hooks/useAdmin";
+import { useAsyncData } from "../hooks/useAsyncData";
 import {
   approvePayment,
   describeGateway,
@@ -17,16 +19,13 @@ import {
   formatTimeRange,
 } from "../lib/bookings";
 import { errorMessage } from "../lib/errors";
+import "./AdminPayments.css";
 
-// หน้านี้เคยเป็น mock ล้วน — บัญชีธนาคาร ยอดรอโอน ช่องทางชำระเงิน และปุ่ม
-// "โอนเงินทันที" ทั้งหมดฮาร์ดโค้ดไว้ในไฟล์ ไม่แตะ Supabase เลยสักบรรทัด
-// ทั้งที่ตาราง payments มี status / verified_by / verified_at /
-// rejection_reason รอไว้ตั้งแต่ 0000 และ RLS ก็เปิดให้แอดมิน update อยู่แล้ว
-// แปลว่าจริง ๆ แล้วแอดมิน "ไม่มีที่ตรวจสอบการชำระเงิน" เลยทั้งระบบ
+// หน้านี้ทำอย่างเดียว: คิวรอตรวจสอบการชำระเงิน + อนุมัติ/ปฏิเสธ
 //
-// ตอนนี้หน้านี้ทำหน้าที่เดียวที่ระบบต้องการจริงและมีข้อมูลรองรับ: คิวรอ
-// ตรวจสอบ + อนุมัติ/ปฏิเสธ ส่วนการตั้งค่าบัญชีรับเงินและรอบการโอน (payout)
-// ยังไม่มีตารางรองรับ จึงยังไม่ทำ ดีกว่าโชว์ตัวเลขปลอมให้เข้าใจผิด
+// รอบการโอนเงินออก (payout) ยังไม่มีตารางรองรับ จึงยังไม่มีในหน้านี้ —
+// ห้ามใส่ตัวเลขที่ไม่มีข้อมูลจริงรองรับเข้ามาให้ดูครบ
+// ส่วนการตั้งค่าบัญชีรับเงินอยู่ที่ /admin/payments/settings
 
 const FILTERS = [
   { key: "review", label: "รอตรวจสอบ" },
@@ -34,6 +33,8 @@ const FILTERS = [
   { key: "rejected", label: "ปฏิเสธ" },
   { key: "", label: "ทั้งหมด" },
 ];
+
+const isWaiting = (payment) => payment.status === "pending" || payment.status === "paid";
 
 function describeBooking(payment) {
   const booking = payment.bookings;
@@ -48,6 +49,10 @@ function describeBooking(payment) {
     booking.start_time,
     booking.end_time,
   )}`;
+}
+
+function customerName(payment) {
+  return payment.profiles?.full_name || payment.profiles?.username || "—";
 }
 
 // พร้อมเพย์ (PlernPay) ไม่มีสลิปให้ดูเหมือนโอนบัญชี เพราะยืนยันอัตโนมัติผ่าน
@@ -93,14 +98,145 @@ function PaymentReferenceModal({ payment, onClose }) {
   );
 }
 
+// เดิมปุ่ม "ดูสลิป" แค่เปิดสลิปในแท็บใหม่ แล้วปล่อยให้กดอนุมัติจากในตารางได้
+// เลยไม่ว่าจะเปิดดูหรือไม่ — เป็นจุดพลาดที่แพงที่สุดของช่องทางโอน+แนบสลิป
+// เพราะการกดอนุมัติเท่ากับยืนยันการจองและรับรู้ยอดทันที (admin_approve_payment)
+// ย้อนกลับยากกว่าการกดปฏิเสธมาก
+//
+// โมดัลนี้เอาสลิปมาวางคู่กับตัวเลขที่ต้องเทียบ (ยอด/เวลาที่แจ้งชำระ/ชื่อผู้ชำระ)
+// และปุ่มอนุมัติจะปลดล็อกก็ต่อเมื่อรูปสลิปขึ้นจอสำเร็จจริง ๆ (onLoad) ไม่ใช่
+// แค่ตอนกดเปิดโมดัล — เปิดแล้วโหลดไม่ขึ้นถือว่ายังไม่ได้ดู
+function SlipReviewModal({
+  payment,
+  reviewed,
+  busy,
+  onReviewed,
+  onApprove,
+  onReject,
+  onClose,
+}) {
+  const [imageError, setImageError] = useState("");
+  const [zoomed, setZoomed] = useState(false);
+
+  // bucket payment-slips เป็น private (สลิปมีเลขบัญชี/ชื่อบัญชีของลูกค้าติดมา)
+  // — ขอ signed URL ตอนเปิดดูจริงเท่านั้น ไม่เก็บ URL สาธารณะไว้ล่วงหน้า
+  const { data: url, loading, error } = useAsyncData(
+    () => fetchSlipSignedUrl(payment.slip_url),
+    `payment-slip:${payment.id}`,
+    "",
+  );
+
+  const problem = error || imageError;
+  const waiting = isWaiting(payment);
+
+  return (
+    <div className="dash-modal-overlay" onClick={onClose}>
+      <div
+        className="dash-modal admin-payments__slip-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="dash-modal__header">
+          <h2>ตรวจสลิป {payment.bookings?.booking_code ?? ""}</h2>
+          <button type="button" className="dash-modal__close" onClick={onClose} aria-label="ปิด">
+            ✕
+          </button>
+        </div>
+
+        <dl className="admin-payments__slip-facts">
+          <div>
+            <dt>ผู้ชำระ</dt>
+            <dd>{customerName(payment)}</dd>
+          </div>
+          <div>
+            <dt>ยอดที่ต้องได้รับ</dt>
+            <dd>{formatBaht(payment.amount)}</dd>
+          </div>
+          <div>
+            <dt>แจ้งชำระเมื่อ</dt>
+            <dd>{formatDateTime(payment.created_at)}</dd>
+          </div>
+        </dl>
+
+        <div className="admin-payments__slip-frame">
+          {problem && <p className="dash-message dash-message--error">{problem}</p>}
+          {!problem && loading && (
+            <p className="admin-payments__slip-status">กำลังโหลดสลิป...</p>
+          )}
+          {!problem && url && (
+            <img
+              src={url}
+              alt={`สลิปการชำระเงินของ ${payment.bookings?.booking_code ?? "การจองนี้"}`}
+              className={`admin-payments__slip-image${
+                zoomed ? " admin-payments__slip-image--zoomed" : ""
+              }`}
+              onClick={() => setZoomed((z) => !z)}
+              onLoad={onReviewed}
+              onError={() => setImageError("เปิดสลิปไม่สำเร็จ ลิงก์อาจหมดอายุ ลองปิดแล้วเปิดใหม่")}
+            />
+          )}
+        </div>
+
+        <p className="admin-payments__slip-note">
+          เทียบยอดและเวลาบนสลิปกับรายการด้านบนก่อนอนุมัติ — กดที่รูปเพื่อซูมในหน้านี้
+          {waiting && !reviewed && " (ปุ่มอนุมัติจะกดได้เมื่อสลิปขึ้นจอแล้ว)"}
+        </p>
+
+        <div
+          className={`admin-payments__slip-actions${
+            waiting ? "" : " admin-payments__slip-actions--end"
+          }`}
+        >
+          {url && !problem && (
+            <a
+              className="dash-btn admin-payments__slip-open"
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              title="เปิดรูปสลิปขนาดเต็มในแท็บใหม่"
+              onClick={onReviewed}
+            >
+              🔍 ขยายรูปเต็มขนาด
+            </a>
+          )}
+          {waiting && (
+            <>
+              <button
+                type="button"
+                className="dash-btn dash-btn--add"
+                disabled={busy || !reviewed}
+                title={reviewed ? undefined : "ต้องเปิดดูสลิปก่อนจึงจะอนุมัติได้"}
+                onClick={() => onApprove(payment)}
+              >
+                {busy ? "กำลังบันทึก..." : "อนุมัติ"}
+              </button>
+              <button
+                type="button"
+                className="dash-btn dash-btn--cancel"
+                disabled={busy}
+                onClick={() => onReject(payment)}
+              >
+                ปฏิเสธ
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPayments() {
   const [filter, setFilter] = useState("review");
   const [page, setPage] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
   const [busyId, setBusyId] = useState(null);
   const [actionError, setActionError] = useState("");
-  const [slipBusyId, setSlipBusyId] = useState(null);
   const [viewingPayment, setViewingPayment] = useState(null);
+  const [viewingSlip, setViewingSlip] = useState(null);
+  // id ของรายการที่แอดมิน "เห็นสลิปแล้ว" ในเซสชันนี้ — เก็บไว้ที่หน้าจอ ไม่ใช่
+  // ที่แถว payments เพราะมันคือสถานะของคนกด ไม่ใช่ของการชำระเงิน แอดมินอีกคน
+  // ที่เปิดคิวเดียวกันก็ต้องเปิดดูสลิปเองก่อนอนุมัติอยู่ดี
+  const [reviewedSlips, setReviewedSlips] = useState(() => new Set());
 
   const { payments, hasMore, loading, error } = useAdminPayments({
     status: filter || undefined,
@@ -114,7 +250,28 @@ export default function AdminPayments() {
     setPage(1);
   }
 
+  // ล็อกปุ่มอนุมัติเฉพาะรายการที่มีสลิปให้ดูจริง (โอนเข้าบัญชี gateway='manual')
+  // — พร้อมเพย์ยืนยันอัตโนมัติและไม่เคยมีสลิป ถ้าล็อกด้วยจะกลายเป็นอนุมัติเคส
+  // ที่ค้าง pending ไม่ได้เลยตลอดกาล
+  const slipLocked = (payment) => Boolean(payment.slip_url) && !reviewedSlips.has(payment.id);
+
+  function markSlipReviewed(paymentId) {
+    setReviewedSlips((prev) => {
+      if (prev.has(paymentId)) return prev;
+      const next = new Set(prev);
+      next.add(paymentId);
+      return next;
+    });
+  }
+
   async function handleApprove(payment) {
+    // กันไว้อีกชั้นเผื่อกดถึงปุ่มนี้ได้ทั้งที่ยังไม่ได้เปิดดูสลิป
+    if (slipLocked(payment)) {
+      setActionError("ต้องเปิดดูสลิปของรายการนี้ก่อน จึงจะกดอนุมัติได้");
+      setViewingSlip(payment);
+      return;
+    }
+
     const ok = window.confirm(
       `ยืนยันว่าได้รับเงิน ${formatBaht(payment.amount)} สำหรับการจอง ${
         payment.bookings?.booking_code ?? ""
@@ -127,6 +284,7 @@ export default function AdminPayments() {
 
     try {
       await approvePayment(payment.id);
+      setViewingSlip(null);
       setReloadKey((k) => k + 1);
     } catch (err) {
       console.error("approvePayment failed:", err);
@@ -150,6 +308,7 @@ export default function AdminPayments() {
 
     try {
       await rejectPayment(payment.id, reason);
+      setViewingSlip(null);
       setReloadKey((k) => k + 1);
     } catch (err) {
       console.error("rejectPayment failed:", err);
@@ -159,21 +318,9 @@ export default function AdminPayments() {
     }
   }
 
-  // bucket payment-slips เป็น private (เก็บเลขบัญชี/ชื่อบัญชีของลูกค้า) —
-  // ต้องขอ signed URL ตอนกดดูจริง ๆ เท่านั้น ไม่เก็บ URL สาธารณะไว้ล่วงหน้า
-  async function handleViewSlip(payment) {
+  function openSlip(payment) {
     setActionError("");
-    setSlipBusyId(payment.id);
-
-    try {
-      const url = await fetchSlipSignedUrl(payment.slip_url);
-      window.open(url, "_blank", "noreferrer");
-    } catch (err) {
-      console.error("fetchSlipSignedUrl failed:", err);
-      setActionError(errorMessage(err));
-    } finally {
-      setSlipBusyId(null);
-    }
+    setViewingSlip(payment);
   }
 
   return (
@@ -239,15 +386,14 @@ export default function AdminPayments() {
                 <tbody>
                   {payments.map((payment) => {
                     const status = describePaymentStatus(payment.status);
-                    const waiting = payment.status === "pending" || payment.status === "paid";
+                    const waiting = isWaiting(payment);
                     const busy = busyId === payment.id;
+                    const locked = slipLocked(payment);
 
                     return (
                       <tr key={payment.id}>
                         <td>{payment.bookings?.booking_code ?? "—"}</td>
-                        <td>
-                          {payment.profiles?.full_name || payment.profiles?.username || "—"}
-                        </td>
+                        <td>{customerName(payment)}</td>
                         <td>{describeBooking(payment)}</td>
                         <td>
                           {describeMethod(payment.payment_method)}
@@ -265,11 +411,12 @@ export default function AdminPayments() {
                             {payment.slip_url && (
                               <button
                                 type="button"
-                                className="dash-btn"
-                                disabled={slipBusyId === payment.id}
-                                onClick={() => handleViewSlip(payment)}
+                                className={`dash-btn admin-payments__slip-open${
+                                  locked ? "" : " admin-payments__slip-open--done"
+                                }`}
+                                onClick={() => openSlip(payment)}
                               >
-                                {slipBusyId === payment.id ? "กำลังเปิด..." : "ดูสลิป"}
+                                {locked ? "🔍 ดูสลิป" : "✓ ดูสลิปแล้ว"}
                               </button>
                             )}
                             {payment.gateway === "plernpay" && (
@@ -286,7 +433,8 @@ export default function AdminPayments() {
                                 <button
                                   type="button"
                                   className="dash-btn dash-btn--add"
-                                  disabled={busy}
+                                  disabled={busy || locked}
+                                  title={locked ? "ต้องเปิดดูสลิปก่อนจึงจะอนุมัติได้" : undefined}
                                   onClick={() => handleApprove(payment)}
                                 >
                                   {busy ? "กำลังบันทึก..." : "อนุมัติ"}
@@ -302,6 +450,9 @@ export default function AdminPayments() {
                               </>
                             )}
                           </div>
+                          {waiting && locked && (
+                            <p className="admin-payments__lock-hint">ดูสลิปก่อนจึงจะอนุมัติได้</p>
+                          )}
                         </td>
                       </tr>
                     );
@@ -317,6 +468,18 @@ export default function AdminPayments() {
           </>
         )}
       </div>
+
+      {viewingSlip && (
+        <SlipReviewModal
+          payment={viewingSlip}
+          reviewed={reviewedSlips.has(viewingSlip.id)}
+          busy={busyId === viewingSlip.id}
+          onReviewed={() => markSlipReviewed(viewingSlip.id)}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onClose={() => setViewingSlip(null)}
+        />
+      )}
 
       {viewingPayment && (
         <PaymentReferenceModal

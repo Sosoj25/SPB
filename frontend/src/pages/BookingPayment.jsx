@@ -1,9 +1,14 @@
+// ขั้นที่ 4 ของการจอง — ชำระเงินด้วยพร้อมเพย์ QR หรือโอนแล้วแนบสลิป
+//
+// การจองถูกกันสิทธิ์ไว้ชั่วคราวเท่านั้น (BOOKING_HOLD_MINUTES) หน้านี้จึงมี
+// นาฬิกานับถอยหลังทั้งของ QR และของตัวการจองเอง
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BookingSteps from "../components/BookingSteps";
 import { Badge } from "../components/DashboardWidgets";
 import { useAuth } from "../context/useAuth";
+import CouponPicker from "../components/CouponPicker";
 import { useAsyncData } from "../hooks/useAsyncData";
 import {
   BOOKING_HOLD_MINUTES,
@@ -18,6 +23,7 @@ import { fetchPaymentChannelSettings, fetchPrimaryPaymentAccount } from "../lib/
 import {
   PAYMENT_METHODS,
   checkPlernpayPayment,
+  confirmZeroAmountBooking,
   createPlernpayCharge,
   submitBankTransferPayment,
   uploadPaymentSlip,
@@ -30,13 +36,15 @@ import "./Booking.css";
 
 const PAYMENT_LABELS = ["เลือกกีฬา", "เลือกสนาม", "เลือกวันและเวลา", "ชำระเงิน"];
 
+// ทุกกี่มิลลิวินาทีถึงถามสถานะการจ่ายเงินอีกครั้ง
+//
 // PlernPay จำกัด 30 requests/นาทีต่อ API key "รวมทั้งระบบ" ไม่ใช่ต่อการจอง
 // เดียว และเกินแล้วแอปทั้งตัวจะถูก deactivate ทันที (ดูคอมเมนต์ใน
-// check-plernpay-payment) — เดิมตั้งไว้ที่ 8 วิเพื่อความปลอดภัยสูงสุด แต่ผู้ใช้
-// ยอมรับความเสี่ยงแล้วขอให้ลดลงมาที่ 4 วิเพื่อให้ลูกค้าไม่ต้องรอนาน (1 คน
-// poll ต่อเนื่อง = 15 req/min ยังเหลือ headroom ให้จ่ายพร้อมกันได้อีก ~1 คน
-// ก่อนชน limit รวม 30 req/min) ถ้ามีคนจ่ายพร้อมกันเยอะขึ้นในอนาคตควรติดต่อขอ
-// เพิ่ม limit แทนการลดค่านี้ลงอีก
+// check-plernpay-payment) — ค่านี้เป็นค่าที่เจ้าของระบบเลือกเองโดยรับความเสี่ยง
+// ไว้แล้ว เพื่อให้ลูกค้าไม่ต้องรอนาน: 1 คนที่ poll ต่อเนื่อง = 15 req/min
+// เหลือที่ให้จ่ายพร้อมกันได้อีกราวคนเดียวก่อนชนเพดาน
+//
+// ถ้ามีคนจ่ายพร้อมกันเยอะขึ้น ให้ติดต่อขอเพิ่ม limit ไม่ใช่ลดค่านี้ลงอีก
 const POLL_MS = 4000;
 
 function formatQrCountdown(seconds) {
@@ -44,6 +52,8 @@ function formatQrCountdown(seconds) {
   const s = seconds % 60;
   return `${m}:${String(s).padStart(2, "0")}`;
 }
+
+const HOLD_WARNING_SECONDS = 120;
 
 export default function BookingPayment() {
   const [params] = useSearchParams();
@@ -69,9 +79,17 @@ export default function BookingPayment() {
   const [slipError, setSlipError] = useState("");
   const [submittingSlip, setSubmittingSlip] = useState(false);
 
+  // ---------- ยอดสุทธิ 0 บาท ----------
+  const [confirmingFree, setConfirmingFree] = useState(false);
+  const [freeError, setFreeError] = useState("");
+
+  // ใช้/ถอดคูปองแล้ว booking.total_amount เปลี่ยน — ต้องโหลดการจองใหม่ ไม่ใช่
+  // แก้ตัวเลขในหน้าเอง เพราะยอดจริงคำนวณฝั่งเซิร์ฟเวอร์ (apply_booking_coupon)
+  const [bookingReloadKey, setBookingReloadKey] = useState(0);
+
   const { data: booking, loading, error } = useAsyncData(
     () => fetchBookingDetail(bookingId),
-    bookingId ? `booking:${bookingId}` : null
+    bookingId ? `booking:${bookingId}:${bookingReloadKey}` : null
   );
 
   // สรุปยอดแบบแยกรายการ (ราคาช่วงเวลา + ส่วนลด) มาจากฟังก์ชันเดียวกับที่
@@ -159,6 +177,32 @@ export default function BookingPayment() {
       )
     : null;
 
+  // นับถอยหลังเวลาที่ระบบกันช่วงเวลาไว้ให้ (BOOKING_HOLD_MINUTES) — เดิมหน้านี้
+  // บอกแค่ตัวเลขนาทีเฉย ๆ ไม่มีนาฬิกาจริงให้ดู ลูกค้าจึงไม่รู้ตัวว่าเหลือเวลา
+  // เท่าไหร่แล้ว คำนวณจาก booking.created_at (เวลาที่ create_booking กันไว้จริง
+  // ฝั่งเซิร์ฟเวอร์) ไม่ใช่เวลาที่หน้านี้โหลดเสร็จ เพื่อให้ตรงกับเวลาที่
+  // expire_unpaid_bookings ใช้จริง
+  const [holdNowTick, setHoldNowTick] = useState(() => Date.now());
+  const isPendingUnpaid = booking?.status === "pending" && booking?.payment_status === "unpaid";
+
+  useEffect(() => {
+    if (!isPendingUnpaid) return undefined;
+
+    const id = setInterval(() => setHoldNowTick(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [isPendingUnpaid]);
+
+  const holdSecondsLeft = isPendingUnpaid
+    ? Math.max(
+        0,
+        Math.round(
+          (new Date(booking.created_at).getTime() + BOOKING_HOLD_MINUTES * 60 * 1000 - holdNowTick) / 1000,
+        ),
+      )
+    : null;
+
+  const isHoldExpired = holdSecondsLeft === 0;
+
   // poll สถานะการจ่ายเป็นระยะจนกว่าจะ approved/rejected หรือออกจากหน้านี้ —
   // เรียกผ่าน Edge Function เสมอ (ไม่อ่านตาราง payments ตรง ๆ) เพราะ
   // check-plernpay-payment เป็นคนไปถาม PlernPay จริงและอัปเดตสถานะให้ในตัว
@@ -208,6 +252,24 @@ export default function BookingPayment() {
 
   const facility = booking?.facilities;
   const hours = booking ? bookingHours(booking) : 0;
+  // ยอดสุทธิ 0 เกิดได้จากโปรโมชั่นของสนามที่ลดจนหมด หรือคูปองที่คลุมค่าสนาม
+  // พอดี — ทั้งสองช่องทางที่มีอยู่ใช้กับยอด 0 ไม่ได้ (PlernPay ไม่รับ charge
+  // 0 บาท ส่วนการโอนก็ไม่มีสลิปให้แนบ) จึงต้องมีปุ่มยืนยันของตัวเอง
+  const isFree = booking ? Number(booking.total_amount) === 0 : false;
+
+  async function handleConfirmFree() {
+    setConfirmingFree(true);
+    setFreeError("");
+
+    try {
+      await confirmZeroAmountBooking(bookingId);
+      navigate(`/booking/receipt?booking=${bookingId}`);
+    } catch (err) {
+      console.error("confirmZeroAmountBooking failed:", err);
+      setFreeError(errorMessage(err));
+      setConfirmingFree(false);
+    }
+  }
 
   async function handleGenerateQr() {
     setQrLoading(true);
@@ -284,7 +346,7 @@ export default function BookingPayment() {
           />
           <h1 className="booking__title">ชำระเงิน</h1>
           <p className="booking__lead">
-            เรากันเวลานี้ไว้ให้คุณแล้ว ตรวจสอบรายละเอียดแล้วเลือกวิธีชำระเงินที่สะดวก
+            เราเก็บสิทธ์ช่วงเวลาเวลานี้ไว้ให้คุณแล้ว ตรวจสอบรายละเอียดแล้วเลือกวิธีชำระเงินที่สะดวก
           </p>
         </section>
 
@@ -296,13 +358,26 @@ export default function BookingPayment() {
           </p>
         )}
 
-        {booking && booking.status === "cancelled" && (
-          <p className="booking-state booking-state--error">
-            รายการจองนี้ถูกยกเลิกไปแล้ว กรุณาเริ่มจองใหม่อีกครั้ง
+        {booking && isPendingUnpaid && !isHoldExpired && (
+          <p
+            className={`booking-note--warn booking-hold-banner ${
+              holdSecondsLeft <= HOLD_WARNING_SECONDS ? "booking-hold-banner--urgent" : ""
+            }`}
+          >
+            🔒 เราเก็บช่วงเวลานี้ไว้ให้คุณแล้ว กรุณาชำระเงินภายใน {BOOKING_HOLD_MINUTES} นาที
+            (เหลือเวลา {formatQrCountdown(holdSecondsLeft)} นาที)
           </p>
         )}
 
-        {booking && booking.status !== "cancelled" && (
+        {booking && (booking.status === "cancelled" || isHoldExpired) && (
+          <p className="booking-state booking-state--error">
+            {isHoldExpired
+              ? "หมดเวลาที่ระบบกันช่วงเวลานี้ไว้ให้แล้ว กรุณาเริ่มจองใหม่อีกครั้ง"
+              : "รายการจองนี้ถูกยกเลิกไปแล้ว กรุณาเริ่มจองใหม่อีกครั้ง"}
+          </p>
+        )}
+
+        {booking && booking.status !== "cancelled" && !isHoldExpired && (
           <div className="booking-payment">
             <div className="booking-payment__left">
               <section className="booking-panel">
@@ -333,6 +408,40 @@ export default function BookingPayment() {
                 </div>
               </section>
 
+              {/* ยอด 0 บาทยังต้องผ่านขั้นตอนยืนยันคำสั่งซื้อเหมือนรายการที่จ่าย
+                  เงินจริง — ระบบออกแถว payments ยืนยันการจอง ตัดคูปอง และออก
+                  ใบเสร็จให้ครบ (confirm_zero_amount_booking, 0054) ไม่ใช่ยืนยัน
+                  ให้เองเงียบ ๆ ตั้งแต่ตอนกดจอง */}
+              {isFree ? (
+                <section className="booking-panel">
+                  <h2 className="booking-panel__title">ยืนยันคำสั่งซื้อ</h2>
+
+                  <div className="booking-simulated booking-simulated--neutral">
+                    <p className="booking-simulated__title">ไม่มียอดที่ต้องชำระ</p>
+                    <p className="booking-simulated__text">
+                      ส่วนลดและคูปองที่ใช้ครอบคลุมค่าสนามทั้งหมดแล้ว
+                      กดยืนยันเพื่อปิดคำสั่งซื้อและรับใบเสร็จ
+                      คุณยังต้องกดยืนยันภายในเวลาที่กันไว้ให้ มิฉะนั้นช่วงเวลานี้จะถูกปล่อยคืน
+                    </p>
+                  </div>
+
+                  {freeError && <p className="booking-state booking-state--error">{freeError}</p>}
+
+                  <button
+                    type="button"
+                    className="booking-btn booking-btn--block"
+                    disabled={confirmingFree}
+                    onClick={handleConfirmFree}
+                  >
+                    {confirmingFree ? "กำลังยืนยัน..." : "ยืนยันคำสั่งซื้อ (0 บาท)"}
+                  </button>
+
+                  <p className="booking-note">
+                    ต้องการเปลี่ยนคูปอง? นำคูปองออกจากสรุปยอดทางขวาก่อน
+                    แล้วเลือกวิธีชำระเงินตามปกติ
+                  </p>
+                </section>
+              ) : (
               <section className="booking-panel">
                 <h2 className="booking-panel__title">เลือกวิธีชำระเงิน</h2>
 
@@ -466,6 +575,7 @@ export default function BookingPayment() {
                   </div>
                 )}
               </section>
+              )}
 
               {refundPolicy && (
                 <section className="booking-panel">
@@ -538,6 +648,21 @@ export default function BookingPayment() {
                 </div>
               )}
 
+              <CouponPicker
+                booking={booking}
+                userId={user?.id}
+                onChanged={async () => setBookingReloadKey((key) => key + 1)}
+              />
+
+              {booking.discount_amount > 0 && (
+                <div className="booking-row">
+                  <span className="booking-row__label">ส่วนลดจากคูปอง</span>
+                  <span className="booking-row__value booking-row__value--success">
+                    -{formatBaht(booking.discount_amount)}
+                  </span>
+                </div>
+              )}
+
               <hr className="booking-divider" />
 
               <div className="booking-row booking-row--total">
@@ -554,10 +679,12 @@ export default function BookingPayment() {
                 ‹ กลับไปเลือกเวลา
               </Link>
 
-              <p className="booking-note">
-                🔒 เวลานี้ถูกกันไว้ให้คุณแล้ว กรุณาชำระเงินภายใน {BOOKING_HOLD_MINUTES} นาที
-                มิฉะนั้นระบบจะปล่อยช่วงเวลานี้ให้ผู้อื่นจองต่อ
-              </p>
+              {isPendingUnpaid && (
+                <p className="booking-note">
+                  🔒 เหลือเวลาชำระเงินอีก {formatQrCountdown(holdSecondsLeft)} นาที
+                  มิฉะนั้นระบบจะปล่อยช่วงเวลานี้ให้ผู้อื่นจองต่อ
+                </p>
+              )}
             </section>
           </div>
         )}

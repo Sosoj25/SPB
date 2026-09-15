@@ -1,3 +1,5 @@
+/* หน้าคิวคำขอคืนเงิน รวมกล่องนโยบายและกล่องแนบสลิปโอนคืน */
+
 .admin-refunds__header-actions {
   display: flex;
   align-items: center;
@@ -368,15 +370,47 @@
   gap: 0.75rem;
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
 @media (max-width: 1100px) {
   .admin-refunds {
     grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 900px) {
+  .admin-refunds,
+  .admin-refunds__side {
+    gap: 1.25rem;
+  }
+
+  .admin-refunds__list-header,
+  .admin-refunds__row {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .admin-refunds__list-header h2,
+  .admin-refunds__policy h2 {
+    font-size: 1.2rem;
+  }
+}
+
 @media (max-width: 700px) {
   .admin-refunds__row {
     flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .admin-refunds__row-info {
+    flex: 1 1 100%;
   }
 
   .admin-refunds__row-amount {
@@ -387,5 +421,38 @@
   .admin-refunds__row-actions {
     width: 100%;
     flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  /* ปุ่มในแถวเดิมกว้าง 100% ของคอลัมน์ 130px พอคอลัมน์กลายเป็นเต็มแถว
+     ปุ่มเดียวจะยืดเต็มจอ — ให้แบ่งกันคนละส่วนแทน */
+  .admin-refunds__row-actions > * {
+    flex: 1;
+    width: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-refunds__header-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-refunds__list-header,
+  .admin-refunds__row {
+    padding: 1rem;
+  }
+
+  .admin-refunds__list-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .admin-refunds__row-name {
+    font-size: 1.05rem;
+  }
+
+  .admin-refunds__review-head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
   }
 }

@@ -1,3 +1,5 @@
+// ชิ้นส่วนที่ใช้ซ้ำทั่วหน้าหลังบ้าน — ป้ายสถานะ การ์ดตัวเลข แถบแบ่งหน้า
+// กล่องค้นหา และสถานะว่าง/กำลังโหลดของตาราง
 import "./DashboardWidgets.css";
 
 export function Badge({ tone = "neutral", children }) {
@@ -51,8 +53,8 @@ export function Pagination({ page, hasMore, onChange }) {
   );
 }
 
-// value/onChange เป็น optional — ไม่ใส่ก็ยังใช้เป็นกล่องค้นหาตกแต่งเฉย ๆ ได้
-// เหมือนเดิม (ดู AdminOverview/AdminBookings) ใส่ก็ผูกกับ state จริงได้ (AdminNews)
+// value/onChange เป็น optional — ไม่ใส่ก็ได้กล่องค้นหาที่ยังพิมพ์ได้แต่ไม่ผูก
+// กับอะไร (หน้าที่ยังไม่มีการค้นหาจริง) ใส่แล้วจึงผูกกับ state ของหน้า
 export function SearchBox({ placeholder = "ค้นหา...", value, onChange }) {
   return (
     <div className="dash-search">

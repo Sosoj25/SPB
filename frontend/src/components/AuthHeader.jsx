@@ -1,3 +1,4 @@
+// แถบโลโก้บนหน้าเข้าสู่ระบบ/สมัครสมาชิก (ใช้ผ่าน AuthLayout)
 import { logoRound } from "../assets/images";
 import "./AuthHeader.css";
 

@@ -1,3 +1,6 @@
+/* ชิ้นส่วนที่ใช้ซ้ำทั่วหน้าหลังบ้าน — ป้าย การ์ดตัวเลข ตาราง ปุ่ม ฟอร์ม
+   แบ่งหน้า และสถานะว่าง (prefix .dash-) */
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -259,6 +262,11 @@
   color: var(--color-muted-purple);
 }
 
+.dash-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .dash-btn--cancel {
   border-color: var(--color-danger-text);
   color: var(--color-danger-text);
@@ -317,11 +325,7 @@
   color: var(--color-muted-purple);
 }
 
-@media (max-width: 700px) {
-  .dash-filters__spacer {
-    display: none;
-  }
-}
+
 
 .dash-empty {
   padding: 3rem 0;
@@ -518,4 +522,223 @@
 .dash-dropzone span {
   color: var(--color-faint-purple);
   font-size: 0.95rem;
+}
+
+/* ===========================================================================
+   จอแคบ — ชิ้นส่วนร่วมของหน้าแอดมินทุกหน้า
+   ---------------------------------------------------------------------------
+   หน้าแอดมินออกแบบมาจากจอกว้าง ๆ ที่มีแถบข้างกินไปแล้ว 340px แปลว่าเนื้อหา
+   ถูกวาดบนพื้นที่ ~1200px เสมอ พอย้ายมาลงมือถือ 360px ตัวที่พังก่อนคือ
+   การ์ด KPI (เรียงสี่ใบข้างกัน) ตาราง (5-7 คอลัมน์) และโมดัล
+   =========================================================================== */
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .dash-kpi {
+    gap: 1rem;
+  }
+
+  .stat-card {
+    /* ต้องมีความกว้างขั้นต่ำเสมอ ไม่ใช่ flex: 1 ล้วน ๆ ไม่งั้นการ์ดสี่ใบ
+       จะยืนยันอยู่แถวเดียวจนตัวเลขล้นกล่อง */
+    flex: 1 1 200px;
+    padding: 1.35rem;
+  }
+
+  .stat-card__value {
+    font-size: 2rem;
+  }
+
+  .dash-card {
+    padding: 1.5rem;
+  }
+
+  .dash-table th,
+  .dash-table td {
+    padding: 0.9rem 1.1rem;
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .stat-card {
+    flex: 1 1 160px;
+    padding: 1.15rem;
+    border-radius: 1.35rem;
+  }
+
+  .stat-card__label {
+    font-size: 0.95rem;
+  }
+
+  .stat-card__value {
+    font-size: 1.7rem;
+  }
+
+  .dash-card {
+    padding: 1.15rem;
+    border-radius: 1.5rem;
+  }
+
+  /* หัวตารางมีมุมโค้ง 2rem ตามการ์ดใหญ่ พอการ์ดเล็กลงมุมนั้นจะโค้งเกินจริง */
+  .dash-table th:first-child {
+    border-top-left-radius: 1.5rem;
+  }
+
+  .dash-table th:last-child {
+    border-top-right-radius: 1.5rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .dash-filters__spacer {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-kpi {
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    flex: 1 1 calc(50% - 0.75rem);
+    padding: 1rem;
+  }
+
+  .stat-card__value {
+    font-size: 1.5rem;
+  }
+
+  .stat-card__hint {
+    font-size: 0.82rem;
+  }
+
+  .dash-card {
+    padding: 1rem;
+    border-radius: 1.25rem;
+  }
+
+  .dash-filters {
+    gap: 0.5rem;
+  }
+
+  /* ช่องค้นหาเดิมกว้างตามเนื้อหา พอตกมาอยู่แถวเดียวกับตัวกรองบนจอแคบมันจะ
+     เหลือไม่กี่ตัวอักษร — ให้กินเต็มแถวของตัวเองไปเลย */
+  .dash-search {
+    flex: 1 1 100%;
+    padding: 0.65rem 1.1rem;
+  }
+
+  .dash-pill {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* ตารางแอดมินเลื่อนแนวนอนได้อยู่แล้ว (.dash-table-wrap) — บนมือถือจึงคง
+     คอลัมน์ไว้ครบแล้วให้ปัดดู ดีกว่าซ่อนคอลัมน์ทิ้งจนแอดมินตัดสินใจไม่ได้
+     แต่ต้องกันไม่ให้คอลัมน์ถูกบีบจนอ่านไม่ออก จึงตั้งความกว้างขั้นต่ำไว้ */
+  .dash-table {
+    min-width: 640px;
+  }
+
+  .dash-table th,
+  .dash-table td {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.92rem;
+  }
+
+  .dash-table th:first-child,
+  .dash-table th:last-child {
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
+  }
+
+  .dash-table-footer {
+    padding: 1rem;
+  }
+
+  .dash-table-footer p {
+    font-size: 0.9rem;
+  }
+
+  .pagination__nav,
+  .pagination__page {
+    min-width: 38px;
+    height: 38px;
+    font-size: 0.92rem;
+  }
+
+  .dash-identity__avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .dash-message {
+    padding: 0.85rem 1.1rem;
+    font-size: 0.9rem;
+  }
+
+  .dash-modal-overlay {
+    padding: 0.75rem;
+    /* โมดัลบนมือถือควรเริ่มจากด้านบน ไม่ใช่กลางจอ — เนื้อหาสูงกว่าจอเมื่อไหร่
+       การจัดกลางจะดันหัวโมดัลขึ้นไปพ้นขอบบนจนกดปุ่มปิดไม่ได้ */
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .dash-modal {
+    padding: 1.25rem;
+    border-radius: 1.35rem;
+    max-height: none;
+    margin: auto 0;
+  }
+
+  .dash-modal__header h2 {
+    font-size: 1.15rem;
+  }
+
+  .dash-input,
+  .dash-textarea,
+  .dash-select-field {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+  }
+
+  .dash-dropzone {
+    padding: 1.75rem 1rem;
+  }
+
+  .dash-dropzone strong {
+    font-size: 1.05rem;
+  }
+
+  .dash-empty {
+    padding: 2rem 0;
+  }
+
+  /* ปุ่มในคอลัมน์ "จัดการ" ของตารางเรียงข้างกันจนล้น — ให้ตกบรรทัดได้ */
+  .dash-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 400px) {
+  .stat-card {
+    flex: 1 1 100%;
+  }
+
+  .dash-card {
+    padding: 0.85rem;
+  }
 }

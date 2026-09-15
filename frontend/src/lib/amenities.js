@@ -1,3 +1,7 @@
+// สิ่งอำนวยความสะดวกของคลับที่โชว์ในหน้า /facilities และข้อความหัวหน้าเพจ
+//
+// แต่ละรายการมี "ข้อมูลย่อย" (club_amenity_facts) เป็นคู่ label/value และมี
+// ลำดับที่แอดมินลากจัดเองได้ทั้งสองระดับ
 import { supabase } from "./supabase";
 import { assertImageFile, imageExt, removeStorageFolder } from "./uploads";
 

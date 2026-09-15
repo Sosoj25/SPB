@@ -1,3 +1,4 @@
+// บัญชีรับเงินและสวิตช์เปิด/ปิดช่องทางชำระเงินที่แอดมินตั้งไว้
 import { useAsyncData } from "./useAsyncData";
 import { fetchPaymentAccounts, fetchPaymentChannelSettings } from "../lib/paymentSettings";
 

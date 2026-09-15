@@ -1,0 +1,111 @@
+/* เมนู ⋯ จัดการห้องแชท — เขียนสไตล์ครบในตัวเอง ไม่พึ่ง .cm__menu ของ
+   Community.css เพราะเมนูนี้โผล่ในหน้าต่างแชทลอยที่อยู่ได้ทุกหน้า ไม่ใช่แค่
+   หน้าชุมชน */
+
+.conv-menu {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+/* พื้นที่กดต้องกว้างพอสำหรับนิ้วบนมือถือ (~28px) และต้องมองเห็นได้เองโดยไม่ต้อง
+   เอาเมาส์ไปชี้ — จอสัมผัสไม่มี hover ให้ใช้ ปุ่มที่โผล่ตอน hover อย่างเดียวจึง
+   เท่ากับไม่มีปุ่ม */
+.conv-menu__trigger {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  /* จุดสามจุดเป็นอักขระตัวเดียวที่บางมากในฟอนต์ระบบ — ต้องทั้งใหญ่และหนาถึงจะ
+     อ่านออกว่าเป็นปุ่ม ไม่ใช่จุดไข่ปลาของข้อความที่ถูกตัด */
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+.conv-menu__trigger:hover:not(:disabled),
+.conv-menu__trigger[aria-expanded="true"] {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.conv-menu__trigger:disabled {
+  color: var(--color-disabled-text);
+  cursor: default;
+}
+
+/* แผงถูกวาดผ่าน portal ที่ <body> แล้ววางด้วยพิกัดบนจอจาก ConversationMenu.jsx
+   — ไม่ใช่ absolute ใต้ปุ่ม เพราะทุกที่ที่เรียกใช้อยู่ในกล่องที่ครอบเนื้อหาไว้
+   (overflow ของรายการห้อง/การ์ด/หน้าต่างแชทลอย) แผงจะถูกตัดหายทั้งใบ
+
+   z-index สูงกว่ากล่องโต้ตอบทั้งหมด (60) เพราะอยู่ชั้น body ไม่มีอะไรครอบให้
+   ไล่ลำดับด้วยแล้ว */
+.conv-menu__panel {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  min-width: 210px;
+  padding: 0.35rem;
+  border: 1px solid #efe6fb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+
+.conv-menu__head {
+  padding: 0.45rem 0.75rem 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-muted-purple);
+}
+
+.conv-menu__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.conv-menu__item:hover {
+  background: var(--color-surface-soft);
+}
+
+.conv-menu__item--danger {
+  color: var(--color-danger-text);
+}
+
+.conv-menu__item--back {
+  color: var(--color-muted-purple);
+  font-weight: 500;
+}
+
+/* ตัวเลขเวลาที่เหลือของการปิดเสียง — ข้อมูลรอง จึงจางและเล็กกว่าชื่อคำสั่ง */
+.conv-menu__hint {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted-purple);
+}
+
+.conv-menu__chevron {
+  margin-left: auto;
+  color: var(--color-muted-purple);
+}

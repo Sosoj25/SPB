@@ -1,7 +1,14 @@
+/* แถบข่าวเด่นเลื่อนอัตโนมัติบนหน้ารวมข่าว */
+
 .news-highlight {
   position: relative;
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto 1rem;
+  padding: 1.1rem 1.1rem 0.95rem;
+  border-radius: calc(var(--radius-lg) + 0.75rem);
+  background: linear-gradient(180deg, #fff, #fdfbf6);
+  border: 1px solid rgba(102, 16, 242, 0.12);
+  box-shadow: 0 24px 48px -30px rgba(102, 16, 242, 0.25);
 }
 
 .news-highlight__slide {
@@ -56,20 +63,74 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .news-highlight__content {
-    animation: none;
-  }
-}
+
 
 .news-highlight__photo {
   position: relative;
   aspect-ratio: 880 / 495;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #f2f0f7;
-  margin: 0 auto 1.25rem;
+  background: linear-gradient(135deg, rgba(102, 16, 242, 0.2), rgba(201, 162, 39, 0.14));
+  margin: 0 auto 0.85rem;
+  box-shadow: 0 20px 40px -24px rgba(102, 16, 242, 0.35);
 }
+
+.news-highlight__ribbon {
+  position: absolute;
+  top: 1.1rem;
+  left: -0.4rem;
+  z-index: 2;
+  background: linear-gradient(90deg, var(--news-gold-deep, #a8791a), var(--news-gold, #c9a227));
+  color: #fff;
+  font-family: var(--editorial-sans);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 1rem 0.4rem 0.85rem;
+  border-radius: 0 999px 999px 0;
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.4);
+}
+
+.news-highlight__ribbon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.35rem;
+  width: 0.4rem;
+  height: 0.35rem;
+  background: var(--news-gold-deep, #a8791a);
+  filter: brightness(0.7);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* จุดแดง "ข่าวที่ยังไม่ได้อ่าน" มุมขวาบนของภาพ — ฝั่งตรงข้ามริบบิ้น "ข่าวเด่น"
+   (ซึ่งอยู่มุมซ้าย) ใช้ top เท่ากันให้อยู่แนวเดียวกัน แสงเรืองรอบจุด + จังหวะ
+   เต้นเบา ๆ (เหมือน .news__card-unread-dot ในหน้ารวมข่าว) ช่วยให้สะดุดตา
+   กว่าจุดสีทึบเฉย ๆ โดยไม่ต้องพึ่งขอบขาว */
+.news-highlight__unread-dot {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d93347;
+  box-shadow: 0 0 0 4px rgba(217, 51, 71, 0.25), 0 3px 10px -2px rgba(217, 51, 71, 0.7);
+  animation: news-unread-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes news-unread-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(217, 51, 71, 0.25), 0 3px 10px -2px rgba(217, 51, 71, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(217, 51, 71, 0.12), 0 3px 10px -2px rgba(217, 51, 71, 0.7);
+  }
+}
+
+
 
 .news-highlight__photo img {
   width: 100%;
@@ -82,16 +143,16 @@
 .news-highlight__title {
   font-family: var(--editorial-serif);
   font-weight: 600;
-  font-size: 1.7rem;
+  font-size: 1.3rem;
   line-height: 1.28;
   color: var(--editorial-text);
-  margin: 0 0 0.65rem;
+  margin: 0 0 0.5rem;
 }
 
 .news-highlight__desc {
   font-family: var(--editorial-sans);
-  font-size: 1.05rem;
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.55;
   color: var(--editorial-muted);
   margin: 0;
 }
@@ -100,13 +161,13 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.1rem;
+  height: 2.1rem;
   border-radius: 50%;
   border: none;
   background: rgba(0, 0, 0, 0.45);
   color: #fff;
-  font-size: 1.45rem;
+  font-size: 1.2rem;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -132,19 +193,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 1.25rem;
+  gap: 0.85rem;
+  margin-top: 1rem;
 }
 
 .news-highlight__dots {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .news-highlight__dot {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.42rem;
+  height: 0.42rem;
   border-radius: 50%;
   border: none;
   padding: 0;
@@ -167,10 +228,56 @@
   margin: 0;
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
 @media (max-width: 640px) {
+  .news-highlight {
+    padding: 0.8rem 0.8rem 0.75rem;
+  }
+
   .news-highlight__nav {
-    width: 2rem;
-    height: 2rem;
+    width: 2.3rem;
+    height: 2.3rem;
     font-size: 1.1rem;
+  }
+
+  /* ปุ่มเลื่อนเดิมเว้นจากขอบ 1rem ซึ่งบนมือถือมันไปนั่งทับกลางภาพพอดี
+     ขยับชิดขอบแล้วขยายวงให้นิ้วกดโดนแทนการเล็งด้วยเมาส์ */
+  .news-highlight__nav--prev {
+    left: 0.4rem;
+  }
+
+  .news-highlight__nav--next {
+    right: 0.4rem;
+  }
+
+  .news-highlight__title {
+    font-size: 1.15rem;
+  }
+
+  .news-highlight__ribbon {
+    top: 0.7rem;
+    padding: 0.3rem 0.8rem 0.3rem 0.7rem;
+    font-size: 0.72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-highlight__content {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-highlight__unread-dot {
+    animation: none;
   }
 }

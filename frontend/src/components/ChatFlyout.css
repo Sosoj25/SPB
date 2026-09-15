@@ -1,0 +1,182 @@
+/* แผงรายชื่อห้องแชทที่กางจากปุ่มบนแถบหัวเว็บ
+
+   ต้องชนกันด้วยสองคลาสรวด (ไม่ใช่แค่ .chat-flyout__panel เดี่ยว ๆ) เพื่อให้
+   specificity สูงกว่าคลาสฐาน .app-header__bell-panel แน่นอน ไม่ต้องพึ่งลำดับ
+   import ของ CSS ว่าไฟล์ไหนมาก่อนมาหลัง */
+.app-header__bell-panel.chat-flyout__panel {
+  /* แผงนี้มีทั้งช่องค้นหา/แท็บกรอง/อวาตาร์ในแต่ละแถว ใหญ่กว่าแผงแจ้งเตือนเดิม
+     ทั้งกว้างและสูง */
+  width: min(400px, calc(100vw - 2rem));
+  max-height: 600px;
+  /* คลาสฐาน .app-header__bell-panel ให้ overflow-y: auto กับตัวแผงเอง ซึ่งที่นี่
+     จะทำให้หัว/ช่องค้นหา/ปุ่ม "ดูข้อความทั้งหมด" เลื่อนหายไปด้วย — ทับให้เลื่อน
+     แค่ .chat-flyout__list ข้างใน ส่วนตัวแผงปิด overflow ไว้ให้มุมโค้งยังตัดขอบ */
+  overflow: hidden;
+  gap: 0;
+}
+
+.chat-flyout__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.app-header__bell-title.chat-flyout__title {
+  margin: 0;
+}
+
+.chat-flyout__expand {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  font-size: 1.15rem;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102, 16, 242, 0.35);
+}
+
+.chat-flyout__expand:hover {
+  background: var(--color-primary-dark);
+}
+
+.chat-flyout__search {
+  flex-shrink: 0;
+  margin: 0.5rem 0 0.6rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #e2d3f5;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-soft);
+  font-size: 0.88rem;
+}
+
+.chat-flyout__search::placeholder {
+  color: var(--color-muted-purple);
+}
+
+.chat-flyout__filters {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ส่วนที่เลื่อนได้จริงมีแค่ตัวนี้ — หัวแผง/ช่องค้นหา/แท็บกรอง/ปุ่มดูทั้งหมด
+   อยู่กับที่เสมอ */
+.chat-flyout__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0 -0.35rem;
+  padding: 0 0.35rem;
+}
+
+.chat-flyout__viewall {
+  flex-shrink: 0;
+}
+
+.chat-flyout__filter {
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.chat-flyout__filter--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.chat-flyout__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.chat-flyout__item:hover {
+  background: var(--color-tint-light);
+}
+
+.chat-flyout__item-avatar {
+  position: relative;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.chat-flyout__presence {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #2fbf71;
+}
+
+.chat-flyout__item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.chat-flyout__item-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-heading);
+}
+
+.chat-flyout__item-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  color: var(--color-muted-purple);
+}
+
+.chat-flyout__unread {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* บนมือถือแผงนี้ถูกดึงออกมาเกาะขอบจอทั้งสองด้านแล้ว (ดู @media ของ
+   .app-header__bell-panel ใน AppHeader.css) แต่ความกว้าง/ความสูงของที่นี่
+   specificity สูงกว่าจึงยังชนะอยู่ — ต้องยอมตามความสูงจอด้วย ไม่งั้นบนมือถือ
+   จอเตี้ยแผง 600px จะยื่นพ้นขอบล่างจนเลื่อนดูรายการล่าง ๆ ไม่ได้ */
+@media (max-width: 640px) {
+  .app-header__bell-panel.chat-flyout__panel {
+    width: auto;
+    max-height: calc(100vh - var(--app-header-h, 4.1rem) - 1rem);
+  }
+}

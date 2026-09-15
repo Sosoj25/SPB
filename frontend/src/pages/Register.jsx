@@ -1,9 +1,11 @@
+// หน้าสมัครสมาชิก — ตรวจรูปแบบครบทุกช่องก่อนยิงสมัคร แล้วพาไปหน้าเข้าสู่ระบบ
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
 import Button from "../components/Button";
 import { supabase } from "../lib/supabase";
+import { PASSWORD_HINT, validatePassword } from "../lib/password";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,10 +21,30 @@ export default function Register() {
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    const nextForm = { ...form, [name]: value };
+    setForm(nextForm);
+
+    // แจ้งเตือนทันทีระหว่างพิมพ์ ไม่ต้องรอกดสร้างบัญชี
+    if (name === "password") {
+      const passwordError = value && validatePassword(value);
+      if (passwordError) {
+        setError(passwordError);
+        return;
+      }
+
+      if (nextForm.confirmPassword && value !== nextForm.confirmPassword) {
+        setError("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
+        return;
+      }
+    }
+
+    if (name === "confirmPassword") {
+      if (nextForm.password && value && nextForm.password !== value) {
+        setError("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
+        return;
+      }
+    }
 
     setError("");
   };
@@ -56,8 +78,9 @@ export default function Register() {
     }
 
     // 6 ตัวสั้นเกินไปสำหรับบัญชีที่ผูกกับการชำระเงิน
-    if (form.password.length < 8) {
-      setError("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
@@ -181,6 +204,7 @@ export default function Register() {
           type="password"
           value={form.password}
           onChange={handleChange}
+          placeholder={PASSWORD_HINT}
         />
 
         <FormField

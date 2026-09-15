@@ -1,0 +1,412 @@
+/* หน้ารายละเอียดของรางวัล — สองคอลัมน์ตามแบบ: การ์ดรายละเอียด 980 + กล่อง
+   สรุปการแลก 440 */
+.reward-detail {
+  min-height: 100%;
+  background: var(--color-page-bg);
+}
+
+.reward-detail__main {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+}
+
+.reward-detail__empty {
+  padding: 3rem 0;
+  color: var(--color-muted-purple);
+  font-size: 1.05rem;
+}
+
+.reward-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.reward-detail__back:hover {
+  text-decoration: underline;
+}
+
+.reward-detail__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.reward-detail__card {
+  background: #fff;
+  border-radius: 48px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.reward-detail__media {
+  height: 420px;
+}
+
+.reward-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 3rem;
+}
+
+.reward-detail__category {
+  align-self: flex-start;
+  padding: 0.6rem 1.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.reward-detail__name {
+  margin: 0;
+  font-size: clamp(1.9rem, 3.2vw, 2.85rem);
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-detail__desc {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--color-muted-purple);
+}
+
+.reward-detail__divider {
+  border: none;
+  border-top: 2px solid var(--color-tint-light);
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
+.reward-detail__facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* แถวคู่ ชื่อซ้าย–ค่าขวา ตามแบบ (ไม่มีเส้นประ ใช้ช่องว่างยืดแทน) */
+.reward-detail__fact {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.reward-detail__fact dt {
+  font-size: 1rem;
+  color: var(--color-muted-purple);
+  white-space: nowrap;
+}
+
+.reward-detail__fact dd {
+  margin: 0 0 0 auto;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  text-align: right;
+}
+
+/* กล่องสรุปการแลก */
+.reward-detail__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  padding: 2.5rem;
+  background: #fff;
+  border-radius: 48px;
+  box-shadow: var(--shadow-card);
+  position: sticky;
+  top: 2rem;
+}
+
+.reward-detail__summary-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-detail__balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem 1.6rem;
+  border-radius: 20px;
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 1.05rem;
+}
+
+.reward-detail__balance strong {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.reward-detail__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.05rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-detail__row strong {
+  color: var(--color-heading);
+  white-space: nowrap;
+}
+
+.reward-detail__row--total strong:last-child {
+  font-size: 1.5rem;
+}
+
+.reward-detail__rule {
+  flex: 1;
+  min-width: 0.5rem;
+  height: 1px;
+  background: var(--color-tint-light);
+}
+
+.reward-detail__negative {
+  color: var(--color-danger-text);
+}
+
+/* ช่องกรอกข้อมูลการรับของ */
+.reward-detail__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-detail__field legend {
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.reward-detail__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.reward-detail__option {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.reward-detail__option:hover {
+  background: var(--color-card-tint);
+}
+
+.reward-detail__option--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.reward-detail__shipping {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reward-detail__input {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid var(--color-tint-light);
+  background: var(--color-surface-soft);
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.reward-detail__input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.reward-detail__textarea {
+  resize: vertical;
+  min-height: 5rem;
+}
+
+.reward-detail__warn {
+  margin: 0;
+  padding: 1.1rem 1.35rem;
+  border-radius: 18px;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.reward-detail__error {
+  margin: 0;
+  padding: 1.1rem 1.35rem;
+  border-radius: 18px;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.reward-detail__cta {
+  padding: 1.35rem 1.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.reward-detail__cta:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.reward-detail__cta:disabled {
+  background: #d9d4e5;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.reward-detail__note {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .reward-detail__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reward-detail__summary {
+    position: static;
+  }
+}
+
+@media (max-width: 1100px) {
+  .reward-detail__main {
+    padding: 2rem 1.5rem 3.5rem;
+  }
+
+  .reward-detail__layout {
+    gap: 1.5rem;
+  }
+
+  .reward-detail__media {
+    height: 300px;
+  }
+
+  .reward-detail__body,
+  .reward-detail__summary {
+    padding: 1.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .reward-detail__main {
+    padding: 1.25rem 0.9rem 2.5rem;
+  }
+
+  .reward-detail__back {
+    font-size: 1rem;
+  }
+
+  .reward-detail__media {
+    height: 210px;
+  }
+
+  .reward-detail__body,
+  .reward-detail__summary {
+    padding: 1.15rem;
+    gap: 0.9rem;
+  }
+
+  .reward-detail__desc {
+    font-size: 1rem;
+  }
+
+  .reward-detail__summary-title {
+    font-size: 1.25rem;
+  }
+
+  .reward-detail__balance {
+    padding: 1rem 1.15rem;
+    font-size: 0.98rem;
+  }
+
+  .reward-detail__balance strong,
+  .reward-detail__row--total strong:last-child {
+    font-size: 1.25rem;
+  }
+
+  /* หัวข้อกับค่าของ "รายละเอียด" เคยอยู่บรรทัดเดียวกันแบบซ้าย-ขวา พอจอแคบ
+     ค่ายาว ๆ (ชื่อของ/เงื่อนไข) จะถูกบีบจนหักคำ — เรียงลงล่างแทน */
+  .reward-detail__fact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .reward-detail__row {
+    font-size: 0.98rem;
+  }
+
+  .reward-detail__cta {
+    padding: 1rem 1.25rem;
+    font-size: 1.1rem;
+  }
+
+  .reward-detail__warn,
+  .reward-detail__error {
+    padding: 0.9rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .reward-detail__main {
+    padding: 1rem 0.6rem 2.5rem;
+  }
+
+  .reward-detail__media {
+    height: 170px;
+  }
+
+  .reward-detail__body,
+  .reward-detail__summary {
+    padding: 0.9rem;
+  }
+}

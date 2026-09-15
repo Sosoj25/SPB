@@ -1,5 +1,8 @@
+/* หน้าแรกก่อนล็อกอิน */
+
 .landing {
-  min-height: 100vh;
+  /* 100dvh = ความสูงที่เห็นจริงบนมือถือ (ดูเหตุผลเต็มใน index.css) */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background-size: cover;
@@ -117,4 +120,90 @@
 .landing__cta-icon {
   width: 32px;
   height: 32px;
+  transform: scaleX(-1);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   จอแคบ — แผงกลางหน้ามีขอบมนใหญ่ (60px) กับระยะในกล่องที่ออกแบบมาสำหรับ 780px
+   พอจอเหลือ 360px ขอบมนกินพื้นที่จนข้อความเหลือคอลัมน์แคบ ๆ ตรงกลาง
+   --------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .landing__main {
+    padding: 2.25rem 1.25rem;
+  }
+
+  .landing__panel {
+    border-radius: 40px;
+    padding: 2.25rem 1.75rem;
+    gap: 1.4rem;
+  }
+
+  .landing__logo {
+    width: 120px;
+  }
+
+  .landing__cta {
+    font-size: 1.2rem;
+    padding: 0.95rem 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing__main {
+    padding: 1.5rem 0.9rem;
+  }
+
+  .landing__panel {
+    border-radius: 28px;
+    padding: 1.75rem 1.1rem;
+    gap: 1.15rem;
+  }
+
+  .landing__logo {
+    width: 96px;
+  }
+
+  .landing__heading {
+    line-height: 1.5;
+  }
+
+  /* ปุ่มหลักของหน้าแรกควรเต็มความกว้างบนมือถือ — เป้ากดใหญ่ที่สุดเท่าที่จอ
+     มีให้ และไม่ต้องเล็งกลางจอ */
+  .landing__cta {
+    width: 100%;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 0.9rem 1.25rem;
+  }
+
+  .landing__cta-icon {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+@media (max-width: 400px) {
+  .landing__panel {
+    border-radius: 22px;
+    padding: 1.4rem 0.9rem;
+  }
+
+  .landing__logo {
+    width: 80px;
+  }
+
+  .landing__cta {
+    font-size: 1rem;
+    gap: 0.5rem;
+  }
 }

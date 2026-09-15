@@ -1,14 +1,26 @@
+// หน้าอ่านข่าวรายชิ้น — เป็นที่เดียวที่ตัดข่าวออกจากรายการ "ยังไม่ได้อ่าน"
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
+import { useAuth } from "../context/useAuth";
 import { usePublicNewsById } from "../hooks/useNews";
 import { formatBookingDate } from "../lib/bookings";
+import { markNewsRead } from "../lib/news";
 import { renderNewsContent } from "../lib/newsContent";
 import "./NewsDetail.css";
 
 export default function NewsDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { news, loading, error } = usePublicNewsById(id);
+
+  // ตัดข่าวนี้ออกจากที่ต้องแจ้งเตือนตอนโหลดสำเร็จจริง (มี news.id แล้ว) ไม่ใช่
+  // แค่มาถึง route นี้ — id ที่พิมพ์ผิดหรือข่าวที่ถูกลบไปแล้วไม่ควรถูกนับว่า
+  // "อ่านแล้ว"
+  useEffect(() => {
+    if (user?.id && news?.id != null) markNewsRead(user.id, news.id);
+  }, [user?.id, news?.id]);
 
   return (
     <div className="news-detail">

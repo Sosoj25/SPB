@@ -1,0 +1,136 @@
+/* โมดัลดูสลิปต้องกว้างกว่า .dash-modal ปกติ (520px) เพราะสลิปธนาคารเป็นภาพ
+   แนวตั้งที่ต้องอ่านเลขบัญชี/ยอด/เวลาให้ออกโดยไม่ต้องเปิดแท็บใหม่ */
+.dash-modal.admin-payments__slip-modal {
+  width: min(760px, 100%);
+}
+
+.admin-payments__slip-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+}
+
+.admin-payments__slip-facts dt {
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-payments__slip-facts dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.admin-payments__slip-frame {
+  background: var(--color-page-bg);
+  border: 2px solid var(--color-tint-light);
+  border-radius: 1.25rem;
+  padding: 0.75rem;
+  min-height: 220px;
+  max-height: 52vh;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-payments__slip-image {
+  display: block;
+  max-width: 100%;
+  max-height: 48vh;
+  border-radius: 0.75rem;
+  cursor: zoom-in;
+}
+
+/* กดที่รูปเพื่อดูขนาดเต็ม — เลขบัญชีบนสลิปมักเล็กเกินกว่าจะอ่านจากขนาดย่อ */
+.admin-payments__slip-image--zoomed {
+  max-width: none;
+  max-height: none;
+  width: 200%;
+  cursor: zoom-out;
+}
+
+.admin-payments__slip-status {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-weight: 600;
+}
+
+.admin-payments__slip-note {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-faint-purple);
+}
+
+.admin-payments__slip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.admin-payments__slip-actions--end {
+  justify-content: flex-end;
+}
+
+/* ปุ่ม "เปิดในแท็บใหม่" เป็น <a> ไม่ใช่ <button> — ต้องบังคับ display เอง
+   เพราะ .dash-btn ถูกออกแบบมาสำหรับ element ที่เป็น inline-block อยู่แล้ว */
+a.dash-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.dash-btn.admin-payments__slip-open {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.dash-btn.admin-payments__slip-open--done {
+  border-color: var(--color-success-text);
+  color: var(--color-success-text);
+}
+
+.admin-payments__lock-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-warning-text);
+  font-weight: 600;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .admin-payments__slip-frame {
+    min-height: 160px;
+    max-height: 45vh;
+    padding: 0.5rem;
+  }
+
+  .admin-payments__slip-image {
+    max-height: 42vh;
+  }
+
+  /* ปุ่มอนุมัติ/ปฏิเสธ/เปิดแท็บใหม่ ในโมดัลสลิป — บนมือถือให้เรียงเต็มแถว
+     ทีละปุ่ม จะได้ไม่กดอนุมัติพลาดเพราะปุ่มชิดกันเกินไป */
+  .admin-payments__slip-actions {
+    flex-direction: column;
+  }
+
+  .admin-payments__slip-actions .dash-btn,
+  .admin-payments__slip-actions a.dash-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.7rem 1rem;
+  }
+}

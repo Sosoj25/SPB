@@ -1,3 +1,8 @@
+// แหล่งเดียวของ "ใครล็อกอินอยู่" — session จาก Supabase Auth + แถว profile
+// ของคนนั้น (role, is_active, แต้ม ฯลฯ) ที่ทุกหน้าอ่านผ่าน useAuth()
+//
+// loading ของที่นี่ครอบถึงตอนโหลด profile เสร็จด้วย ไม่ใช่แค่ได้ session —
+// ด่านตรวจสิทธิ์ที่อ่าน profile.role จึงรอได้อย่างปลอดภัย
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { supabase } from "../lib/supabase";
@@ -30,23 +35,11 @@ export function AuthProvider({ children }) {
   // SIGNED_IN ซ้อนกับ getSession ที่เรียกเอง) และทุกครั้งที่ต่ออายุ token
   // รายชั่วโมง — ทั้งสองทางเรียก applySession() พร้อมกันได้
   //
-  // เดิมที่นี่เป็น ref เก็บแค่ user id ที่โหลดไปแล้ว (loadedFor) ซึ่งกันการยิง
-  // ซ้ำได้จริง แต่พังตอนสองสายชนกันพอดี:
-  //
-  //   สาย A (จาก getSession)  เห็นว่ายังไม่เคยโหลด -> ตั้ง loadedFor = id
-  //                           ทันที แล้วค่อย await fetchProfile()
-  //   สาย B (INITIAL_SESSION) มาถึงระหว่างที่ A ยัง await อยู่ เห็นว่า
-  //                           loadedFor ตรงกับ id แล้ว -> ข้ามทั้งบล็อก
-  //                           ไปถึง setLoading(false) เลย
-  //
-  // ผลคือ loading กลายเป็น false ตั้งแต่ profile ยังเป็น null อยู่ —
-  // ProtectedRoute ไม่เป็นไรเพราะเช็คแค่ user แต่ RoleProtectedRoute เช็ค
-  // profile.role ด้วย มันจึงอ่านได้ undefined แล้วเด้งไป /home ทุกครั้งที่
-  // แอดมิน "กดรีเฟรช" บนหน้า /admin/* หรือ /superadmin/*
-  //
-  // เก็บเป็น promise แทน ทำให้สาย B รอ "ผลเดียวกัน" กับสาย A แทนที่จะข้ามไป
-  // — ยังยิง query แค่ครั้งเดียวเหมือนเดิม แต่ไม่มีใครประกาศว่าโหลดเสร็จก่อน
-  // ที่ profile จะมาถึงจริง
+  // ถ้าเก็บแค่ธงว่า "โหลด id นี้ไปแล้ว" สายที่มาทีหลังจะเห็นธงที่สายแรกตั้งไว้
+  // ก่อน await เสร็จ แล้วข้ามไป setLoading(false) ทั้งที่ profile ยังเป็น null
+  // — RoleProtectedRoute ที่อ่าน profile.role จะเด้งแอดมินออกจากหน้า /admin/*
+  // ทุกครั้งที่กดรีเฟรช เก็บเป็น promise ทำให้สายที่สองรอผลเดียวกันกับสายแรก
+  // โดยยังยิง query แค่ครั้งเดียว
   const profileRequest = useRef({ userId: null, promise: null });
 
   useEffect(() => {

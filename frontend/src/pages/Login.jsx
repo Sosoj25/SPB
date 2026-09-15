@@ -1,3 +1,6 @@
+// หน้าเข้าสู่ระบบ — รับได้ทั้งชื่อผู้ใช้และอีเมล (lib/auth.js แยกให้เอง)
+//
+// หลังล็อกอินสำเร็จพากลับไปหน้าที่ผู้ใช้ตั้งใจเปิดก่อนโดนเด้งออกมา
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";

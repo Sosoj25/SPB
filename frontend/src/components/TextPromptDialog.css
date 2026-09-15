@@ -1,0 +1,122 @@
+/* กล่องกรอกข้อความสั้น ๆ — คลาส .prompt-dialog__* ถูกยืมไปใช้โดยกล่องอื่น
+   (AdjustPointsDialog, RevenueDetailDialog) แก้ที่นี่กระทบทุกตัว */
+
+.prompt-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(26, 10, 54, 0.45);
+}
+
+.prompt-dialog {
+  width: min(420px, 100%);
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.prompt-dialog__title {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.prompt-dialog__label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-muted-purple);
+}
+
+.prompt-dialog__input {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e2d3f5;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.prompt-dialog__input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.prompt-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.prompt-dialog__cancel,
+.prompt-dialog__submit {
+  padding: 0.65rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.prompt-dialog__cancel {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.prompt-dialog__submit {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.prompt-dialog__submit:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* จอแคบ — กล่องกลางจอเดิมสูงได้ไม่จำกัด พอเนื้อหายาว (เช่นกล่องยืนยันที่มี
+   รายละเอียดการจอง) มันจะล้นทั้งบนและล่างจนกดปุ่มไม่ได้ */
+@media (max-width: 640px) {
+  .prompt-dialog__backdrop {
+    padding: 0.75rem;
+    align-items: start;
+    overflow-y: auto;
+  }
+
+  .prompt-dialog {
+    padding: 1.25rem;
+    margin: auto 0;
+  }
+
+  .prompt-dialog__title {
+    font-size: 1.12rem;
+    margin-bottom: 1rem;
+  }
+
+  .prompt-dialog__actions {
+    margin-top: 1.25rem;
+  }
+
+  .prompt-dialog__cancel,
+  .prompt-dialog__submit {
+    flex: 1;
+    padding: 0.7rem 1rem;
+  }
+}

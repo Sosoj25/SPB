@@ -1,3 +1,7 @@
+// ข่าวประชาสัมพันธ์ — ทั้งฝั่งแอดมินที่เขียน/ตั้งเวลาเผยแพร่ และฝั่งผู้อ่าน
+//
+// ไฟล์นี้มีสามส่วน: จัดการข่าวของแอดมิน, หน้ารวมข่าวสาธารณะ และการจำว่า
+// ผู้ใช้อ่านข่าวไหนไปแล้ว (สำหรับป้ายข่าวใหม่)
 import { supabase } from "./supabase";
 import { assertImageFile, imageExt, removeStorageFolder } from "./uploads";
 import { stripNewsFormatting } from "./newsContent";
@@ -12,6 +16,7 @@ const NEWS_SELECT = `
   category,
   tags,
   is_featured,
+  notify_message,
   view_count,
   published_at,
   created_at,
@@ -30,6 +35,7 @@ function toNews(row) {
     category: row.category,
     tags: row.tags ?? [],
     isFeatured: row.is_featured,
+    notifyMessage: row.notify_message ?? "",
     viewCount: row.view_count,
     publishedAt: row.published_at,
     createdAt: row.created_at,
@@ -69,11 +75,9 @@ export async function fetchAdminNews({
   return { news: rows.slice(0, limit), hasMore: rows.length > limit };
 }
 
-// นับแยกตามสถานะสำหรับการ์ด KPI บนหัวหน้า
-//
-// เดิมเป็นสี่ query ซ้อนกัน และอันสุดท้ายดึง view_count ของ "ทุกแถว" กลับมา
-// บวกกันฝั่ง client เพื่อให้ได้เลขเดียว — โตตามจำนวนข่าวไปเรื่อย ๆ ไม่มี
-// เพดาน ตอนนี้ให้ admin_news_stats() (0021) นับให้ในคำสั่งเดียวที่ฝั่ง DB
+// นับแยกตามสถานะสำหรับการ์ด KPI บนหัวหน้า — ให้ admin_news_stats() (0021)
+// นับที่ฝั่ง DB คำสั่งเดียว ห้ามดึงทุกแถวมาบวกฝั่ง client เพราะโตตามจำนวนข่าว
+// ไปเรื่อย ๆ โดยไม่มีเพดาน
 export async function fetchAdminNewsStats() {
   const { data, error } = await supabase.rpc("admin_news_stats");
 
@@ -106,6 +110,7 @@ function fromNewsPayload(payload) {
   if ("category" in payload) row.category = payload.category;
   if ("tags" in payload) row.tags = payload.tags;
   if ("isFeatured" in payload) row.is_featured = payload.isFeatured;
+  if ("notifyMessage" in payload) row.notify_message = payload.notifyMessage || null;
   if ("publishedAt" in payload) row.published_at = payload.publishedAt;
   if ("authorId" in payload) row.author_id = payload.authorId;
   return row;
@@ -167,6 +172,7 @@ const PUBLIC_NEWS_SELECT = `
   cover_image,
   category,
   is_featured,
+  notify_message,
   published_at
 `;
 
@@ -180,6 +186,7 @@ function toPublicNews(row) {
     coverImage: row.cover_image,
     category: row.category,
     isFeatured: row.is_featured,
+    notifyMessage: row.notify_message ?? "",
     publishedAt: row.published_at,
   };
 }
@@ -209,4 +216,70 @@ export async function fetchPublicNewsById(id) {
 
   if (error) throw error;
   return toPublicNews(data);
+}
+
+// ฟังข่าวใหม่/แก้ไข/ลบแบบเรียลไทม์ (news ต้องอยู่ใน publication supabase_realtime
+// ก่อน ดู 0071_news_realtime.sql) — เหมือน subscribeToNotifications ใน
+// lib/notifications.js: postgres_changes เคารพ RLS ของตารางเอง (news_public_read,
+// 0018) จึงไม่ต้องใส่ filter เพิ่ม ผู้ใช้จะได้รับ event เฉพาะแถวที่เผยแพร่แล้ว
+// และถึงเวลาจริงเท่านั้น
+//
+// ชื่อ channel ต้องไม่ซ้ำกันข้ามการเรียกแต่ละครั้งด้วยเหตุผลเดียวกับ
+// notificationChannelSeq — usePublicNews ถูกเรียกพร้อมกันได้จากหลายจุด
+// (AppHeader ผ่าน useHasUnseenNews + News.jsx) แต่ละจุดต้องได้ channel ของตัวเอง
+let newsChannelSeq = 0;
+
+export function subscribeToPublicNews(onChange) {
+  const channel = supabase
+    .channel(`public-news:${++newsChannelSeq}`)
+    .on("postgres_changes", { event: "*", schema: "public", table: "news" }, onChange)
+    .subscribe();
+
+  return () => supabase.removeChannel(channel);
+}
+
+// ---------- ข่าวที่ยังไม่เคยอ่าน (badge บนปุ่ม "ข่าว" + ป้ายหมวดใหม่) ----------
+
+// จำเป็น "รายข่าว" ว่าอ่านไปแล้วหรือยัง ไม่ใช่จำแค่เวลาเข้าหน้า /news ล่าสุด
+// — ถ้าจำแค่เวลา แค่เปิดหน้ารวมข่าวก็จะถือว่าอ่านทุกข่าวในหน้านั้นแล้วทันที
+// ป้ายข่าวใหม่ของทุกหมวดจะหายพร้อมกันทั้งที่ยังไม่ได้อ่าน
+//
+// เก็บใน localStorage แยกตาม user — เป็นค่าของ "เครื่อง/เบราว์เซอร์นี้"
+// ไม่ใช่สถานะกลางที่ต้องซิงก์ข้ามอุปกรณ์ จึงไม่ต้องมีตารางในฐานข้อมูล
+const NEWS_READ_STORAGE_PREFIX = "spb.news.readIds.v1";
+
+// กันรายการยาวไม่รู้จบ — fetchPublicNews ดึงมาแค่ 60 ข่าวล่าสุดอยู่แล้ว
+// (ดู usePublicNews) เก่ากว่านี้ไม่โผล่ในหน้ารวมให้ต้องเทียบอยู่ดี
+const MAX_TRACKED_READ_IDS = 200;
+
+const readIdsKey = (userId) => `${NEWS_READ_STORAGE_PREFIX}.${userId}`;
+
+export function loadReadNewsIds(userId) {
+  if (!userId) return new Set();
+  try {
+    const raw = window.localStorage.getItem(readIdsKey(userId));
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch {
+    // โหมดส่วนตัว/เบราว์เซอร์ที่บล็อก storage หรือ JSON เสีย — ไม่ต้องพัง
+    // แค่ไม่มีป้ายข่าวใหม่ให้ตัด
+    return new Set();
+  }
+}
+
+export function markNewsRead(userId, newsId) {
+  if (!userId || newsId == null) return;
+  try {
+    const ids = loadReadNewsIds(userId);
+    ids.add(String(newsId));
+    window.localStorage.setItem(
+      readIdsKey(userId),
+      JSON.stringify([...ids].slice(-MAX_TRACKED_READ_IDS)),
+    );
+  } catch {
+    // เช่นเดียวกับด้านบน
+  }
+}
+
+export function isNewsUnseen(news, readIds) {
+  return !readIds.has(String(news.id));
 }

@@ -1,3 +1,5 @@
+/* หน้าเช็คอินที่เคาน์เตอร์ — ช่องสแกน รายการคิววันนี้ และกล่องตัดคูปอง */
+
 .admin-checkin__header-actions {
   display: flex;
   align-items: center;
@@ -351,6 +353,20 @@
   text-align: center;
 }
 
+/* ปุ่มพิมพ์เป็นทางเลือกรอง ไม่ใช่ปุ่มหลักของกล่อง — ใช้โครงเดียวกับปุ่มยืนยัน
+   แต่เป็นพื้นขาวขอบม่วง จะได้ไม่แย่งสายตาไปจาก "ยืนยันเช็คอิน" */
+.admin-checkin__confirm-print {
+  background: #fff;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-pill);
+  width: 100%;
+  text-align: center;
+}
+
 .admin-checkin__confirm-cancel {
   background: #fff;
   border: 2px solid var(--color-disabled-text);
@@ -445,19 +461,139 @@
   text-align: center;
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
 @media (max-width: 1200px) {
   .admin-checkin {
     grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 900px) {
+  .admin-checkin {
+    gap: 1.25rem;
+  }
+
+  .admin-checkin__scanner-head h2,
+  .admin-checkin__confirm-head h2 {
+    font-size: 1.3rem;
+  }
+
+  /* กรอบสแกนเดิม 22.5rem สูงเกือบครึ่งจอมือถือก่อนจะถึงช่องค้นหาด้วยซ้ำ */
+  .admin-checkin__viewfinder {
+    height: 17rem;
+  }
+
+  .admin-checkin__viewfinder-frame {
+    width: 12rem;
+    height: 12rem;
+  }
+
+  .admin-checkin__list-head,
+  .admin-checkin__row {
+    padding: 1.1rem 1.25rem;
+  }
+}
+
 @media (max-width: 640px) {
   .admin-checkin__row {
     flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
   }
 
   .admin-checkin__row-info {
     order: 1;
     flex-basis: 100%;
+  }
+
+  .admin-checkin__row-time {
+    width: auto;
+    font-size: 1.1rem;
+  }
+
+  .admin-checkin__row-avatar {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.1rem;
+  }
+
+  .admin-checkin__header-actions {
+    flex-wrap: wrap;
+  }
+
+  /* ช่องค้นหากับปุ่มค้นหาอยู่ข้างกัน พอจอแคบช่องเหลือไม่กี่ตัวอักษร */
+  .admin-checkin__search {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .admin-checkin__search-field {
+    flex: 1 1 100%;
+    padding: 0.8rem 1.1rem;
+  }
+
+  .admin-checkin__search-btn {
+    flex: 1;
+  }
+
+  .admin-checkin__list-head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  .admin-checkin__list-head h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-checkin__confirm-avatar {
+    width: 4rem;
+    height: 4rem;
+    font-size: 1.5rem;
+  }
+
+  .admin-checkin__confirm-name {
+    font-size: 1.2rem;
+  }
+
+  /* หัวข้อ/ค่าของรายละเอียดการจองเรียงข้างกันไม่พอกว้าง — ลงล่างแทน */
+  .admin-checkin__confirm-facts div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .admin-checkin__confirm-facts dd {
+    text-align: left;
+  }
+
+  .admin-checkin__recent h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-checkin__alert {
+    padding: 1.25rem;
+  }
+
+  .admin-checkin__viewfinder {
+    height: 14rem;
+  }
+
+  .admin-checkin__viewfinder-frame {
+    width: 9.5rem;
+    height: 9.5rem;
+  }
+
+  .admin-checkin__viewfinder p {
+    font-size: 0.95rem;
   }
 }

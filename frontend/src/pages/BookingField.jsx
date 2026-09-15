@@ -1,16 +1,12 @@
+// ขั้นที่ 2 ของการจอง — เลือกสนามของกีฬาที่เลือกไว้ พร้อมป้ายบอกความว่างของวันนี้
 import { useMemo, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BookingSteps from "../components/BookingSteps";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { fetchFacilitiesBySport, fetchSportAvailability } from "../lib/catalog";
-import {
-  BOOKING_WINDOW_DAYS,
-  addDaysISO,
-  formatBaht,
-  formatBookingDate,
-  todayISO,
-} from "../lib/bookings";
+import { useBookingWindow } from "../hooks/useBookings";
+import { formatBaht, formatBookingDate, todayISO } from "../lib/bookings";
 import { heroFields } from "../assets/images";
 import "./Booking.css";
 
@@ -37,6 +33,10 @@ export default function BookingField() {
   const date = params.get("date") || todayISO();
 
   const [venueFilter, setVenueFilter] = useState(ALL);
+
+  // เพดานจองล่วงหน้ามาจากเซิร์ฟเวอร์ (0055) ไม่ใช่ค่าคงที่ในหน้าเว็บอีกแล้ว —
+  // คนที่แลกสิทธิ์จองล่วงหน้าไว้จะเลือกวันได้ไกลกว่าคนอื่นจริง ๆ
+  const { window: bookingWindow } = useBookingWindow();
 
   const {
     data: facilities,
@@ -92,13 +92,21 @@ export default function BookingField() {
           </p>
 
           <label className="booking-datepick">
-            <span className="booking-datepick__label">ดูความว่างของวันที่</span>
+            <span className="booking-datepick__label">
+              ดูความว่างของวันที่
+              {bookingWindow.bonusDays > 0 && (
+                <span className="booking-datepick__bonus">
+                  {" "}
+                  · สิทธิ์จองล่วงหน้า +{bookingWindow.bonusDays} วัน
+                </span>
+              )}
+            </span>
             <input
               type="date"
               className="booking-datepick__input"
               value={date}
               min={todayISO()}
-              max={addDaysISO(todayISO(), BOOKING_WINDOW_DAYS)}
+              max={bookingWindow.lastDate}
               onChange={(e) => {
                 // replace: เลื่อนดูวันไปมาไม่ควรถมประวัติเบราว์เซอร์
                 // จนกดย้อนกลับไปหน้าเลือกกีฬาไม่ได้

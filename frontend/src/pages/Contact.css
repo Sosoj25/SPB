@@ -1,0 +1,609 @@
+/* หน้า "ติดต่อเรา" ฝั่งลูกค้า — โครงสองคอลัมน์ตามดีไซน์: ฟอร์มกว้างทางซ้าย
+   การ์ดช่องทางติดต่อ/ที่ตั้ง/คำถามที่พบบ่อยเรียงลงมาทางขวา */
+.contact {
+  min-height: 100%;
+  background: var(--color-page-bg);
+}
+
+.contact__main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+}
+
+.contact__masthead {
+  margin-bottom: 2.25rem;
+}
+
+.contact__title {
+  margin: 0;
+  font-size: 2.9rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.contact__intro {
+  margin: 0.6rem 0 0;
+  font-size: 1.2rem;
+  color: var(--color-muted-purple);
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.contact__col {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 0;
+}
+
+.contact-card {
+  background: #fff;
+  border-radius: 2.75rem;
+  box-shadow: var(--shadow-card);
+  padding: 2.5rem;
+}
+
+.contact__col--side .contact-card {
+  border-radius: 2.25rem;
+  padding: 2rem;
+}
+
+.contact-card__title {
+  margin: 0 0 1.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.contact-card__title--sm {
+  font-size: 1.35rem;
+  margin-bottom: 1.1rem;
+}
+
+/* ---------- ฟอร์ม ---------- */
+
+.contact-form__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+.contact-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.contact-field__label {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-heading);
+}
+
+.contact-field__optional {
+  font-weight: 400;
+  color: var(--color-faint-purple);
+}
+
+.contact-field__input {
+  background: var(--color-surface-soft);
+  border: 2px solid var(--color-tint-light);
+  border-radius: 1.1rem;
+  padding: 1.05rem 1.4rem;
+  font-family: inherit;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  width: 100%;
+}
+
+.contact-field__input::placeholder {
+  color: #b2a8c2;
+}
+
+.contact-field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ลูกศรของ <select> เป็นสไตล์ของระบบปฏิบัติการซึ่งขัดกับกรอบม่วงอ่อนในดีไซน์
+   จึงถอดออกแล้ววาดเองด้วย background image (สี #6610f2 เท่าดีไซน์) */
+.contact-field__input--select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%236610f2' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1.4rem center;
+  background-size: 0.85rem;
+  padding-right: 3rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+.contact-field__input--area {
+  resize: vertical;
+  min-height: 7rem;
+  line-height: 1.65;
+}
+
+.contact-btn {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 1.35rem 2rem;
+  border-radius: var(--radius-pill);
+  width: 100%;
+}
+
+.contact-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.contact-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contact-btn--small {
+  width: auto;
+  align-self: flex-start;
+  font-size: 1rem;
+  padding: 0.85rem 1.8rem;
+}
+
+.contact-form__error,
+.contact-form__success {
+  margin: 0;
+  border-radius: 1.1rem;
+  padding: 0.9rem 1.3rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.contact-form__error {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.contact-form__success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+/* ---------- เรื่องที่ส่งไปแล้ว ---------- */
+
+.contact-history {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-history .contact-card__title {
+  margin-bottom: 0.5rem;
+}
+
+.contact-history__empty {
+  margin: 0;
+  color: var(--color-muted-purple);
+  line-height: 1.7;
+}
+
+.contact-ticket {
+  border: 2px solid var(--color-tint-light);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.contact-ticket--open {
+  border-color: var(--color-primary);
+}
+
+/* เธรดที่ทีมงานตอบกลับมาแล้วแต่ยังไม่ได้เปิดอ่าน — ต้องหาเจอได้ทันทีเมื่อเห็น
+   เลขบนเมนู "ติดต่อเรา" แล้วกดเข้ามา โดยเฉพาะตอนมีหลายเรื่องค้างพร้อมกัน
+   แยกด้วยขอบม่วงเข้ม + แถบซ้าย + ป้ายจำนวน ไม่พึ่งสีอย่างเดียว */
+.contact-ticket--unread {
+  border-color: var(--color-primary);
+  box-shadow: inset 5px 0 0 var(--color-primary);
+}
+
+.contact-ticket--unread .contact-ticket__head {
+  background: var(--color-tint-light);
+}
+
+.contact-ticket__new {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.contact-ticket__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  text-align: left;
+  background: var(--color-surface-soft);
+  padding: 1.2rem 1.5rem;
+}
+
+.contact-ticket__headline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.contact-ticket__category {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.05rem;
+}
+
+.contact-ticket__status {
+  padding: 0.25rem 0.85rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.contact-ticket__status--primary {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.contact-ticket__status--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.contact-ticket__status--success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+/* ข้อความย่อบรรทัดเดียว — รายการต้องกวาดตาหาเรื่องที่ต้องการได้เร็ว
+   เนื้อเต็มอ่านได้ตอนกางเธรด */
+.contact-ticket__preview {
+  color: var(--color-text);
+  font-size: 1.02rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-ticket__time {
+  font-size: 0.88rem;
+  color: var(--color-faint-purple);
+}
+
+.contact-ticket__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.35rem 1.5rem;
+  border-top: 2px solid var(--color-tint-light);
+}
+
+.contact-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.contact-thread__msg {
+  border-radius: 1.2rem;
+  padding: 1rem 1.25rem;
+  max-width: 88%;
+}
+
+/* ข้อความของตัวเองอยู่ขวา ของทีมงานอยู่ซ้าย — วางตามที่คนคุ้นจากแอปแชททั่วไป
+   (LINE/Messenger) จะได้ไม่ต้องอ่านชื่อทุกกล่องเพื่อรู้ว่าใครพูด และตรงข้าม
+   กับฝั่งแอดมินที่ "ของเรา" คือข้อความของทีมงาน (ดู AdminSupport.css) */
+.contact-thread__msg--mine {
+  background: var(--color-tint-light);
+  align-self: flex-end;
+}
+
+/* เฉพาะบรรทัดชื่อ-เวลาที่ชิดขวาตามกล่อง ตัวเนื้อความยังชิดซ้ายเหมือนเดิม —
+   ข้อความหลายบรรทัดที่จัดชิดขวาทั้งย่อหน้าอ่านยากกว่าที่ควรจะเป็น */
+.contact-thread__msg--mine .contact-thread__meta {
+  text-align: right;
+}
+
+.contact-thread__msg--staff {
+  background: var(--color-surface-soft);
+  border: 2px solid var(--color-tint-light);
+  align-self: flex-start;
+}
+
+.contact-thread__text {
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.contact-thread__meta {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-faint-purple);
+}
+
+.contact-ticket__booking {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-muted-purple);
+}
+
+.contact-ticket__booking strong {
+  color: var(--color-heading);
+}
+
+.contact-ticket__closed {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 0.95rem;
+}
+
+.contact-ticket__reply {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ---------- ช่องทางติดต่อด่วน ---------- */
+
+.contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.contact-channel {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.contact-channel:hover .contact-channel__value {
+  color: var(--color-primary);
+}
+
+.contact-channel__icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 1.1rem;
+  background: var(--color-tint-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.contact-channel__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.contact-channel__label {
+  font-size: 0.95rem;
+  color: var(--color-muted-purple);
+}
+
+.contact-channel__value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-heading);
+  overflow-wrap: anywhere;
+}
+
+.contact-channel__hint {
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+/* ---------- ที่ตั้งสำนักงาน ---------- */
+
+/* ดีไซน์วางกล่องสี่เหลี่ยมม่วงอ่อนไว้เป็นที่สำหรับแผนที่ — ทำเป็นลิงก์เปิด
+   Google Maps แทนการฝัง iframe เพราะแผนที่ฝังต้องใช้ API key และดึงสคริปต์
+   ของ Google มาทุกครั้งที่เปิดหน้านี้ ทั้งที่คนส่วนใหญ่มาหาเบอร์โทร */
+.contact-map {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 200px;
+  border-radius: 1.5rem;
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+}
+
+.contact-map:hover {
+  background: var(--color-on-primary-soft);
+}
+
+.contact-map__pin {
+  font-size: 2rem;
+}
+
+.contact-map__cta {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.contact-address {
+  margin: 1.1rem 0 0;
+  line-height: 1.65;
+  color: var(--color-muted-purple);
+  font-size: 1.02rem;
+}
+
+/* ---------- คำถามที่พบบ่อย ---------- */
+
+.contact-faq__item {
+  border-top: 1px solid var(--color-tint-light);
+}
+
+.contact-faq__item:first-of-type {
+  border-top: none;
+}
+
+.contact-faq__q {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  padding: 1rem 0.25rem;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--color-heading);
+}
+
+.contact-faq__q span:first-child {
+  flex: 1;
+}
+
+.contact-faq__chevron {
+  color: var(--color-muted-purple);
+  font-size: 1.3rem;
+  transition: transform 0.15s ease;
+}
+
+.contact-faq__item--open .contact-faq__chevron {
+  transform: rotate(90deg);
+}
+
+.contact-faq__a {
+  margin: 0 0.25rem 1.1rem;
+  line-height: 1.75;
+  color: var(--color-muted-purple);
+  font-size: 0.98rem;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .contact__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .contact__main {
+    padding: 2rem 1.1rem 3.5rem;
+  }
+
+  .contact__title {
+    font-size: 2.1rem;
+  }
+
+  .contact__intro {
+    font-size: 1.05rem;
+  }
+
+  .contact__grid {
+    gap: 1.5rem;
+  }
+
+  .contact__col {
+    gap: 1.25rem;
+  }
+
+  .contact-card,
+  .contact__col--side .contact-card {
+    padding: 1.5rem;
+    border-radius: 1.75rem;
+  }
+
+  .contact-card__title {
+    font-size: 1.35rem;
+  }
+
+  .contact-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-thread__msg {
+    max-width: 100%;
+  }
+
+  /* ช่องกรอกกับปุ่มส่งของหน้านี้ตั้งไว้ใหญ่กว่าฟอร์มอื่นทั้งเว็บ (1.1–1.25rem
+     พร้อมระยะใน 1.35rem) ซึ่งบนมือถือกินความสูงเกินจำเป็นจนต้องเลื่อนหลายจอ
+     กว่าจะถึงปุ่มส่ง */
+  .contact-field__input {
+    padding: 0.85rem 1.1rem;
+    font-size: 1rem;
+  }
+
+  .contact-btn {
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .contact-ticket__head,
+  .contact-ticket__body {
+    padding: 1rem 1.1rem;
+  }
+
+  .contact-channel__icon {
+    width: 46px;
+    height: 46px;
+    font-size: 1.25rem;
+  }
+
+  .contact-channel {
+    gap: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .contact__main {
+    padding: 1.5rem 0.7rem 2.5rem;
+  }
+
+  .contact__title {
+    font-size: 1.7rem;
+  }
+
+  .contact-card,
+  .contact__col--side .contact-card {
+    padding: 1.1rem;
+    border-radius: 1.25rem;
+  }
+
+  .contact-ticket__headline {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+}

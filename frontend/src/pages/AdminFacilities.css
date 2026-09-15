@@ -1,3 +1,5 @@
+/* หน้าจัดการกีฬาและสนาม รวมแถวที่ลากสลับลำดับได้ */
+
 .admin-facilities__actions {
   display: flex;
   gap: 0.75rem;
@@ -366,6 +368,16 @@
   box-shadow: 0 4px 10px rgba(90, 60, 160, 0.12);
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
 @media (max-width: 1200px) {
   .admin-facilities {
     grid-template-columns: 1fr;
@@ -373,5 +385,72 @@
 
   .admin-facilities__edit {
     position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-facilities {
+    gap: 1.25rem;
+  }
+
+  .admin-facilities__main {
+    gap: 1.25rem;
+  }
+
+  .admin-facilities__edit-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-facilities__list-header,
+  .admin-facilities__row,
+  .admin-facilities__footnote {
+    padding: 1.1rem 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-facilities__actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-facilities__list-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  /* แถวรายการ: ที่จับลาก | ลำดับ | รูป | ชื่อ | สวิตช์ | ปุ่ม — หกชิ้นใน
+     บรรทัดเดียวไม่มีทางลงจอมือถือ ให้ตกบรรทัดได้ แล้วชื่อกินเต็มความกว้าง */
+  .admin-facilities__row {
+    flex-wrap: wrap;
+    gap: 0.6rem 0.75rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .admin-facilities__info {
+    flex: 1 1 100%;
+    order: 1;
+  }
+
+  .admin-facilities__thumb {
+    width: 56px;
+    height: 42px;
+  }
+
+  .admin-facilities__name {
+    font-size: 1.05rem;
+  }
+
+  .admin-facilities__footnote {
+    padding: 1rem;
+    font-size: 0.92rem;
+  }
+
+  .admin-facilities__edit-header {
+    flex-wrap: wrap;
+  }
+
+  .admin-facilities__confirm {
+    flex-wrap: wrap;
   }
 }

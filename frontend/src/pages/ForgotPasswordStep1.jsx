@@ -1,3 +1,5 @@
+// หน้าขอลิงก์ตั้งรหัสผ่านใหม่ — ตอบว่า "ส่งแล้ว" เสมอไม่ว่าจะเจอบัญชีหรือไม่
+// เพราะการบอกว่าไม่พบบัญชีคือการยืนยันให้คนสุ่มว่าชื่อไหนมีอยู่จริง
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";

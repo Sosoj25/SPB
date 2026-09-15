@@ -1,17 +1,41 @@
+/* หน้ารวมข่าว — ข่าวเด่น ตัวกรองหมวด และการ์ดข่าว */
+
 .news {
   --editorial-serif: "Noto Serif Thai", var(--font-main);
   --editorial-sans: "Sarabun", var(--font-main);
   --editorial-text: #1a1a1c;
   --editorial-muted: #6b6b73;
   --editorial-rule: #e3e3e5;
+  --news-gold: #c9a227;
+  --news-gold-deep: #a8791a;
+  --news-violet: #8b5cf6;
+  --news-accent: var(--color-primary);
   min-height: 100%;
-  background: #fff;
+  background: radial-gradient(circle at 12% 0%, rgba(102, 16, 242, 0.05), transparent 42%),
+    radial-gradient(circle at 88% 6%, rgba(201, 162, 39, 0.06), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(102, 16, 242, 0.03), transparent 45%),
+    #fdfcf9;
+}
+
+/* หมวดหมู่แต่ละอันมีสีประจำตัว ผูกผ่าน data-category ที่ตั้งใน JSX — ธีมม่วง/ทอง/ขาว */
+.news [data-category="การแข่งขัน"] {
+  --news-accent: var(--color-primary);
+}
+.news [data-category="กิจกรรม"] {
+  --news-accent: var(--news-gold);
+}
+.news [data-category="ประกาศ"] {
+  --news-accent: var(--news-violet);
+}
+.news [data-category="โปรโมชัน"] {
+  --news-accent: var(--news-gold-deep);
 }
 
 .news__main {
   max-width: 1440px;
   margin: 0 auto;
   padding: 3.5rem 2rem 5rem;
+  position: relative;
 }
 
 .news__rule {
@@ -21,8 +45,21 @@
 }
 
 .news__rule--strong {
+  position: relative;
   border-top: 2px solid var(--editorial-text);
   margin: 3rem 0 2rem;
+}
+
+.news__rule--strong::after {
+  content: "◆";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+  background: #fdfcf9;
+  color: var(--news-gold);
+  font-size: 0.85rem;
+  padding: 0 0.85rem;
 }
 
 .news__empty {
@@ -32,13 +69,68 @@
 }
 
 /* Masthead */
+.news__masthead {
+  position: relative;
+}
+
+.news__masthead::before {
+  content: "";
+  position: absolute;
+  top: -4rem;
+  left: -6rem;
+  width: 34rem;
+  height: 24rem;
+  background: radial-gradient(circle at 20% 20%, rgba(102, 16, 242, 0.18), transparent 60%),
+    radial-gradient(circle at 75% 55%, rgba(201, 162, 39, 0.16), transparent 55%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.news__masthead::after {
+  content: "";
+  position: absolute;
+  top: -1.5rem;
+  right: -1rem;
+  width: 14rem;
+  height: 14rem;
+  background-image: radial-gradient(circle, rgba(102, 16, 242, 0.35) 1.2px, transparent 1.6px);
+  background-size: 16px 16px;
+  -webkit-mask-image: radial-gradient(circle, #000, transparent 72%);
+  mask-image: radial-gradient(circle, #000, transparent 72%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.news__eyebrow,
+.news__title,
+.news__intro {
+  position: relative;
+  z-index: 1;
+}
+
 .news__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--editorial-sans);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   letter-spacing: 0.18em;
-  color: var(--color-primary);
   margin: 0 0 1rem;
+}
+
+.news__eyebrow::before {
+  content: "◆";
+  font-size: 0.55rem;
+  color: var(--news-gold);
+}
+
+.news__eyebrow-text {
+  background: linear-gradient(90deg, var(--color-primary), var(--news-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .news__title {
@@ -62,33 +154,80 @@
 /* Categories */
 .news__categories {
   display: flex;
-  gap: 2rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .news__category {
-  background: none;
+  position: relative;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
   font-family: var(--editorial-sans);
   font-weight: 600;
-  font-size: 1rem;
-  letter-spacing: 0.06em;
-  color: var(--editorial-muted);
-  padding: 0 0 1rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+/* จำนวนข่าวในหมวด — พื้นหลังเข้ม/อ่อนสลับกับปุ่มแม่เอง (currentColor) เพื่อให้
+   อ่านออกทั้งตอนแท็บ active (ตัวหนังสือขาว) และไม่ active (ตัวหนังสือม่วง) */
+.news__category-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  margin-left: 0.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* จุดแจ้งเตือน "หมวดนี้มีข่าวใหม่" — เทียบข่าวที่เคยเปิดอ่านแล้วฝั่ง client
+   (ดู newCategories ใน News.jsx และ lib/news.js) ไม่ใช่ทรงเดียวกับปุ่ม
+   --active เพราะต้องมองเห็นได้ทั้งตอนแท็บ active และไม่ active */
+.news__category-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 0.4rem;
+  border-radius: 50%;
+  background: #d93347;
+  vertical-align: middle;
+}
+
+.news__category:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 
 .news__category--active {
-  color: var(--editorial-text);
-  box-shadow: inset 0 -2px 0 var(--editorial-text);
+  color: #fff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--color-primary) 70%, transparent);
 }
 
 /* Meta text shared */
 .news__meta {
+  display: inline-block;
   font-family: var(--editorial-sans);
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
-  color: var(--color-primary);
-  margin: 0 0 0.6rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--news-accent);
+  background: color-mix(in srgb, var(--news-accent) 12%, transparent);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  margin: 0 0 0.75rem;
 }
 
 /* Lead story + sidebar */
@@ -219,12 +358,24 @@
 
 /* Section label */
 .news__section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--editorial-sans);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.14em;
   color: var(--editorial-text);
   margin: 0 0 2rem;
+}
+
+.news__section-label::before {
+  content: "";
+  display: inline-block;
+  width: 1.5rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), var(--news-violet), var(--news-gold));
 }
 
 /* Special reports grid */
@@ -237,20 +388,114 @@
 .news__card {
   cursor: pointer;
   text-align: left;
+  padding: 1rem 1rem 1.25rem;
+  border-radius: calc(var(--radius-lg) + 0.5rem);
+  background: #fff;
+  border: 1px solid var(--editorial-rule);
+  box-shadow: 0 2px 10px -6px rgba(26, 26, 28, 0.08);
+}
+
+.news__card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--news-accent) 35%, var(--editorial-rule));
+  box-shadow: 0 16px 32px -18px color-mix(in srgb, var(--news-accent) 55%, transparent);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .news__card:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--news-accent);
   outline-offset: 4px;
   border-radius: var(--radius-lg);
 }
 
 .news__card-photo {
+  position: relative;
   aspect-ratio: 440 / 280;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: #f2f0f7;
   margin-bottom: 1.25rem;
+  box-shadow: inset 0 0 0 999px transparent;
+}
+
+.news__card-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--news-accent) 45%, transparent);
+  opacity: 0;
+  z-index: 2;
+}
+
+.news__card:hover .news__card-photo::after {
+  opacity: 1;
+  transition: opacity 0.18s ease;
+}
+
+.news__card-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.45) 50%, transparent 58%);
+  transform: translateX(-120%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.news__card:hover .news__card-photo::before {
+  transform: translateX(120%);
+  transition: transform 0.65s ease;
+}
+
+/* จุดแดง "ข่าวที่ยังไม่ได้อ่าน" มุมขวาบนของภาพปก — เทียบข่าวที่เคยเปิดอ่าน
+   แล้วฝั่ง client ตัวเดียวกับที่ตัดสินป้ายบนแท็บหมวดหมู่ (ดู unreadIds ใน
+   News.jsx และ lib/news.js) แสงเรืองรอบจุด + จังหวะเต้นเบา ๆ ช่วยให้สะดุดตา
+   กว่าจุดสีทึบเฉย ๆ โดยไม่ต้องพึ่งขอบขาว (ตัดออกไปแล้วตามที่ขอ) */
+.news__card-unread-dot {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  z-index: 3;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d93347;
+  box-shadow: 0 0 0 4px rgba(217, 51, 71, 0.25), 0 3px 10px -2px rgba(217, 51, 71, 0.7);
+  animation: news-unread-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes news-unread-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(217, 51, 71, 0.25), 0 3px 10px -2px rgba(217, 51, 71, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(217, 51, 71, 0.12), 0 3px 10px -2px rgba(217, 51, 71, 0.7);
+  }
+}
+
+
+
+/* ป้าย "ข่าวเด่น" มุมซ้ายบนของภาพปก — ข่าวเด่นตอนนี้ปนอยู่ในตาราง "ข่าว
+   ทั้งหมด" ด้วย (ไม่ได้แยกออกไปเหมือนเดิม) ต้องมีป้ายบอกไว้ให้รู้ว่าเป็น
+   ข่าวเด่น ทรงเดียวกับ .news-highlight__ribbon แต่ย่อส่วนลงมาให้พอดีการ์ด —
+   เงาสีทองเข้มด้านล่าง + ไอคอนดาวหน้าข้อความ ช่วยให้เด่นขึ้นมาจากรูปโดยไม่
+   ต้องดันพ้นกรอบออกไป */
+.news__card-featured-badge {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 3;
+  background: linear-gradient(90deg, var(--news-gold-deep), var(--news-gold));
+  color: #fff;
+  font-family: var(--editorial-sans);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  box-shadow: 0 8px 18px -4px rgba(168, 121, 26, 0.85);
 }
 
 .news__card-photo img {
@@ -260,9 +505,19 @@
   display: block;
 }
 
+.news__card:hover .news__card-photo img {
+  transform: scale(1.04);
+  transition: transform 0.3s ease;
+}
+
 .news__card-placeholder {
   width: 100%;
   height: 100%;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--news-accent) 35%, #f2f0f7),
+    color-mix(in srgb, var(--news-accent) 10%, #fff)
+  );
 }
 
 .news__card-title {
@@ -272,6 +527,11 @@
   line-height: 1.32;
   color: var(--editorial-text);
   margin: 0 0 0.6rem;
+}
+
+.news__card:hover .news__card-title {
+  color: var(--news-accent);
+  transition: color 0.15s ease;
 }
 
 .news__card-desc {
@@ -287,8 +547,35 @@
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.06em;
-  color: var(--editorial-text);
+  color: var(--news-accent);
   margin: 0;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .news__main {
+    padding: 2.5rem 1.5rem 3.5rem;
+  }
+
+  .news__lead-grid {
+    gap: 2rem;
+  }
+
+  /* สามคอลัมน์บนแท็บเล็ตเหลือคอลัมน์ละ ~230px ซึ่งภาพปกกับหัวข่าวยังพออยู่ได้
+     สองคอลัมน์ แต่สามไม่ไหว */
+  .news__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
 }
 
 @media (max-width: 980px) {
@@ -304,5 +591,78 @@
 
   .news__grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  /* clamp เดิมมีพื้นที่ต่ำสุด 2.2rem (≈35px) ซึ่งบนจอ 360px เหลือแค่
+     ~10 ตัวอักษรต่อบรรทัด หัวข้อภาษาไทยยาว ๆ เลยแตกเป็นห้าหกบรรทัด */
+  .news__title {
+    font-size: clamp(1.7rem, 7vw, 2.4rem);
+  }
+
+  .news__main {
+    padding: 1.75rem 0.9rem 2.5rem;
+  }
+
+  /* ก้อนเบลอตกแต่งหลังหัวเรื่องกว้าง 34rem และยื่นออกนอกกรอบ 6rem ทางซ้าย —
+     บนมือถือมันคือสาเหตุที่หน้าเลื่อนซ้ายขวาได้ทั้งที่ไม่มีเนื้อหาตรงนั้น */
+  .news__masthead::before {
+    left: -2rem;
+    width: 20rem;
+    height: 16rem;
+  }
+
+  .news__masthead::after {
+    right: -0.5rem;
+    width: 9rem;
+    height: 9rem;
+  }
+
+  .news__intro {
+    font-size: 1rem;
+  }
+
+  .news__categories {
+    gap: 0.5rem;
+  }
+
+  .news__category {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .news__lead-grid {
+    gap: 1.5rem;
+  }
+
+  .news__grid {
+    gap: 1.25rem;
+  }
+
+  .news__card {
+    padding: 0.75rem 0.75rem 1rem;
+  }
+
+  .news__section-label {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+}
+
+@media (max-width: 400px) {
+  .news__main {
+    padding: 1.5rem 0.6rem 2.5rem;
+  }
+
+  .news__category {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news__card-unread-dot {
+    animation: none;
   }
 }

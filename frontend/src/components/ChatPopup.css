@@ -1,0 +1,288 @@
+/* หน้าต่างแชทลอยหนึ่งห้อง รวมสถานะย่อเป็นวงกลม */
+
+.chat-popup {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  /* ล็อกเป็นพิกเซลตายตัวเป็นหลัก (แบบ Facebook) ไม่ใช้ vh ล้วนเพราะจอสูงมาก
+     จะได้กล่องที่สูงจนล้นทะลุขึ้นไปบังหัวเว็บ — 74vh เหลือไว้แค่กันจอเตี้ย ๆ */
+  max-height: min(480px, 74vh);
+  border-radius: 12px 12px 0 0;
+  background: #fff;
+  box-shadow: 0 -6px 24px rgba(43, 10, 99, 0.18);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.chat-popup__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.5rem 0.65rem 0.75rem;
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.chat-popup__head-avatar {
+  position: relative;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.chat-popup__dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  background: #2fbf71;
+}
+
+.chat-popup__head-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.chat-popup__minimize,
+.chat-popup__close {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: none;
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.chat-popup__minimize:hover,
+.chat-popup__close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.chat-popup__body {
+  flex: 1;
+  /* min-height:0 แก้ปัญหา flex item ไม่ยอมหดตาม max-height ของ .chat-popup —
+     ไม่งั้นพอข้อความเยอะขึ้น กล่องนี้จะดันความสูงรวมเกิน max-height แทนที่จะ
+     เลื่อนดูภายในตัวเอง ทำให้ช่องพิมพ์ด้านล่างโดนบีบ/หลุดจอไป */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  overflow-y: auto;
+}
+
+.chat-popup__hint {
+  margin: auto;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+  text-align: center;
+}
+
+.chat-popup__emoji {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.2rem;
+  max-height: 8rem;
+  overflow-y: auto;
+  margin: 0 0.85rem 0.5rem;
+  padding: 0.5rem;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+  flex-shrink: 0;
+}
+
+.chat-popup__emoji-item {
+  padding: 0.25rem;
+  border-radius: 8px;
+  background: none;
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.chat-popup__emoji-item:hover {
+  background: var(--color-tint-light);
+}
+
+.chat-popup__error {
+  margin: 0;
+  padding: 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+.chat-popup__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid #efe6fb;
+}
+
+.chat-popup__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.9rem;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.chat-popup__input::placeholder {
+  color: var(--color-muted-purple);
+}
+
+.chat-popup__send {
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.chat-popup__send:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.chat-popup__send:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+
+
+/* วงกลมอวาตาร์ลอยตอนย่อแชท (แบบ chat head ของ Facebook) แทนที่แถบหัวเต็ม
+   ความกว้าง — ทับขนาดดีฟอลต์ 56px ของ .cm-avatar ให้เหลือ 54px */
+.chat-popup-bubble {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(43, 10, 99, 0.25);
+  cursor: pointer;
+}
+
+.chat-popup-bubble__avatar {
+  display: block;
+  width: 54px;
+  height: 54px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.chat-popup-bubble__dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #2fbf71;
+}
+
+/* ป้ายแจ้งเตือนข้อความยังไม่อ่าน — มุมตรงข้ามกับปุ่มปิด (บนซ้าย) จะได้ไม่ทับกัน
+   และโชว์ตลอด ไม่ใช่แค่ตอน hover เหมือนปุ่มปิด */
+.chat-popup-bubble__unread {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.25rem;
+  border-radius: var(--radius-pill);
+  background: #d93347;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.1rem;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(43, 10, 99, 0.3);
+}
+
+.chat-popup-bubble__close {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(43, 10, 99, 0.3);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.chat-popup-bubble:hover .chat-popup-bubble__close,
+.chat-popup-bubble:focus-visible .chat-popup-bubble__close,
+.chat-popup-bubble__close:focus-visible {
+  opacity: 1;
+}
+
+/* ---------- เมนูจัดการห้อง / สถานะบล็อก (0094) ---------- */
+
+.chat-popup__muted {
+  margin-left: 0.35rem;
+  font-size: 0.78rem;
+}
+
+/* ปุ่ม ⋯ อยู่บนหัวสีม่วง จึงต้องกลับสีตัวอักษรเป็นขาว ต่างจากที่ใช้ในรายการ
+   ห้องบนพื้นขาว (ค่าเริ่มต้นใน ConversationMenu.css) */
+.chat-popup__menu {
+  flex: none;
+}
+
+.chat-popup__menu .conv-menu__trigger {
+  color: #fff;
+}
+
+.chat-popup__menu .conv-menu__trigger:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* แผงวาดที่ <body> แล้ว จึงไม่รับสีตัวอักษรสีขาวของหัวหน้าต่างมาด้วย และพลิก
+   ขึ้นบนเองเมื่อที่ด้านล่างไม่พอ (ดู ConversationMenu.jsx) — ไม่ต้องมีกฎพิเศษ
+   ของหน้าต่างลอยอีก */
+
+.chat-popup__blocked {
+  margin: 0;
+  padding: 0.85rem;
+  border-top: 1px solid #efe6fb;
+  background: var(--color-neutral-bg);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-muted-purple);
+  text-align: center;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .chat-popup {
+    width: 88vw;
+  }
+}

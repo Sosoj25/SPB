@@ -1,3 +1,6 @@
+/* แถบหัวเว็บฝั่งลูกค้า — เมนู กระดิ่งแจ้งเตือน ปุ่มแชท เมนูผู้ใช้
+   และเวอร์ชันจอแคบที่ยุบเมนูเป็นลิ้นชัก */
+
 .app-header {
   position: relative;
   z-index: 20;
@@ -11,12 +14,25 @@
   box-shadow: 0 4px 4px rgba(102, 16, 242, 0.5);
 }
 
+/* ตัวถ่วงซ้ายให้สมดุลกับบล็อกผู้ใช้ฝั่งขวา */
+.app-header::before {
+  content: "";
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* บล็อกผู้ใช้กินพื้นที่ว่างฝั่งขวาเท่ากับตัวถ่วงฝั่งซ้าย แล้วดันเนื้อหาตัวเอง
+   ไปชิดขวา — เมนู+โลโก้ตรงกลางจึงอยู่กลางจริง ๆ
+   ห้ามใช้ margin-left: auto แทน เพราะมันดูดที่ว่างไปหมดจน
+   justify-content: center ไม่มีผล เมนูจะไปกองซ้าย */
 .app-header__user {
   position: relative;
   display: flex;
+  flex: 1 1 0;
+  min-width: 0;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.75rem;
-  margin-right: auto;
 }
 
 .app-header__avatar-btn {
@@ -38,13 +54,22 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text);
+  transition: transform 0.18s ease;
+}
+
+/* ลูกศรพลิกขึ้นตอนเมนูเปิด — บอกสถานะของปุ่มไปพร้อมกับเมนูที่กางออก */
+.app-header__caret--open {
+  transform: rotate(180deg);
 }
 
 .app-header__logo {
   width: 72px;
   height: 72px;
+  padding: 3px;
+  box-sizing: border-box;
   border-radius: 50%;
-  object-fit: cover;
+  background-color: var(--color-logo-bg);
+  object-fit: contain;
   box-shadow: 0 4px 4px var(--color-shadow-gold);
   flex-shrink: 0;
 }
@@ -56,6 +81,7 @@
 }
 
 .app-header__link {
+  position: relative;
   font-weight: 700;
   font-size: 1.05rem;
   white-space: nowrap;
@@ -63,6 +89,67 @@
 
 .app-header__link:hover {
   color: var(--color-primary);
+}
+
+/* เมนูของหน้าที่เปิดอยู่ — ต้องมีขีดใต้ด้วย ไม่ใช่เปลี่ยนแค่สีตัวอักษร
+   เพราะสีม่วงชนกับ :hover จนแยกไม่ออกว่าอันไหนคือหน้าปัจจุบันจริง ๆ */
+.app-header__link--active {
+  color: var(--color-primary);
+}
+
+.app-header__link--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.45rem;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-gold);
+}
+
+/* จุดแจ้งเตือน "มีข่าวใหม่" บนปุ่ม ข่าว — ทรงเดียวกับ .app-header__bell-badge
+   แต่เป็นจุดเฉย ๆ ไม่มีตัวเลข เพราะสถานะ "อ่านแล้ว" ของข่าวเก็บอยู่ใน
+   localStorage ของเครื่องนั้น ไม่ใช่ตัวนับกลางในฐานข้อมูล (ดู lib/news.js) */
+.app-header__link-dot {
+  position: absolute;
+  top: -3px;
+  right: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d93347;
+}
+
+/* ป้ายตัวเลขข้างเมนู (ตอนนี้ใช้ที่ "ติดต่อเรา") — ต่างจากจุดแดงของข่าวตรงที่
+   บอกจำนวนเรื่องที่รออ่านจริง ๆ ไม่ใช่แค่บอกว่ามีของใหม่ */
+.app-header__link-badge {
+  position: absolute;
+  top: -8px;
+  right: -18px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: #d93347;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ข้อความสำหรับโปรแกรมอ่านหน้าจอเท่านั้น — ป้ายตัวเลขโดด ๆ อ่านออกมาเป็น "2"
+   เฉย ๆ ไม่มีทางรู้ว่าสองอะไร */
+.app-header__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .app-header__bell {
@@ -100,7 +187,7 @@
 .app-header__bell-panel {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  right: 0;
   z-index: 30;
   width: min(320px, calc(100vw - 2rem));
   max-height: 420px;
@@ -139,9 +226,25 @@
 }
 
 .app-header__bell-item-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--color-heading);
+}
+
+/* ป้ายของใบที่ยังมีงานค้าง (รอรีวิว / รอกดยืนยันรับของ) — ใบพวกนี้ไม่เคลียร์
+   ตอนเปิดกระดิ่งเหมือนใบอื่น ป้ายจึงทำหน้าที่บอกว่าทำไมมันยังค้างอยู่ */
+.app-header__bell-item-tag {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .app-header__bell-item-message {
@@ -161,9 +264,12 @@
 }
 
 .app-header__bell-viewall {
+  display: block;
+  width: 100%;
   margin-top: 4px;
   padding: 10px 12px;
   border-radius: 12px;
+  background: none;
   text-align: center;
   font-weight: 700;
   font-size: 0.85rem;
@@ -174,26 +280,10 @@
   background: var(--color-tint-light);
 }
 
-.app-header__logout-btn {
-  margin-left: auto;
-  background: var(--color-primary);
-  color: #fff;
-  font-weight: 500;
-  padding: 0.7rem 1.6rem;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-  transition: background-color 0.15s ease, transform 0.18s ease;
-}
-
-.app-header__logout-btn:hover {
-  background: var(--color-primary-dark);
-  transform: translateY(-2px);
-}
-
 .app-menu {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  right: 0;
   width: 320px;
   background: #fff;
   border-radius: 24px;
@@ -202,7 +292,80 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  /* กางออกจากมุมขวาบน คือตำแหน่งของปุ่มรูปโปรไฟล์ที่กดมา */
+  transform-origin: top right;
 }
+
+.app-menu--in {
+  animation: app-menu-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ระหว่างหุบ เมนูยังอยู่ใน DOM รอ animationend — ตัดการคลิกไว้ก่อน
+   ไม่ให้กดโดนลิงก์ที่กำลังจางหาย */
+.app-menu--out {
+  animation: app-menu-out 0.13s ease-in both;
+  pointer-events: none;
+}
+
+@keyframes app-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes app-menu-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+}
+
+/* รายการไล่โผล่ทีละอันตอนกาง — ตอนหุบไม่ต้อง เพราะทั้งก้อนจางหายอยู่แล้ว */
+.app-menu--in > * {
+  animation: app-menu-item-in 0.2s ease both;
+}
+
+.app-menu--in > :nth-child(2) {
+  animation-delay: 0.03s;
+}
+
+.app-menu--in > :nth-child(3) {
+  animation-delay: 0.06s;
+}
+
+.app-menu--in > :nth-child(4) {
+  animation-delay: 0.09s;
+}
+
+.app-menu--in > :nth-child(5) {
+  animation-delay: 0.12s;
+}
+
+.app-menu--in > :nth-child(n + 6) {
+  animation-delay: 0.15s;
+}
+
+@keyframes app-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 
 .app-menu__profile {
   display: flex;
@@ -252,9 +415,24 @@
 }
 
 .app-menu__item-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-weight: 700;
   font-size: 1rem;
   color: var(--color-heading);
+}
+
+/* ป้ายเตือนจำนวนรายการรอชำระเงิน — ทรงเดียวกับ .app-header__messages-badge */
+.app-menu__item-badge {
+  min-width: 20px;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: #d93347;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
 }
 
 .app-menu__item--tint .app-menu__item-title {
@@ -270,6 +448,59 @@
   border: none;
   border-top: 2px solid var(--color-tint-light);
   margin: 4px 0;
+}
+
+/* แถวสวิตช์เสียงแจ้งเตือน — ทรงเดียวกับ .app-menu__item แต่เรียงหัวข้อกับ
+   สวิตช์ไว้คนละฝั่งในบรรทัดเดียว เพราะไม่มีคำอธิบายบรรทัดที่สองเหมือนเมนูอื่น */
+.app-menu__sound {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: none;
+  padding: 12px 18px;
+  border-radius: 14px;
+  text-align: left;
+}
+
+.app-menu__sound:hover {
+  background: var(--color-tint-light);
+}
+
+.app-menu__switch {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  width: 40px;
+  height: 22px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: #c9c6d4;
+  transition: background 0.18s ease;
+}
+
+.app-menu__switch--on {
+  background: var(--color-primary);
+}
+
+.app-menu__switch-knob {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.18s ease;
+}
+
+.app-menu__switch--on .app-menu__switch-knob {
+  transform: translateX(18px);
+}
+
+/* เครื่องที่ตั้งค่าลดการเคลื่อนไหวไว้ — สวิตช์ยังต้องสลับสถานะให้เห็น แค่ไม่ต้องไถล */
+@media (prefers-reduced-motion: reduce) {
+  .app-menu__switch,
+  .app-menu__switch-knob {
+    transition: none;
+  }
 }
 
 .app-menu__logout {
@@ -289,12 +520,286 @@
   background: #fdecee;
 }
 
+/* ---------------------------------------------------------------------------
+   ปุ่มขีดสามขีด + ลิ้นชักของจอแคบ
+   ซ่อนไว้ทั้งคู่บนเดสก์ท็อป แล้วค่อยสลับที่กับแถบลิงก์ใน @media ด้านล่าง
+   --------------------------------------------------------------------------- */
+.app-header__burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--color-tint-light);
+  flex-shrink: 0;
+}
+
+.app-header__burger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 22px;
+  height: 16px;
+}
+
+.app-header__burger-icon > span {
+  display: block;
+  height: 2.5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  transition:
+    transform 0.2s ease,
+    opacity 0.15s ease;
+}
+
+/* ขีดสามขีดพับเป็นกากบาทตอนเปิด — ผู้ใช้จะได้รู้ว่าปุ่มเดิมคือปุ่มปิดด้วย
+   ไม่ต้องเดาว่าต้องแตะตรงไหนถึงจะกลับ */
+.app-header__burger-icon--open > span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.app-header__burger-icon--open > span:nth-child(2) {
+  opacity: 0;
+}
+
+.app-header__burger-icon--open > span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* .app-header สร้าง stacking context ของตัวเอง (position + z-index) ลิ้นชัก
+   กับฉากหลังที่อยู่ข้างในจึงไม่มีทางขึ้นเหนือของนอกบริบทที่ z-index สูงกว่า 20
+   ได้เลย ไม่ว่าจะตั้งเลขข้างในเท่าไหร่ — ที่ชนคือหน้าต่างแชทลอย (ChatDock,
+   z-index 56) ซึ่งจะลอยทับฉากหลังของลิ้นชักอยู่ จึงต้องยกทั้งแถบหัวขึ้นเหนือ
+   มันเฉพาะตอนลิ้นชักกาง แต่ยังต่ำกว่ากล่องโต้ตอบ (60) ที่ต้องอยู่บนสุดเสมอ */
+.app-header--nav-open {
+  z-index: 57;
+}
+
+.app-header__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  background: rgba(26, 8, 56, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.app-header__scrim--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.app-header__drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 19;
+  width: min(78vw, 320px);
+  padding: 5.5rem 1rem 1.5rem;
+  background: #fff;
+  box-shadow: 4px 0 24px rgba(43, 10, 99, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition:
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 0.22s;
+}
+
+.app-header__drawer--open {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.app-header__drawer-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.app-header__drawer-link--active {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.app-header__drawer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d93347;
+}
+
+.app-header__drawer-badge {
+  min-width: 20px;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: #d93347;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* แล็ปท็อปเล็ก — ลิงก์ยังกางอยู่ แค่บีบระยะห่างให้ลงบรรทัดเดียวต่อไปได้ */
+@media (max-width: 1200px) {
+  .app-header {
+    gap: 1.5rem;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .app-header__links {
+    gap: 1.25rem;
+  }
+
+  .app-header__link {
+    font-size: 1rem;
+  }
+
+  .app-header__logo {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* แท็บเล็ตลงมา — ลิงก์ทั้งหกไม่มีทางลงบรรทัดเดียวแล้ว ย้ายเข้าลิ้นชักทั้งชุด
+   เหลือบนแถบหัวแค่ ขีดสามขีด | โลโก้ | แชท+กระดิ่ง+โปรไฟล์ */
 @media (max-width: 900px) {
   .app-header {
-    gap: 1rem;
+    gap: 0.75rem;
+    padding: 0.7rem 1rem;
+    justify-content: space-between;
+    flex-wrap: nowrap;
   }
-  .app-header__user,
-  .app-header__logout-btn {
+
+  .app-header::before {
+    display: none;
+  }
+
+  .app-header__burger {
+    display: flex;
+  }
+
+  .app-header__links {
+    display: none;
+  }
+
+  .app-header__logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .app-header__user {
+    flex: 0 0 auto;
     margin: 0;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .app-header__logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .app-header__bell-trigger,
+  .app-header__burger {
+    width: 40px;
+    height: 40px;
+  }
+
+  .app-header__avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* เมนูโปรไฟล์กับกล่องแจ้งเตือนเดิมกว้างคงที่ 320px แล้วเกาะขอบขวาของปุ่ม
+     ที่กดมา ซึ่งบนจอ 360px จะยื่นพ้นขอบซ้ายออกไป บนมือถือจึงถอดออกมาเกาะ
+     ขอบจอทั้งสองด้านแทน (fixed) แล้ววางใต้แถบหัวพอดีด้วย --app-header-h
+     ที่นับจาก padding + ความสูงของชิ้นที่สูงที่สุดบนแถบ (โลโก้ 46px) */
+  .app-header {
+    --app-header-h: 4.1rem;
+  }
+
+  .app-menu,
+  .app-header__bell-panel {
+    position: fixed;
+    top: var(--app-header-h);
+    left: 0.6rem;
+    right: 0.6rem;
+    width: auto;
+    max-height: calc(100vh - var(--app-header-h) - 1rem);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-header {
+    gap: 0.4rem;
+    --app-header-h: 3.8rem;
+  }
+
+  .app-header__logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .app-header__user {
+    gap: 0.35rem;
+  }
+
+  .app-header__caret {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-header__caret {
+    transition: none;
+  }
+
+  .app-menu--in,
+  .app-menu--in > * {
+    animation: none;
+  }
+
+  /* ตอนหุบยังต้องเหลือ animation ไว้ (สั้นจนมองไม่เห็น) เพราะ AppHeader
+     ถอดเมนูออกจาก DOM ตอน animationend — ถ้าใส่ none เมนูจะค้างเปิดถาวร */
+  .app-menu--out {
+    animation: app-menu-out 0.01s linear both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-header__burger-icon > span,
+  .app-header__scrim,
+  .app-header__drawer {
+    transition: none;
   }
 }

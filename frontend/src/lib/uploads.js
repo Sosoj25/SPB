@@ -1,3 +1,4 @@
+// กฎตรวจไฟล์ภาพก่อนอัปโหลด และการเก็บกวาดไฟล์ใน Storage
 import { supabase } from "./supabase";
 
 // ข้อจำกัดชุดเดียวกับที่ตั้งไว้บน bucket ฝั่ง Supabase (avatars ตั้งมาตั้งแต่
@@ -36,10 +37,10 @@ const EXT_BY_TYPE = {
 export const imageExt = (file) => EXT_BY_TYPE[file.type] ?? "bin";
 
 // ลบไฟล์ทั้งหมดใต้โฟลเดอร์ของเรคอร์ดหนึ่ง ๆ (news/<id>/, amenities/<id>/)
+// เรียกคู่กับการลบแถวใน DB เสมอ ไม่งั้นรูปจะค้างใน bucket โดยไม่มีอะไรอ้างถึง
 //
-// เดิมการลบข่าว/สิ่งอำนวยความสะดวกลบแค่แถวใน DB ปล่อยให้รูปค้างอยู่ใน bucket
-// ตลอดไปโดยไม่มีอะไรอ้างถึงอีกเลย — ลบไม่สำเร็จไม่ถือเป็น error ของการลบ
-// เรคอร์ด (แถวหายไปแล้วจริง) แค่บันทึกไว้ใน console
+// ลบไฟล์ไม่สำเร็จไม่ถือเป็น error ของการลบเรคอร์ด (แถวหายไปแล้วจริง)
+// แค่บันทึกไว้ใน console
 export async function removeStorageFolder(bucket, folder) {
   try {
     const { data, error } = await supabase.storage.from(bucket).list(String(folder));

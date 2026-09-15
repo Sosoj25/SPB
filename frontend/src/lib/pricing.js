@@ -1,4 +1,10 @@
+// ระบบราคาของสนาม (0024) — ราคาพื้นฐาน + ราคาตามช่วงเวลา + ส่วนลดอัตโนมัติ
+//
+// รวมงานจัดการสถานที่/สนามของแอดมินไว้ด้วย เพราะทั้งหมดอยู่ในหน้าเดียวกัน
+// (AdminFacilityPricing) ราคาจริงที่ลูกค้าจ่ายคำนวณที่ฝั่ง DB เสมอ
+// (compute_facility_price) ที่นี่ไม่มีสูตรคิดเงินของตัวเอง
 import { supabase } from "./supabase";
+import { removeStorageFolder } from "./uploads";
 
 const RULE_SELECT =
   "id, facility_id, label, start_time, end_time, weekday_price, weekend_price, holiday_price, is_peak, sort_order";
@@ -94,11 +100,116 @@ export async function updateFacilityBasePrice(
   if (error) throw error;
 }
 
+// ---------- สถานที่และสนาม ----------
+
 // venues เป็นคนละตารางกับ facilities — หนึ่งสถานที่มีได้หลายสนาม เปลี่ยน
 // ชื่อ/ที่อยู่ตรงนี้จึงมีผลกับทุกสนามที่อยู่ในสถานที่เดียวกันด้วย
 export async function updateVenueDetails(venueId, { name, address }) {
   const { error } = await supabase.from("venues").update({ name, address }).eq("id", venueId);
   if (error) throw error;
+}
+
+// รายชื่อสถานที่ที่เปิดใช้งาน ให้ฟอร์ม "เพิ่มสนามใหม่" เลือกว่าจะผูกสนามใหม่
+// เข้ากับสถานที่ไหน (หนึ่งสถานที่มีได้หลายสนาม)
+export async function fetchVenues() {
+  const { data, error } = await supabase
+    .from("venues")
+    .select("id, name, address, opening_time, closing_time")
+    .eq("status", "active")
+    .order("name");
+
+  if (error) throw error;
+
+  return (data ?? []).map((v) => ({
+    id: v.id,
+    name: v.name,
+    address: v.address,
+    openingTime: (v.opening_time ?? "").slice(0, 5),
+    closingTime: (v.closing_time ?? "").slice(0, 5),
+  }));
+}
+
+// สร้างสถานที่ใหม่ — ใช้ตอนเพิ่มสนามในทำเลที่ยังไม่มีในระบบ
+// venues_admin_manage (0000) ให้สิทธิ์ admin insert อยู่แล้ว
+export async function createVenue({ name, address, phone, openingTime, closingTime }) {
+  const { data, error } = await supabase
+    .from("venues")
+    .insert({
+      name,
+      address,
+      phone: phone || null,
+      opening_time: openingTime,
+      closing_time: closingTime,
+    })
+    .select("id, name, address, opening_time, closing_time")
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    name: data.name,
+    address: data.address,
+    openingTime: (data.opening_time ?? "").slice(0, 5),
+    closingTime: (data.closing_time ?? "").slice(0, 5),
+  };
+}
+
+// สร้างสนามใหม่ในสถานที่ที่เลือก — facilities_admin_manage (0000) ให้สิทธิ์
+// admin insert อยู่แล้ว สนามใหม่ยังจองไม่ได้จนกว่าจะมีช่วงเวลาใน
+// facility_time_slots (เรียก ensureFutureSlots จากฝั่งเรียกหลัง insert สำเร็จ)
+export async function createFacility({
+  venueId,
+  sportId,
+  name,
+  description,
+  capacity,
+  pricePerHour,
+  minBookingHours,
+  depositPercent,
+}) {
+  const { data, error } = await supabase
+    .from("facilities")
+    .insert({
+      venue_id: venueId,
+      sport_id: sportId,
+      name,
+      description: description || null,
+      capacity: capacity ?? null,
+      price_per_hour: pricePerHour,
+      min_booking_hours: minBookingHours ?? 1,
+      deposit_percent: depositPercent ?? 0,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") throw new Error(`มีสนามชื่อ "${name}" อยู่แล้วในสถานที่นี้ กรุณาใช้ชื่ออื่น`);
+    throw error;
+  }
+  return data.id;
+}
+
+// ลบสนามทิ้ง — รูปภาพ ราคาตามช่วงเวลา ส่วนลด ประวัติราคา และตารางเวลาของสนาม
+// นี้ (facility_images, facility_pricing_rules, facility_discounts,
+// facility_price_history, facility_time_slots) เป็น on delete cascade ทั้งหมด
+// (0000, 0010, 0024) จึงหายตามไปด้วยอัตโนมัติ แต่ bookings.facility_id เป็น
+// on delete restrict — ลบไม่ได้ถ้าสนามนี้เคยมีการจองอยู่แม้แต่รายการเดียว
+// (กันประวัติการจอง/ใบเสร็จเก่าอ้างอิงสนามที่หายไปแล้ว) ควรเปลี่ยนสถานะเป็น
+// "ปิดปรับปรุง" แทนถ้าเจอเคสนี้
+export async function deleteFacility(facilityId) {
+  const { error } = await supabase.from("facilities").delete().eq("id", facilityId);
+
+  if (error) {
+    if (error.code === "23503") {
+      throw new Error(
+        "ลบไม่ได้ เพราะสนามนี้มีประวัติการจองอยู่ — ให้เปลี่ยนสถานะเป็นปิดปรับปรุงแทนการลบ",
+      );
+    }
+    throw error;
+  }
+
+  await removeStorageFolder("facility-images", facilityId);
 }
 
 // คัดลอกเฉพาะราคาพื้นฐาน (ไม่รวมช่วงเวลา/ส่วนลด) ไปยังทุกสนามอื่นในกีฬา
@@ -128,6 +239,8 @@ export async function applyBasePriceToSport(sportId, excludeFacilityId, basePric
   if (error) throw error;
   return facilities.length;
 }
+
+// ---------- ราคาตามช่วงเวลา ----------
 
 export async function createPricingRule(facilityId, payload) {
   const { data, error } = await supabase
@@ -196,6 +309,8 @@ export function reorderPricingRules(orderedRules) {
   return reorderRows("facility_pricing_rules", orderedRules);
 }
 
+// ---------- ส่วนลดอัตโนมัติ ----------
+
 export async function createDiscount(facilityId, payload) {
   const { data, error } = await supabase
     .from("facility_discounts")
@@ -241,6 +356,8 @@ export async function deleteDiscount(discountId) {
   const { error } = await supabase.from("facility_discounts").delete().eq("id", discountId);
   if (error) throw error;
 }
+
+// ---------- ประวัติการแก้ราคา และตัวอย่างราคา ----------
 
 export async function fetchPriceHistory(facilityId) {
   const { data, error } = await supabase

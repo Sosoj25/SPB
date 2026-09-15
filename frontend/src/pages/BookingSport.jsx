@@ -1,3 +1,4 @@
+// ขั้นที่ 1 ของการจอง — เลือกประเภทกีฬา (โชว์เฉพาะกีฬาที่มีสนามเปิดจองจริง)
 import { Link } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BookingSteps from "../components/BookingSteps";

@@ -1,0 +1,190 @@
+/* กล่องสร้างกลุ่มแชท — ช่องค้นหาคนและ chip รายชื่อที่เลือกไว้ */
+
+.group-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(26, 10, 54, 0.45);
+}
+
+.group-dialog {
+  width: min(460px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.group-dialog__title {
+  margin: 0 0 1.1rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.group-dialog__label {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.group-dialog__input {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2d3f5;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.group-dialog__input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.group-dialog__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: -0.4rem 0 1rem;
+}
+
+.group-dialog__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.group-dialog__chip button {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.group-dialog__results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: -0.4rem 0 1rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.group-dialog__result {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 14px;
+  background: none;
+  font-family: inherit;
+  font-size: 0.92rem;
+  text-align: left;
+  color: var(--color-text);
+}
+
+.group-dialog__result:hover {
+  background: var(--color-surface-soft);
+}
+
+.group-dialog__result img,
+.group-dialog__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-tint-light);
+  flex-shrink: 0;
+}
+
+.group-dialog__hint {
+  margin: 0;
+  padding: 0.4rem 0.2rem;
+  font-size: 0.88rem;
+  color: var(--color-muted-purple);
+}
+
+.group-dialog__error {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+.group-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.group-dialog__cancel,
+.group-dialog__submit {
+  padding: 0.65rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.group-dialog__cancel {
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+}
+
+.group-dialog__submit {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.group-dialog__submit:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.group-dialog__submit:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 640px) {
+  .group-dialog__backdrop {
+    padding: 0.6rem;
+  }
+
+  .group-dialog {
+    padding: 1.15rem;
+    max-height: 94vh;
+  }
+}

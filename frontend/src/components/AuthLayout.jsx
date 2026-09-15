@@ -1,3 +1,4 @@
+// โครงหน้าของทุกหน้าที่ยังไม่ได้ล็อกอิน — พื้นหลังสนาม + การ์ดฟอร์มตรงกลาง
 import { bgField } from "../assets/images";
 import AuthHeader from "./AuthHeader";
 import "./AuthLayout.css";

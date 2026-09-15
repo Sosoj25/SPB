@@ -1,3 +1,4 @@
+// จุดเริ่มของแอป — ครอบ AuthProvider ไว้นอกสุดเพราะทุกหน้าต้องรู้ว่าใครล็อกอินอยู่
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";

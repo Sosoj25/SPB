@@ -1,3 +1,7 @@
+// หน้าเขียน/แก้ไขข่าว — ใช้ทั้งตอนสร้างใหม่และตอนแก้ของเดิม
+//
+// ปุ่มจัดรูปแบบบน toolbar แทรก syntax ที่ lib/newsContent.jsx เป็นคนแปลงกลับ
+// ตอนแสดงผล ทั้งสองไฟล์ต้องรู้จัก syntax ชุดเดียวกันเสมอ
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
@@ -29,6 +33,7 @@ const EMPTY_FORM = {
   category: NEWS_CATEGORIES[0],
   tags: [],
   isFeatured: false,
+  notifyMessage: "",
   coverImage: null,
   publishDate: toDateInput(),
   publishTime: toTimeInput(),
@@ -82,6 +87,7 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
           category: news.category,
           tags: news.tags,
           isFeatured: news.isFeatured,
+          notifyMessage: news.notifyMessage,
           coverImage: news.coverImage,
           publishDate: toDateInput(news.publishedAt),
           publishTime: toTimeInput(news.publishedAt),
@@ -160,6 +166,7 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
         category: form.category,
         tags: form.tags,
         isFeatured: form.isFeatured,
+        notifyMessage: form.isFeatured ? form.notifyMessage : "",
         status: nextStatus,
         publishedAt,
       };
@@ -375,6 +382,25 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
                 label="ปักหมุดเป็นข่าวเด่น"
               />
             </div>
+
+            {form.isFeatured && (
+              <div className="dash-field">
+                <label className="dash-field__label" htmlFor="news-notify-message">
+                  ข้อความแจ้งเตือน (ที่กระดิ่งแจ้งเตือนของลูกค้า)
+                </label>
+                <textarea
+                  id="news-notify-message"
+                  className="dash-textarea"
+                  rows={2}
+                  value={form.notifyMessage}
+                  onChange={(e) => updateField("notifyMessage", e.target.value)}
+                  placeholder="เว้นว่างไว้ให้ระบบใช้คำโปรยของข่าวแทน"
+                />
+                <p className="dash-field__hint">
+                  ข่าวเด่นที่ลูกค้ายังไม่ได้อ่านจะขึ้นแจ้งเตือนที่กระดิ่งด้านบนของทุกหน้า
+                </p>
+              </div>
+            )}
           </section>
 
           <section className="dash-card admin-editor__section">

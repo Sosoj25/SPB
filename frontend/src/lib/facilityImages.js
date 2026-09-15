@@ -1,3 +1,7 @@
+// แกลเลอรีรูปของสนาม — อัปโหลด/ครอบตัด/จัดลำดับ/ตั้งรูปหลัก
+//
+// ไฟล์จริงอยู่ใน bucket "facility-images" ส่วนแถวในตาราง facility_images เก็บ
+// public URL + ลำดับ + ขนาด ทั้งสองฝั่งต้องถูกลบ/อัปเดตคู่กันเสมอ
 import { supabase } from "./supabase";
 import { assertImageFile, imageExt } from "./uploads";
 

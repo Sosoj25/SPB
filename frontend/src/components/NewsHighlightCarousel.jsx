@@ -1,3 +1,9 @@
+// แถบข่าวเด่นบนหน้ารวมข่าว — ปักหมุดได้หลายข่าว ตัวนี้รับมาทั้ง list แล้ว
+// เลื่อนสลับให้เองทีละข่าว
+//
+// เมื่อสลับหมวดหมู่แล้วชุดข่าวเด่นเปลี่ยน ผู้เรียกต้องส่ง key ที่ผูกกับชุดข่าว
+// (เช่น id ต่อกัน) มาด้วย เพื่อให้ React remount component นี้ใหม่และ index
+// กลับไปเริ่มที่ 0 เอง — ไม่ใช้ effect + setState เพราะจะยิง render ซ้อนกัน
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatBookingDate } from "../lib/bookings";
 import "./NewsHighlightCarousel.css";
@@ -9,13 +15,7 @@ function meta(item) {
   return `${item.category} · ${formatBookingDate(item.publishedAt.slice(0, 10))}`;
 }
 
-// ปักหมุดข่าวเด่นได้หลายข่าว — component นี้รับ list มาแล้วเลื่อนดูทีละข่าว
-// เอง แทนที่จะโชว์แค่ข่าวแรกแบบเดิม
-//
-// เมื่อสลับหมวดหมู่แล้วชุดข่าวเด่นเปลี่ยน ผู้เรียกต้องส่ง key ที่ผูกกับชุดข่าว
-// (เช่น id ต่อกัน) มาด้วย เพื่อให้ React remount component นี้ใหม่และ index
-// กลับไปเริ่มที่ 0 เอง — ไม่ใช้ effect + setState เพราะจะยิง render ซ้อนกัน
-export default function NewsHighlightCarousel({ items, onSelect }) {
+export default function NewsHighlightCarousel({ items, onSelect, unreadIds }) {
   const [index, setIndex] = useState(0);
   // ทิศทางที่เลื่อน — ใช้เลือกว่า slide ใหม่จะเลื่อนเข้าจากขวาหรือซ้าย
   // (ดู .news-highlight__content--next/--prev ใน CSS)
@@ -89,10 +89,14 @@ export default function NewsHighlightCarousel({ items, onSelect }) {
       >
         <div key={current.id} className={`news-highlight__content news-highlight__content--${direction}`}>
           <div className="news-highlight__photo">
+            <span className="news-highlight__ribbon">ข่าวเด่น</span>
             {current.coverImage ? (
               <img src={current.coverImage} alt={current.title} draggable="false" />
             ) : (
               <div className="news__card-placeholder" aria-hidden="true" />
+            )}
+            {unreadIds?.has(current.id) && (
+              <span className="news-highlight__unread-dot" aria-label="ข่าวที่ยังไม่ได้อ่าน" />
             )}
 
             {hasMultiple && (

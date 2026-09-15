@@ -1,0 +1,455 @@
+/* โครงหน้าเดียวกับ AdminCheckin.css (สแกนเนอร์ + แผงยืนยันด้านข้าง) —
+   คัดลอกคลาสมาแยกไฟล์แทนใช้ร่วมกัน เพราะสองหน้านี้ไม่ได้ผูกกันจริง แก้ไข
+   ลักษณะหน้าเช็คอินในอนาคตไม่ควรกระทบหน้ารับของรางวัลโดยไม่ตั้งใจ */
+.admin-reward-scan {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 27.5rem;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.admin-reward-scan__main,
+.admin-reward-scan__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-width: 0;
+}
+
+/* Scanner */
+
+.admin-reward-scan__scanner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.admin-reward-scan__scanner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-reward-scan__scanner-head h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--color-heading);
+}
+
+.admin-reward-scan__viewfinder {
+  background: #17141f;
+  border-radius: 1.5rem;
+  height: 22.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.admin-reward-scan__viewfinder-frame {
+  position: relative;
+  width: 16.25rem;
+  height: 16.25rem;
+  border: 4px solid #fff;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.admin-reward-scan__viewfinder-scanline {
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  top: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-primary);
+  box-shadow: 0 0 12px 2px var(--color-primary);
+  animation: admin-reward-scan-scan 2.4s ease-in-out infinite;
+}
+
+@keyframes admin-reward-scan-scan {
+  0%,
+  100% {
+    top: 12%;
+  }
+  50% {
+    top: 82%;
+  }
+}
+
+.admin-reward-scan__viewfinder p {
+  margin: 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.admin-reward-scan__divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-reward-scan__divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--color-tint-light);
+}
+
+.admin-reward-scan__divider p {
+  margin: 0;
+  color: var(--color-faint-purple);
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.admin-reward-scan__search {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-reward-scan__search-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-page-bg);
+  border: 2px solid var(--color-tint-light);
+  border-radius: 1.1rem;
+  padding: 1rem 1.4rem;
+}
+
+.admin-reward-scan__search-field span {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.admin-reward-scan__search-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 1.05rem;
+  color: var(--color-text);
+}
+
+.admin-reward-scan__search-btn {
+  flex-shrink: 0;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--radius-pill);
+}
+
+.admin-reward-scan__search-btn:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+}
+
+.admin-reward-scan__search-hint {
+  margin: -0.4rem 0 0;
+  color: var(--color-danger-text);
+  font-size: 0.9rem;
+}
+
+/* ป้ายสถานะคูปอง — คัดลอกจาก .reward-history__badge (RewardHistory.css)
+   เพราะสองหน้านี้ไม่ได้แชร์สไตล์ชีตกัน */
+.admin-reward-scan__badge {
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-reward-scan__badge--success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.admin-reward-scan__badge--neutral {
+  background: var(--color-neutral-bg);
+  color: var(--color-muted-purple);
+}
+
+.admin-reward-scan__badge--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.admin-reward-scan__badge--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.admin-reward-scan__badge--muted {
+  background: var(--color-neutral-bg);
+  color: var(--color-faint-purple);
+}
+
+/* Confirm panel */
+
+.admin-reward-scan__confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-reward-scan__confirm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-reward-scan__confirm-head h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--color-heading);
+}
+
+.admin-reward-scan__confirm-item {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.admin-reward-scan__confirm-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}
+
+.admin-reward-scan__confirm-code {
+  margin: 0.2rem 0 0;
+  color: var(--color-muted-purple);
+  font-size: 1rem;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  letter-spacing: 0.03em;
+}
+
+.admin-reward-scan__confirm-divider {
+  margin: 0;
+  border: none;
+  height: 2px;
+  background: var(--color-tint-light);
+}
+
+.admin-reward-scan__confirm-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+}
+
+.admin-reward-scan__confirm-facts div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.admin-reward-scan__confirm-facts dt {
+  color: var(--color-muted-purple);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.admin-reward-scan__confirm-facts dd {
+  flex: 1;
+  margin: 0;
+  border-bottom: 1px dotted var(--color-tint-light);
+  text-align: right;
+  font-weight: 700;
+  color: var(--color-heading);
+  font-size: 1.1rem;
+}
+
+.admin-reward-scan__confirm-warning {
+  margin: 0;
+  padding: 0.9rem 1.1rem;
+  border-radius: 1rem;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* คำเตือนที่ยาวกว่าหนึ่งบรรทัด (เช่น ใบที่เลือกจัดส่ง) — ชิดซ้ายอ่านง่ายกว่า */
+.admin-reward-scan__confirm-warning--block {
+  text-align: left;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.admin-reward-scan__confirm-btn {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.15rem;
+  padding: 1rem 1.4rem;
+  border-radius: var(--radius-pill);
+  width: 100%;
+  text-align: center;
+}
+
+.admin-reward-scan__confirm-btn:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+}
+
+.admin-reward-scan__confirm-cancel {
+  background: #fff;
+  border: 2px solid var(--color-disabled-text);
+  color: var(--color-disabled-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-pill);
+  width: 100%;
+  text-align: center;
+}
+
+/* Recent */
+
+.admin-reward-scan__recent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.admin-reward-scan__recent h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  color: var(--color-heading);
+}
+
+.admin-reward-scan__recent-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.admin-reward-scan__recent-row > span:first-child {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--color-faint-purple);
+  font-size: 1rem;
+}
+
+.admin-reward-scan__recent-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-reward-scan__recent-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
+  font-size: 1.05rem;
+}
+
+.admin-reward-scan__recent-detail {
+  margin: 0.1rem 0 0;
+  color: var(--color-muted-purple);
+  font-size: 0.85rem;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .admin-reward-scan {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-reward-scan {
+    gap: 1.25rem;
+  }
+
+  .admin-reward-scan__scanner-head h2,
+  .admin-reward-scan__confirm-head h2 {
+    font-size: 1.3rem;
+  }
+
+  /* กรอบสแกนเดิม 22.5rem สูงเกือบครึ่งจอมือถือ — ย่อลงให้เห็นช่องกรอกรหัส
+     สำรองด้านล่างพร้อมกันในจอเดียว */
+  .admin-reward-scan__viewfinder {
+    height: 17rem;
+  }
+
+  .admin-reward-scan__viewfinder-frame {
+    width: 12rem;
+    height: 12rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-reward-scan__viewfinder {
+    height: 14rem;
+  }
+
+  .admin-reward-scan__viewfinder-frame {
+    width: 9.5rem;
+    height: 9.5rem;
+  }
+
+  .admin-reward-scan__viewfinder p {
+    font-size: 0.95rem;
+  }
+
+  .admin-reward-scan__scanner-head,
+  .admin-reward-scan__confirm-head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  /* ช่องกรอกรหัสกับปุ่มค้นหาอยู่ข้างกัน พอจอแคบช่องเหลือไม่กี่ตัวอักษร */
+  .admin-reward-scan__search {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .admin-reward-scan__search-field {
+    flex: 1 1 100%;
+    padding: 0.8rem 1.1rem;
+  }
+
+  .admin-reward-scan__search-btn {
+    flex: 1;
+  }
+
+  /* หัวข้อ/ค่าของรายละเอียดคูปองเรียงข้างกันไม่พอกว้าง — ลงล่างแทน */
+  .admin-reward-scan__confirm-facts div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .admin-reward-scan__confirm-facts dd {
+    text-align: left;
+  }
+
+  .admin-reward-scan__recent h2 {
+    font-size: 1.2rem;
+  }
+}

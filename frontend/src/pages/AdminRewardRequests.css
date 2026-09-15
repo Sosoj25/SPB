@@ -1,0 +1,327 @@
+/* คำขอแลกรางวัล — โครงเดียวกับหน้าคืนเงิน: คิวซ้าย + แผงจัดการขวา 440 */
+.admin-requests__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.admin-requests__refresh {
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  border: none;
+}
+
+.admin-requests {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.admin-requests__list {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-requests__list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--color-tint-light);
+  padding: 1.5rem 1.9rem;
+}
+
+.admin-requests__list-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}
+
+/* แต่ละแถวเป็นปุ่มจริง ๆ ไม่ใช่ div ที่ผูก onClick — คีย์บอร์ดโฟกัสและกด
+   Enter เลือกคำขอได้เหมือนเมาส์ */
+.admin-requests__row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  text-align: left;
+  padding: 1.35rem 1.9rem;
+  border-top: 1px solid #f2ecfd;
+  background: #fff;
+  font-family: inherit;
+}
+
+.admin-requests__row:nth-of-type(odd) {
+  background: #fbf9ff;
+}
+
+.admin-requests__row--selected {
+  background: var(--color-tint-light);
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.admin-requests__thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: block;
+}
+
+.admin-requests__row-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.admin-requests__row-name {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-heading);
+}
+
+.admin-requests__row-reward {
+  font-size: 0.98rem;
+  color: var(--color-muted-purple);
+}
+
+.admin-requests__row-meta {
+  font-size: 0.88rem;
+  color: var(--color-faint-purple);
+}
+
+.admin-requests__row-status {
+  flex-shrink: 0;
+}
+
+/* แผงจัดการการจัดส่ง */
+.admin-requests__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.admin-requests__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-requests__panel-head h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--color-heading);
+}
+
+.admin-requests__divider {
+  border: none;
+  border-top: 2px solid var(--color-tint-light);
+  width: 100%;
+  margin: 0;
+}
+
+.admin-requests__facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-requests__fact {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.admin-requests__fact dt {
+  font-size: 0.98rem;
+  color: var(--color-muted-purple);
+  white-space: nowrap;
+}
+
+.admin-requests__fact dd {
+  margin: 0 0 0 auto;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  text-align: right;
+}
+
+.admin-requests__address {
+  padding: 1.15rem 1.35rem;
+  border-radius: 1rem;
+  background: var(--color-panel-tint);
+}
+
+.admin-requests__address-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.admin-requests__address-body {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+.admin-requests__panel .dash-btn {
+  width: 100%;
+  text-align: center;
+}
+
+.admin-requests__ship {
+  padding: 1rem;
+  font-size: 1.05rem;
+}
+
+.admin-requests__cancel {
+  background: #fff;
+  color: var(--color-danger-text);
+  border: 2px solid var(--color-danger-text);
+}
+
+.admin-requests__cancel:hover:not(:disabled) {
+  background: var(--color-danger-bg);
+}
+
+.admin-requests__note {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-faint-purple);
+}
+
+
+
+/* ---------- ปุ่มเดินสถานะจัดส่งทีละขั้น (0055) ---------- */
+
+.admin-requests__steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.9rem;
+}
+
+.admin-requests__step {
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+/* ขั้นที่ผ่านมาแล้ว — ยังกดได้เพื่อแก้ข้อมูลย้อนหลัง แต่ไม่ควรเด่นเท่าขั้นถัดไป */
+.admin-requests__step--past {
+  opacity: 0.6;
+}
+
+.admin-requests__step--now {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* หลักฐานการรับของที่ลูกค้าแนบมาตอนกดยืนยัน (0085) */
+.admin-requests__proof {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.admin-requests__proof-img {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid #eee4fb;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1280px) {
+  .admin-requests {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-requests {
+    gap: 1.25rem;
+  }
+
+  .admin-requests__list-header,
+  .admin-requests__row {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .admin-requests__list-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .admin-requests__panel-head h2 {
+    font-size: 1.18rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-requests__header-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-requests__list-header {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  /* แถวคำขอ: รูป | ข้อมูล | สถานะ — บนจอแคบให้ข้อมูลตกลงมาเต็มแถวใต้รูป
+     ไม่งั้นชื่อของรางวัลเหลือไม่กี่ตัวอักษร */
+  .admin-requests__row {
+    flex-wrap: wrap;
+    gap: 0.6rem 0.85rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .admin-requests__row-info {
+    flex: 1 1 100%;
+    order: 1;
+  }
+
+  .admin-requests__thumb {
+    width: 48px;
+    height: 48px;
+  }
+
+  .admin-requests__row-name {
+    font-size: 1.05rem;
+  }
+
+  .admin-requests__panel-head {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  /* หัวข้อ/ค่าเรียงข้างกันไม่พอกว้างแล้ว — ลงล่างแทน */
+  .admin-requests__fact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  /* ปุ่มเดินสถานะสองคอลัมน์บีบชื่อขั้น ("จัดส่งแล้ว" ฯลฯ) จนตกบรรทัด */
+  .admin-requests__steps {
+    grid-template-columns: 1fr;
+  }
+}

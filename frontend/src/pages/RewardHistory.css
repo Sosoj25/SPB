@@ -1,0 +1,626 @@
+/* ประวัติการแลกรางวัล — การ์ดใบเดียวครอบรายการทั้งหมด แถวคั่นด้วยเส้นบาง
+   และสลับพื้นเข้ม/อ่อนแบบเดียวกับตารางฝั่งแอดมิน */
+.reward-history {
+  min-height: 100%;
+  background: var(--color-page-bg);
+}
+
+.reward-history__main {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+.reward-history__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.reward-history__back:hover {
+  text-decoration: underline;
+}
+
+.reward-history__title {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-history__intro {
+  margin: 0 0 2.25rem;
+  font-size: 1.05rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-history__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.reward-history__tab {
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.reward-history__tab:hover {
+  background: var(--color-card-tint);
+}
+
+.reward-history__tab--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.reward-history__tab--active:hover {
+  background: var(--color-primary-dark);
+}
+
+.reward-history__empty {
+  margin: 0;
+  color: var(--color-muted-purple);
+  font-size: 1.05rem;
+}
+
+.reward-history__blank {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 3.5rem 3rem;
+  background: #fff;
+  border-radius: 40px;
+  box-shadow: var(--shadow-card);
+}
+
+.reward-history__cta {
+  padding: 0.85rem 1.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.reward-history__cta:hover {
+  background: var(--color-primary-dark);
+}
+
+.reward-history__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.reward-history__row {
+  display: flex;
+  align-items: center;
+  /* แผงติดตามการจัดส่งกางลงมาเป็นบรรทัดเต็มใต้แถว จึงต้องให้ห่อบรรทัดได้ */
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.6rem 2.5rem;
+}
+
+.reward-history__row + .reward-history__row {
+  border-top: 1px solid #f2ecfd;
+}
+
+.reward-history__row:nth-child(even) {
+  background: #fbf9ff;
+}
+
+/* คูปองใบที่เพิ่งแลกมา (มาจาก ?code= หลังกดแลกสำเร็จ) */
+.reward-history__row--new {
+  background: var(--color-tint-light);
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+/* แถวที่ของถึงแล้วแต่ยังรอลูกค้ากดยืนยัน — ไฮไลต์แบบเดียวกับใบที่เพิ่งแลก
+   แต่คนละสี เพราะอันนี้คือ "มีอะไรให้ทำ" ไม่ใช่ "นี่คือใบที่เพิ่งได้มา" */
+.reward-history__row--await {
+  background: #fffaf0;
+  box-shadow: inset 4px 0 0 var(--color-gold);
+}
+
+.reward-history__await {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-warning-text);
+}
+
+.reward-history__thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.reward-history__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.reward-history__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-history__meta {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-history__detail {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #b8adc7;
+}
+
+.reward-history__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.reward-history__points {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.reward-history__badge {
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reward-history__badge--success {
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.reward-history__badge--neutral {
+  background: var(--color-neutral-bg);
+  color: var(--color-muted-purple);
+}
+
+.reward-history__badge--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.reward-history__badge--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.reward-history__badge--muted {
+  background: var(--color-neutral-bg);
+  color: var(--color-faint-purple);
+}
+
+
+
+/* ปุ่มคัดลอกรหัสคูปอง — โผล่เฉพาะใบที่ยังใช้ได้ ใบที่ใช้/หมดอายุแล้วคัดลอก
+   ไปก็ไม่มีประโยชน์ */
+.reward-history__copy {
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reward-history__copy:hover {
+  background: var(--color-card-tint);
+}
+
+/* ใบที่ส่งถึงบ้าน: เปิดกล่องเดียวกันแต่เป็นรายละเอียดการแลก ไม่ใช่ QR รับของ
+   จึงไม่ต้องเด่นเท่าปุ่มหลักของใบที่ต้องไปรับเอง */
+.reward-history__detail-toggle {
+  padding: 0.5rem 1.15rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.reward-history__detail-toggle:hover {
+  background: var(--color-card-tint);
+}
+
+/* ปุ่มเปิดบัตรรับของรางวัล — ตัวบัตรอยู่ใน RewardPassDialog
+   ทำเป็นปุ่มทึบสีหลักปุ่มเดียวของแถว เพราะนี่คือสิ่งที่ลูกค้าต้องกดจริงตอนยืน
+   อยู่หน้าเคาน์เตอร์ ส่วนคัดลอกรหัส/ดูสถานะเป็นทางเลือกรอง */
+.reward-history__qr-toggle {
+  padding: 0.5rem 1.15rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(102, 16, 242, 0.28);
+  cursor: pointer;
+}
+
+.reward-history__qr-toggle:hover {
+  background: var(--color-primary-dark);
+}
+
+.reward-history__pager {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.75rem;
+}
+
+/* ---------- ติดตามการจัดส่งของรางวัล (0055) ---------- */
+
+.reward-history__track {
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ใบที่รอกดยืนยัน: ปุ่มเดียวกันแต่เป็นปุ่มทึบสีเขียว — เป็นงานเดียวที่เหลือ
+   ของใบนี้ จึงควรเด่นกว่าปุ่มดูรายละเอียด/คัดลอกรหัสรอบ ๆ */
+.reward-history__track--cta {
+  padding: 0.5rem 1.15rem;
+  background: var(--color-success);
+  color: #fff;
+  font-size: 0.86rem;
+  box-shadow: 0 6px 16px rgba(40, 167, 69, 0.28);
+}
+
+.reward-history__track--cta:hover {
+  background: var(--color-success-dark);
+}
+
+.reward-history__shipping {
+  flex-basis: 100%;
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #eee4fb;
+}
+
+/* แถบความคืบหน้าแนวนอน — เส้นเชื่อมวาดด้วย ::before ของแต่ละขั้น ยกเว้นขั้นแรก
+   เพื่อไม่ให้มีหางยื่นออกไปทางซ้ายของจุดแรก */
+.reward-track {
+  display: flex;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.reward-track__step {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.reward-track__step::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 50%;
+  left: -50%;
+  height: 2px;
+  background: #e7dcf8;
+}
+
+.reward-track__step:first-child::before {
+  display: none;
+}
+
+.reward-track__step--done::before {
+  background: var(--color-primary);
+}
+
+.reward-track__dot {
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e7dcf8;
+}
+
+.reward-track__step--done .reward-track__dot {
+  background: var(--color-primary);
+}
+
+.reward-track__step--now .reward-track__dot {
+  box-shadow: 0 0 0 4px var(--color-tint-light);
+}
+
+.reward-track__label {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--color-muted-purple);
+}
+
+.reward-track__step--done .reward-track__label {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-track__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+}
+
+.reward-track__meta dt {
+  color: var(--color-muted-purple);
+}
+
+.reward-track__meta dd {
+  margin: 0;
+  color: var(--color-heading);
+}
+
+.reward-track__code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.reward-track__note {
+  margin: 0 0 0.75rem;
+  font-size: 0.83rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-track__log {
+  margin: 0 0 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: var(--color-surface-soft);
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.reward-track__log li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.reward-track__log li + li {
+  margin-top: 0.35rem;
+}
+
+.reward-track__log-time {
+  min-width: 6.5rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-track__log-label {
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-track__log-note {
+  color: var(--color-muted-purple);
+}
+
+.reward-track__error {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-danger-text);
+}
+
+/* กล่องยืนยันรับของ + ช่องแนบรูปหลักฐาน (0085) */
+.reward-track__confirm-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+}
+
+.reward-track__proof-label {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-muted-purple);
+}
+
+.reward-track__proof-pick {
+  align-self: flex-start;
+  padding: 0.5rem 1.15rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-primary);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reward-track__proof-pick:hover {
+  background: var(--color-card-tint);
+}
+
+/* ซ่อนช่องไฟล์จริงแต่ยังโฟกัสด้วยคีย์บอร์ดได้ (display:none จะหลุดจากลำดับแท็บ) */
+.reward-track__proof-pick input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.reward-track__proof-preview {
+  align-self: flex-start;
+  width: min(14rem, 100%);
+  border-radius: 16px;
+  border: 1px solid #eee4fb;
+}
+
+.reward-track__confirm {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reward-track__confirm:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.reward-track__done {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-success-text, #1c7c54);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 780px) {
+  .reward-history__row {
+    flex-wrap: wrap;
+    padding: 1.35rem 1.5rem;
+  }
+
+  .reward-history__side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .reward-track__label {
+    font-size: 0.65rem;
+  }
+
+  .reward-track__meta {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  .reward-track__meta dt {
+    margin-top: 0.4rem;
+  }
+
+  .reward-history__main {
+    padding: 1.5rem 0.9rem 2.5rem;
+  }
+
+  .reward-history__back {
+    font-size: 1rem;
+  }
+
+  .reward-history__intro {
+    font-size: 0.98rem;
+  }
+
+  .reward-history__tabs {
+    gap: 0.5rem;
+  }
+
+  .reward-history__tab {
+    padding: 0.55rem 1rem;
+    font-size: 0.92rem;
+  }
+
+  .reward-history__row {
+    padding: 1.1rem;
+    gap: 0.85rem;
+  }
+
+  .reward-history__thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .reward-history__name {
+    font-size: 1.08rem;
+  }
+
+  .reward-history__blank {
+    padding: 2.25rem 1.25rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .reward-history__main {
+    padding: 1.25rem 0.6rem 2.5rem;
+  }
+
+  .reward-history__row {
+    padding: 0.9rem;
+  }
+
+  /* แถวสถานะฝั่งขวา (แต้ม + ป้ายสถานะ + ปุ่มคัดลอก) เคยแบ่งซ้าย-ขวาเต็มแถว
+     พอกว้างไม่พอมันจะดันปุ่มคัดลอกตกไปคนละบรรทัดกับป้าย ให้ชิดซ้ายเรียงกัน */
+  .reward-history__side {
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+}

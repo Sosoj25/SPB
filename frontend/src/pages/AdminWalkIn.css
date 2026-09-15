@@ -1,0 +1,406 @@
+/* หน้ารับลูกค้า Walk-in — เลือกสนาม/ช่วงเวลา และสรุปยอดที่เคาน์เตอร์ */
+
+.walkin {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.walkin__main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-width: 0;
+}
+
+.walkin__step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.walkin__step-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.walkin__step-head h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-heading);
+}
+
+.walkin__step-num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walkin__sports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.walkin__facilities {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.walkin__facility {
+  background: var(--color-surface-soft);
+  border: 3px solid transparent;
+  border-radius: 1.25rem;
+  padding: 1.1rem 1.3rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.walkin__facility--active {
+  background: var(--color-tint-light);
+  border-color: var(--color-primary);
+}
+
+.walkin__facility--full {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.walkin__facility-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--color-heading);
+}
+
+.walkin__facility--full .walkin__facility-name {
+  color: var(--color-disabled-text);
+}
+
+.walkin__facility-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.walkin__facility--full .walkin__facility-desc {
+  color: var(--color-disabled-text);
+}
+
+.walkin__facility-price {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-primary);
+}
+
+.walkin__facility--full .walkin__facility-price {
+  color: var(--color-disabled-text);
+}
+
+.walkin__slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.walkin__slot {
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+}
+
+.walkin__slot--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.walkin__slot--full {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.walkin__slots-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-muted-purple);
+}
+
+.walkin__customer-search {
+  position: relative;
+}
+
+.walkin__customer-results {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.walkin__customer-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.9rem 1.3rem;
+  background: #fff;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.walkin__customer-result:hover {
+  background: var(--color-page-bg);
+}
+
+.walkin__customer-result span:last-child {
+  color: var(--color-muted-purple);
+}
+
+.walkin__customer-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--color-tint-light);
+  border-radius: 1.25rem;
+  padding: 1rem 1.4rem;
+}
+
+.walkin__customer-chip-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.walkin__customer-chip-phone {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-muted-purple);
+}
+
+.walkin__divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.walkin__divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--color-tint-light);
+}
+
+.walkin__divider p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-faint-purple);
+  white-space: nowrap;
+}
+
+.walkin__fields {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.walkin__fields .dash-field {
+  flex: 1;
+  min-width: 220px;
+}
+
+.walkin__side {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.walkin__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.walkin__summary h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--color-heading);
+}
+
+.walkin__summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1rem;
+}
+
+.walkin__summary-row span {
+  color: var(--color-muted-purple);
+}
+
+.walkin__summary-row strong {
+  color: var(--color-heading);
+  text-align: right;
+}
+
+.walkin__summary-row--total strong {
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.walkin__summary-divider {
+  border: none;
+  border-top: 2px solid var(--color-tint-light);
+  margin: 0;
+}
+
+.walkin__summary-subhead {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-heading);
+}
+
+.walkin__payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.walkin__confirm-btn {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-pill);
+  width: 100%;
+}
+
+.walkin__confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.walkin__summary-code {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-heading);
+}
+
+.walkin__summary-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-faint-purple);
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .walkin {
+    grid-template-columns: 1fr;
+  }
+
+  .walkin__side {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .walkin {
+    gap: 1.25rem;
+  }
+
+  .walkin__main {
+    gap: 1.25rem;
+  }
+
+  .walkin__step {
+    gap: 1rem;
+  }
+
+  .walkin__step-head h2 {
+    font-size: 1.15rem;
+  }
+
+  .walkin__step-num {
+    width: 30px;
+    height: 30px;
+    font-size: 0.95rem;
+  }
+
+  /* การ์ดสนามขั้นต่ำ 190px ได้แค่คอลัมน์เดียวบนจอ 360px อยู่แล้ว — ลดขั้นต่ำ
+     ลงให้ได้สองคอลัมน์ จะได้เห็นตัวเลือกมากกว่าหนึ่งอันโดยไม่ต้องเลื่อน */
+  .walkin__facilities {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.6rem;
+  }
+
+  .walkin__facility {
+    padding: 0.85rem 0.95rem;
+  }
+
+  .walkin__facility-name {
+    font-size: 1rem;
+  }
+
+  .walkin__slot {
+    font-size: 0.92rem;
+    padding: 0.75rem 1rem;
+  }
+
+  /* ช่องกรอกข้อมูลลูกค้าขอความกว้างขั้นต่ำ 220px ซึ่งบนจอ 360px ยังดันให้
+     สองช่องพยายามอยู่แถวเดียวกันจนล้น */
+  .walkin__fields {
+    gap: 0.9rem;
+  }
+
+  .walkin__fields .dash-field {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .walkin__customer-result,
+  .walkin__customer-chip {
+    padding: 0.8rem 1rem;
+    gap: 0.6rem;
+  }
+
+  .walkin__summary h2 {
+    font-size: 1.2rem;
+  }
+}

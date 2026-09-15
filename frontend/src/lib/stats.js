@@ -1,10 +1,10 @@
-import { supabase } from "./supabase";
-
 // ตัวเลขบนหน้าแรก
 //
 // bookings_select_own ทำให้ client นับการจองรวมทั้งระบบไม่ได้ (เห็นแต่ของตัวเอง)
 // จึงต้องผ่าน platform_stats() ที่เป็น security definer และคืนออกมาแค่ "จำนวน"
 // ไม่ใช่ตัวข้อมูล
+import { supabase } from "./supabase";
+
 export async function fetchPlatformStats() {
   const { data, error } = await supabase.rpc("platform_stats");
 

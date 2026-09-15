@@ -1,3 +1,5 @@
+/* แถบเมนูบนหน้าก่อนล็อกอิน */
+
 .nav-header {
   position: relative;
   z-index: 5;
@@ -11,7 +13,7 @@
   box-shadow: 0 4px 4px rgba(102, 16, 242, 0.5);
 }
 
-.nav-header__avatar {
+.nav-header__spacer {
   width: 42px;
   height: 42px;
   margin-right: auto;
@@ -20,8 +22,11 @@
 .nav-header__logo {
   width: 72px;
   height: 72px;
+  padding: 3px;
+  box-sizing: border-box;
   border-radius: 50%;
-  object-fit: cover;
+  background-color: var(--color-logo-bg);
+  object-fit: contain;
   box-shadow: 0 4px 4px var(--color-shadow-gold);
   flex-shrink: 0;
 }
@@ -33,6 +38,7 @@
 }
 
 .nav-header__link {
+  position: relative;
   font-weight: 700;
   font-size: 1.05rem;
   white-space: nowrap;
@@ -40,6 +46,22 @@
 
 .nav-header__link:hover {
   color: var(--color-primary);
+}
+
+/* ทรงเดียวกับ .app-header__link--active ของหัวเว็บฝั่งล็อกอินแล้ว */
+.nav-header__link--active {
+  color: var(--color-primary);
+}
+
+.nav-header__link--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.45rem;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--color-gold);
 }
 
 .nav-header__cta {
@@ -112,12 +134,99 @@
   opacity: 0;
 }
 
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1100px) {
+  .nav-header {
+    gap: 1.4rem;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .nav-header__links {
+    gap: 1.2rem;
+  }
+
+  .nav-header__link {
+    font-size: 1rem;
+  }
+
+  .nav-header__logo {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* จอแคบ — ลิงก์ทั้งห้ากับโลโก้กับปุ่มเข้าสู่ระบบไม่มีทางอยู่บรรทัดเดียวกันได้
+   จึงแยกเป็นสองแถว: โลโก้กับปุ่มเข้าสู่ระบบอยู่แถวบน ลิงก์ทั้งหมดลงแถวล่าง
+   ตัวคั่น (.nav-header__spacer) ที่เดิมเป็นแค่ตัวถ่วงให้โลโก้อยู่กลาง ถูกใช้
+   เป็นตัวบังคับขึ้นบรรทัดใหม่แทน — ไม่ต้องเพิ่ม element ใหม่ให้เดสก์ท็อป */
 @media (max-width: 900px) {
   .nav-header {
-    gap: 1rem;
+    gap: 0.75rem 1rem;
+    padding: 0.7rem 1rem;
+    justify-content: flex-start;
   }
-  .nav-header__avatar,
-  .nav-header__cta {
+
+  .nav-header__spacer {
+    order: 2;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 0;
     margin: 0;
+  }
+
+  .nav-header__logo {
+    order: 1;
+    width: 52px;
+    height: 52px;
+  }
+
+  .nav-header__cta {
+    order: 1;
+    margin-left: auto;
+    padding: 0.6rem 1.3rem;
+  }
+
+  .nav-header__links {
+    order: 3;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1rem;
+  }
+
+  .nav-header__link {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-header {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .nav-header__logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .nav-header__cta {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.92rem;
+  }
+
+  .nav-header__links {
+    gap: 0.4rem 0.85rem;
+  }
+
+  .nav-header__link {
+    font-size: 0.9rem;
   }
 }

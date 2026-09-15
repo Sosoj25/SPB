@@ -1,9 +1,12 @@
+/* โครงหน้าหลังบ้าน — แถบเมนูข้าง แถบหัว และลิ้นชักเมนูบนจอแคบ */
+
 .dash {
   --dash-sidebar-bg: #fff;
   --dash-sidebar-text: var(--color-heading);
   --dash-sidebar-muted: var(--color-muted-purple);
   --dash-nav-hover: var(--color-tint-light);
   --dash-profile-bg: var(--color-tint-light);
+  --dash-badge-bg: #d93347;
   display: flex;
   min-height: 100%;
   background: var(--color-page-bg);
@@ -26,7 +29,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-height: 100vh;
+  /* 100dvh = ความสูงที่เห็นจริงบนมือถือ (ดูเหตุผลเต็มใน index.css) */
+  min-height: 100dvh;
   position: sticky;
   top: 0;
 }
@@ -41,8 +45,11 @@
 .dash__brand-logo {
   width: 56px;
   height: 56px;
+  padding: 2px;
+  box-sizing: border-box;
   border-radius: 50%;
-  object-fit: cover;
+  background-color: var(--color-logo-bg);
+  object-fit: contain;
   flex-shrink: 0;
 }
 
@@ -81,6 +88,9 @@
 }
 
 .dash__nav-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 1rem 0 0.2rem 1rem;
   font-weight: 700;
   font-size: 0.8rem;
@@ -105,6 +115,59 @@
 .dash__nav-item--active {
   background: var(--color-primary);
   color: #fff;
+}
+
+/* ป้ายตัวเลขคิวข้างเมนู (ดู QueueBadge ใน DashboardLayout.jsx) — ชื่อเมนูกิน
+   พื้นที่ที่เหลือทั้งหมด ป้ายจึงถูกดันไปชิดขวาเสมอ ทุกแถวจะได้เรียงเป็นคอลัมน์
+   เดียวกัน ไม่ลอยตามความยาวของชื่อเมนู */
+.dash__nav-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash__nav-badge {
+  flex-shrink: 0;
+  min-width: 1.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: var(--dash-badge-bg);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* แถวที่เปิดอยู่พื้นหลังเป็นม่วงเข้ม ป้ายสีแดงบนม่วงอ่านแทบไม่ออก — สลับเป็น
+   พื้นขาวตัวหนังสือม่วงแทน ให้ยังเด่นเท่าเดิมโดยไม่ต้องแข่งสีกับพื้น */
+.dash__nav-item--active .dash__nav-badge {
+  background: #fff;
+  color: var(--color-primary);
+}
+
+.dash__nav-label-badge {
+  min-width: 1.3rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--dash-badge-bg);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ตัวเลขเปล่า ๆ ไม่บอกอะไรกับ screen reader — ซ่อนคำว่า "รอดำเนินการ" ไว้ให้
+   อ่านนำหน้าเลข แต่ไม่กินที่บนจอ */
+.dash__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .dash__profile {
@@ -213,6 +276,25 @@
   white-space: nowrap;
 }
 
+/* ปุ่มเปิด/ปิดเสียงแจ้งเตือน — ทรงกลมข้างกระดิ่ง เล็กกว่าเพราะเป็นสวิตช์ค้าง
+   ไม่ใช่ปุ่มที่ต้องเรียกสายตา ต่างจากกระดิ่งที่แบกตัวเลขคิวอยู่ */
+.dash__sound {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-tint-light);
+  border-radius: 50%;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.dash__sound[aria-checked="false"] {
+  opacity: 0.65;
+}
+
 .dash__bell-panel {
   position: absolute;
   top: calc(100% + 0.6rem);
@@ -244,6 +326,13 @@
   background: var(--color-tint-light);
 }
 
+/* "ใหม่ N" ต่อท้ายชื่อคิว — บอกว่ามีของเพิ่งเข้ามาวันนี้ ต่างจากตัวเลขคิวรวม
+   ทางขวาที่เป็นยอดค้างสะสมทั้งหมด */
+.dash__bell-new {
+  color: var(--color-danger-text);
+  font-weight: 700;
+}
+
 .dash__bell-count {
   flex-shrink: 0;
   min-width: 1.6rem;
@@ -268,16 +357,240 @@
   gap: 1.75rem;
 }
 
-@media (max-width: 1100px) {
-  .dash {
-    flex-direction: column;
-  }
+/* ---------------------------------------------------------------------------
+   ปุ่มขีดสามขีด + ฉากหลังของลิ้นชัก — ซ่อนไว้บนเดสก์ท็อปที่แถบข้างกางอยู่แล้ว
+   --------------------------------------------------------------------------- */
+.dash__burger {
+  display: none;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--color-tint-light);
+  flex-shrink: 0;
+}
+
+.dash--superadmin .dash__burger {
+  background: #3d1a80;
+}
+
+.dash__burger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 22px;
+  height: 16px;
+}
+
+.dash__burger-icon > span {
+  display: block;
+  height: 2.5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  transition:
+    transform 0.2s ease,
+    opacity 0.15s ease;
+}
+
+.dash--superadmin .dash__burger-icon > span {
+  background: #d9ccf7;
+}
+
+.dash__burger-icon--open > span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.dash__burger-icon--open > span:nth-child(2) {
+  opacity: 0;
+}
+
+.dash__burger-icon--open > span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+.dash__burger-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 1.25rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--dash-badge-bg);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+.dash__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+  background: rgba(26, 8, 56, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+/* แล็ปท็อปเล็ก — แถบข้างยังอยู่ แค่แคบลงและบีบระยะห่างของเนื้อหา */
+@media (max-width: 1200px) {
   .dash__sidebar {
-    width: 100%;
-    min-height: auto;
-    position: static;
+    width: 272px;
+    padding: 1.25rem 1rem;
   }
+
+  .dash__nav-item {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.98rem;
+    gap: 0.6rem;
+  }
+
+  .dash__brand-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .dash__brand-name {
+    font-size: 1rem;
+  }
+
   .dash__body {
-    padding: 2rem 1.25rem;
+    padding: 2.25rem 1.75rem;
+  }
+
+  .dash__title {
+    font-size: 1.85rem;
+  }
+}
+
+/* แท็บเล็ตลงมา — แถบข้างออกจากสายการไหลของหน้า กลายเป็นลิ้นชักที่เลื่อนเข้ามา
+   ทับเนื้อหา เรียกด้วยปุ่มขีดสามขีดบนแถบหัว */
+@media (max-width: 1100px) {
+  .dash__sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 30;
+    width: min(84vw, 320px);
+    min-height: 100dvh;
+    overflow-y: auto;
+    box-shadow: 4px 0 24px rgba(43, 10, 99, 0.2);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.22s;
+  }
+
+  .dash__sidebar--open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .dash__scrim--open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .dash__burger {
+    display: flex;
+  }
+
+  .dash__body {
+    padding: 1.75rem 1.25rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .dash__topbar {
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .dash__topbar-heading {
+    min-width: 0;
+    flex: 1 1 8rem;
+  }
+
+  .dash__title {
+    font-size: 1.5rem;
+  }
+
+  .dash__subtitle {
+    font-size: 0.95rem;
+  }
+
+  .dash__content {
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .dash__body {
+    padding: 1.25rem 0.85rem 2.5rem;
+  }
+
+  .dash__title {
+    font-size: 1.3rem;
+  }
+
+  .dash__subtitle {
+    font-size: 0.88rem;
+  }
+
+  .dash__bell-trigger {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  /* แถบหัวขึ้นบรรทัดใหม่ได้บนจอแคบ กระดิ่งจึงอาจไปตกอยู่ต้นบรรทัดล่าง —
+     ดันให้ชิดขวาเสมอ แผงที่เกาะขอบขวาของมัน (right: 0) จะได้ไม่ยื่นพ้นจอ
+     ตัวที่ดันคือปุ่มเสียงซึ่งอยู่ก่อนกระดิ่ง ทั้งคู่จึงไปชิดขวาติดกันเป็นคู่
+     ไม่ใช่ปุ่มเสียงค้างอยู่กลางแถบแล้วกระดิ่งหนีไปอยู่คนละฝั่ง */
+  .dash__sound {
+    margin-left: auto;
+  }
+
+  .dash__bell-panel {
+    width: min(300px, calc(100vw - 1.75rem));
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .dash__content {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .dash__body {
+    padding: 1rem 0.6rem 2.5rem;
+  }
+
+  .dash__title {
+    font-size: 1.18rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash__burger-icon > span,
+  .dash__scrim,
+  .dash__sidebar {
+    transition: none;
   }
 }

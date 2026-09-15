@@ -1,0 +1,468 @@
+/* หน้าแลกรางวัล — สัดส่วนมาจากแบบ Figma กว้าง 1920 (เนื้อหา 1520 เว้นขอบ
+   ข้างละ 200) ย่อลงมาเป็น max-width 1520 + padding แบบยืดหยุ่น สีทุกตัวใช้
+   ตัวแปรใน index.css ที่ตรงกับค่าที่แบบใช้อยู่แล้ว */
+.rewards {
+  min-height: 100%;
+  background: var(--color-page-bg);
+}
+
+.rewards__main {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+.rewards__title {
+  margin: 0 0 0.6rem;
+  font-size: clamp(2rem, 3.5vw, 2.9rem);
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.rewards__intro {
+  margin: 0 0 2.5rem;
+  font-size: 1.05rem;
+  color: var(--color-muted-purple);
+}
+
+.rewards__empty {
+  padding: 3rem 0;
+  color: var(--color-muted-purple);
+  font-size: 1.05rem;
+}
+
+/* การ์ดแต้ม — ไล่สีม่วงเข้มไปม่วงอ่อนตามแบบ */
+.rewards__balance {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2.6rem 3rem;
+  border-radius: 56px;
+  background: linear-gradient(90deg, var(--color-primary), #c9a8ff);
+  box-shadow: var(--shadow-card);
+}
+
+.rewards__balance-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rewards__balance-label {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--color-on-primary-soft);
+}
+
+.rewards__balance-value {
+  margin: 0.4rem 0 1rem;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.rewards__progress {
+  height: 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.rewards__progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  transition: width 0.35s ease;
+}
+
+.rewards__balance-hint {
+  margin: 0.9rem 0 0;
+  font-size: 1rem;
+  color: var(--color-on-primary-soft);
+}
+
+.rewards__balance-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  flex-shrink: 0;
+}
+
+.rewards__balance-btn {
+  padding: 0.95rem 1.6rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rewards__balance-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.rewards__balance-btn--solid {
+  background: #fff;
+  color: var(--color-primary);
+}
+
+.rewards__balance-btn--solid:hover {
+  background: var(--color-on-primary-soft);
+}
+
+/* ป้ายจำนวนของที่รอกดยืนยันรับของ — เกาะอยู่บนปุ่มประวัติการแลกรางวัล */
+.rewards__balance-badge {
+  min-width: 22px;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: #d93347;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* แท็บหมวดหมู่ */
+.rewards__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin: 2.5rem 0 1.75rem;
+}
+
+.rewards__tab {
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-tint-light);
+  color: var(--color-heading);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.rewards__tab:hover {
+  background: var(--color-card-tint);
+}
+
+.rewards__tab--active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.rewards__tab--active:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ตารางการ์ดของรางวัล — 3 คอลัมน์ในแบบ ย่อลงเองตามความกว้างจอ */
+.rewards__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.reward-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 48px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.reward-card__media {
+  height: 240px;
+  flex-shrink: 0;
+}
+
+.reward-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 2.25rem;
+}
+
+.reward-card__name {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.reward-card__desc {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--color-muted-purple);
+}
+
+.reward-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.reward-card__points {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+/* เส้นคั่นที่ยืดเต็มช่องว่างระหว่างราคากับปุ่ม ตามแบบ */
+.reward-card__rule {
+  flex: 1;
+  min-width: 0.5rem;
+  height: 1px;
+  background: var(--color-tint-light);
+}
+
+.reward-card__cta {
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reward-card__cta:hover {
+  background: var(--color-primary-dark);
+}
+
+.reward-card__cta--disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.reward-card__cta--disabled:hover {
+  background: var(--color-disabled-bg);
+}
+
+.reward-card__limit {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-faint-purple);
+}
+
+
+
+/* กล่อง "วิธีสะสมแต้ม" — อัตราที่แสดงมาจาก reward_settings ที่แอดมินตั้ง
+   ไม่ใช่เลขที่เขียนตายไว้ในหน้านี้ */
+.rewards__howto {
+  margin-top: 1.5rem;
+  padding: 2rem 2.25rem;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.rewards__howto-title {
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+
+.rewards__howto-body {
+  margin: 0 0 1.25rem;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--color-muted-purple);
+}
+
+.rewards__howto-list {
+  margin: 0 0 1.25rem;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--color-muted-purple);
+}
+
+.rewards__howto-list strong {
+  color: var(--color-primary);
+}
+
+.rewards__howto-cta {
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.rewards__howto-cta:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ของรางวัลที่แอดมินปิดไว้ — ลูกค้าไม่เห็นการ์ดนี้เลย เห็นเฉพาะแอดมิน */
+.reward-card--hidden {
+  opacity: 0.75;
+  outline: 2px dashed var(--color-faint-purple);
+  outline-offset: -2px;
+}
+
+.reward-card__flag {
+  margin-left: 0.6rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-neutral-bg);
+  color: var(--color-faint-purple);
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* ===========================================================================
+   Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
+   จอกว้างไปจอแคบ
+
+   ต้องอยู่ท้ายไฟล์และเรียงแบบนี้เท่านั้น เพราะเงื่อนไขจอไม่ได้เพิ่ม
+   specificity ให้ตัวเอง เวลาชนกับกฎอื่นจึงตัดสินด้วย "ใครอยู่ทีหลัง" ล้วน ๆ
+   กฎฐานที่เขียนไว้ใต้บล็อกพวกนี้จะทับกฎของจอแคบทิ้งเงียบ ๆ และบล็อก 1200px
+   ที่อยู่ใต้บล็อก 640px ก็จะชนะที่จอ 360px ด้วย เพราะเงื่อนไขเป็นจริงทั้งคู่
+   =========================================================================== */
+
+@media (max-width: 1200px) {
+  .rewards__main {
+    padding: 2.5rem 1.5rem 3.5rem;
+  }
+
+  /* การ์ดขั้นต่ำ 340px + ระยะห่าง 2rem ทำให้แท็บเล็ตได้แค่คอลัมน์เดียวทั้งที่
+     พื้นที่พอสองคอลัมน์ — ลดขั้นต่ำลงแทนการล็อกจำนวนคอลัมน์ */
+  .rewards__grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .reward-card__body {
+    padding: 1.5rem;
+  }
+
+  .reward-card__media {
+    height: 190px;
+  }
+
+  .reward-card__name {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .rewards__balance {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 2rem 1.75rem;
+    border-radius: 36px;
+  }
+
+  .rewards__balance-actions {
+    flex-direction: row;
+  }
+
+  .rewards__balance-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .rewards__main {
+    padding: 1.5rem 0.9rem 2.5rem;
+  }
+
+  .rewards__intro {
+    font-size: 0.98rem;
+  }
+
+  .rewards__balance {
+    padding: 1.35rem;
+    border-radius: 26px;
+    gap: 1.25rem;
+  }
+
+  .rewards__balance-label {
+    font-size: 1rem;
+  }
+
+  .rewards__balance-btn {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .rewards__tabs {
+    gap: 0.5rem;
+  }
+
+  .rewards__tab {
+    padding: 0.55rem 1rem;
+    font-size: 0.92rem;
+  }
+
+  .rewards__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reward-card__body {
+    padding: 1.15rem;
+    gap: 0.7rem;
+  }
+
+  .reward-card__media {
+    height: 170px;
+  }
+
+  .reward-card__desc {
+    font-size: 0.98rem;
+  }
+
+  /* ชื่อรางวัล/แต้ม/ปุ่มแลก เรียงข้างกันไม่พอ — เส้นคั่นกลางถูกถอด แล้วปุ่ม
+     กินเต็มความกว้างเป็นเป้ากดเดียวที่ชัดเจน */
+  .reward-card__footer {
+    flex-wrap: wrap;
+  }
+
+  .reward-card__rule {
+    display: none;
+  }
+
+  .reward-card__cta {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .rewards__howto {
+    padding: 1.25rem;
+  }
+
+  .rewards__howto-title {
+    font-size: 1.15rem;
+  }
+
+  .rewards__howto-body,
+  .rewards__howto-list {
+    font-size: 0.98rem;
+  }
+
+  .rewards__howto-cta {
+    display: block;
+    text-align: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .rewards__main {
+    padding: 1.25rem 0.6rem 2.5rem;
+  }
+
+  /* ปุ่มสองอันใต้ยอดแต้ม (แลกรางวัล / ประวัติ) แคบจนชื่อหักคำ — เรียงลงล่าง */
+  .rewards__balance-actions {
+    flex-direction: column;
+  }
+}

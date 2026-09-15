@@ -1,3 +1,4 @@
+// ปุ่มมาตรฐานของแอป — variant กำหนดสี/สไตล์ (ดู Button.css)
 import "./Button.css";
 
 export default function Button({ children, variant = "primary", onClick, type = "button", fullWidth = true, disabled = false }) {

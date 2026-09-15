@@ -1,3 +1,4 @@
+// นโยบายคืนเงินแถวเดียวของระบบ — ใช้ทั้งหน้าลูกค้าและหน้าตั้งค่าของแอดมิน
 import { useAsyncData } from "./useAsyncData";
 import { fetchRefundPolicy } from "../lib/refundPolicy";
 
