@@ -13,3 +13,10 @@ Thumbs.db
 
 # Supabase CLI cache
 supabase/.temp
+
+# เอกสารรายงาน/นำเสนอ — เก็บไว้ในเครื่องอย่างเดียว ไฟล์ .docx เป็น binary
+# ขนาดหลักสิบ MB ที่ git ทำ diff ไม่ได้ commit ทุกรอบที่แก้จะบวม repo ทิ้งไว้
+*.docx
+_report_assets/
+prompt-สไลด์นำเสนอ.md
+สคริปต์นำเสนอ_SPORTSBOOKING.md
