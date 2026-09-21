@@ -1,5 +1,6 @@
 // รายการจองทั้งระบบสำหรับแอดมิน — กรองตามสถานะ/วันที่ และดูรายละเอียดแต่ละรายการ
 import { useState } from "react";
+import { X } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, SearchBox, Pill, Pagination } from "../components/DashboardWidgets";
 import { useAdminBookings } from "../hooks/useAdmin";
@@ -46,7 +47,7 @@ function BookingDetailModal({ booking, onClose }) {
         <div className="dash-modal__header">
           <h2>รายละเอียดการจอง {booking.booking_code}</h2>
           <button type="button" className="dash-modal__close" onClick={onClose} aria-label="ปิด">
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 

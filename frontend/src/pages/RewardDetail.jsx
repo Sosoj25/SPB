@@ -5,6 +5,7 @@
 // สต๊อก โควตา และตัวเลือกอีกรอบ ปุ่มที่ปิดอยู่ตรงนี้จึงเป็นเรื่องของ UX
 // ไม่ใช่ด่านความปลอดภัย
 import { useState } from "react";
+import { ArrowLeft, Check, Gift, TriangleAlert } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import AlertDialog from "../components/AlertDialog";
 import AppHeader from "../components/AppHeader";
@@ -66,7 +67,7 @@ export default function RewardDetail() {
         <AppHeader />
         <main className="reward-detail__main">
           <Link to="/rewards" className="reward-detail__back">
-            <span aria-hidden="true">←</span> กลับสู่หน้าแลกรางวัล
+            <ArrowLeft size={15} aria-hidden="true" /> กลับสู่หน้าแลกรางวัล
           </Link>
           <p className="reward-detail__empty">{error || "ไม่พบของรางวัลนี้"}</p>
         </main>
@@ -153,7 +154,7 @@ export default function RewardDetail() {
 
       <main className="reward-detail__main">
         <Link to="/rewards" className="reward-detail__back">
-          <span aria-hidden="true">←</span> กลับสู่หน้าแลกรางวัล
+          <ArrowLeft size={15} aria-hidden="true" /> กลับสู่หน้าแลกรางวัล
         </Link>
 
         <div className="reward-detail__layout">
@@ -301,10 +302,14 @@ export default function RewardDetail() {
             )}
 
             {!affordable && (
-              <p className="reward-detail__warn">⚠ แต้มของคุณไม่พอสำหรับของรางวัลนี้</p>
+              <p className="reward-detail__warn">
+                <TriangleAlert size={15} aria-hidden="true" /> แต้มของคุณไม่พอสำหรับของรางวัลนี้
+              </p>
             )}
             {limit.soldOut && (
-              <p className="reward-detail__warn">⚠ ของรางวัลนี้หมดแล้ว ลองดูรางวัลชิ้นอื่น</p>
+              <p className="reward-detail__warn">
+                <TriangleAlert size={15} aria-hidden="true" /> ของรางวัลนี้หมดแล้ว ลองดูรางวัลชิ้นอื่น
+              </p>
             )}
             {formError && <p className="reward-detail__error">{formError}</p>}
 
@@ -329,7 +334,7 @@ export default function RewardDetail() {
 
       {confirming && (
         <AlertDialog
-          icon="🎁"
+          icon={<Gift size={26} aria-hidden="true" />}
           title="ยืนยันการแลกรางวัล"
           description="แต้มจะถูกตัดทันทีที่กดยืนยัน และขอคืนไม่ได้ไม่ว่ากรณีใด"
           facts={[
@@ -353,7 +358,7 @@ export default function RewardDetail() {
       {done && (
         <AlertDialog
           tone="success"
-          icon="✓"
+          icon={<Check size={26} aria-hidden="true" />}
           title="แลกรางวัลสำเร็จ"
           description="เก็บรหัสคูปองนี้ไว้ยื่นให้เจ้าหน้าที่ ดูซ้ำหรือเปิด QR ได้ทุกเมื่อในประวัติการแลกรางวัล"
           facts={[

@@ -1,5 +1,7 @@
 // หน้ารวมข่าว — ข่าวเด่นด้านบน กรองตามหมวด และป้าย "ยังไม่ได้อ่าน" รายข่าว
 import { useMemo, useState } from "react";
+import useReveal from "../hooks/useReveal";
+import { Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import NewsHighlightCarousel from "../components/NewsHighlightCarousel";
@@ -19,6 +21,7 @@ function meta(item) {
 }
 
 export default function News() {
+  const revealRef = useReveal();
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
   const { news, loading, error } = usePublicNews();
   const navigate = useNavigate();
@@ -66,8 +69,8 @@ export default function News() {
     <div className="news">
       <AppHeader />
 
-      <main className="news__main">
-        <section className="news__masthead">
+      <main className="news__main" ref={revealRef}>
+        <section className="news__masthead" data-reveal>
           <p className="news__eyebrow">
             <span className="news__eyebrow-text">NEWSROOM</span>
           </p>
@@ -121,12 +124,16 @@ export default function News() {
             <div className="news__rule news__rule--strong" />
             <p className="news__section-label">ข่าวทั้งหมด</p>
 
+            {/* หน่วงการจางเข้ามาทีละใบตามคอลัมน์ ไม่ใช่ตามลำดับทั้งหมด ไม่งั้น
+                การ์ดใบท้าย ๆ ของหน้ายาว ๆ จะรอนานจนดูเหมือนค้าง */}
             <section className="news__grid">
-              {filtered.map((item) => (
+              {filtered.map((item, index) => (
                 <article
                   key={item.id}
                   className="news__card"
                   data-category={item.category}
+                  data-reveal
+                  data-reveal-delay={index % 3}
                   role="button"
                   tabIndex={0}
                   onClick={() => openArticle(item.id)}
@@ -141,7 +148,10 @@ export default function News() {
                       <div className="news__card-placeholder" aria-hidden="true" />
                     )}
                     {item.isFeatured && (
-                      <span className="news__card-featured-badge">⭐ ข่าวเด่น</span>
+                      <span className="news__card-featured-badge">
+                        <Star size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" />{" "}
+                        ข่าวเด่น
+                      </span>
                     )}
                     {unreadIds.has(item.id) && (
                       <span className="news__card-unread-dot" aria-label="ข่าวที่ยังไม่ได้อ่าน" />

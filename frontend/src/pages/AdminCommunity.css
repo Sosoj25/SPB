@@ -113,6 +113,9 @@
 }
 
 .admin-cm__flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--color-danger-text);
@@ -137,6 +140,9 @@
 }
 
 .admin-cm__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   font-size: 0.9rem;
   color: var(--color-muted-purple);
 }
@@ -343,6 +349,9 @@
 }
 
 .admin-cm__category-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   padding: 0.2rem 0.35rem;
   font-size: 1rem;
@@ -356,6 +365,9 @@
 /* ป้ายแทนปุ่มแก้/ลบของหมวดระบบ ("รีวิว") — โทนทองชุดเดียวกับรีวิวในหน้าชุมชน
    บอกว่าแถวนี้แตะไม่ได้ ไม่ใช่ปุ่มที่บังเอิญกดไม่ติด */
 .admin-cm__category-system {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   padding: 0.25rem 0.7rem;
   border-radius: var(--radius-pill);
   background: var(--color-warning-bg);

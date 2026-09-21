@@ -4,6 +4,7 @@
 // กล่องพรีวิวราคาเรียก compute_facility_price จริงเสมอ ตัวเลขที่แอดมินเห็น
 // จึงเป็นตัวเลขเดียวกับที่ลูกค้าจะถูกเรียกเก็บ
 import { useRef, useState } from "react";
+import { TriangleAlert, X } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import ImageCropModal from "../components/ImageCropModal";
 import { Switch, Badge } from "../components/DashboardWidgets";
@@ -1524,7 +1525,7 @@ export default function AdminFacilityPricing() {
                     aria-label={`ลบส่วนลด ${discount.label}`}
                     onClick={() => handleDeleteDiscount(discount)}
                   >
-                    ✕
+                    <X size={14} aria-hidden="true" />
                   </button>
                 </div>
               ))}
@@ -1728,7 +1729,10 @@ export default function AdminFacilityPricing() {
 
             {lowResImages.length > 0 && (
               <section className="photos-warning">
-                <p className="photos-warning__title">⚠ พบรูปความละเอียดต่ำ {lowResImages.length} รูป</p>
+                <p className="photos-warning__title">
+                  <TriangleAlert size={15} aria-hidden="true" /> พบรูปความละเอียดต่ำ{" "}
+                  {lowResImages.length} รูป
+                </p>
                 <p className="photos-warning__text">
                   {lowResImages
                     .map((img) => `"${img.caption || "ไม่มีชื่อ"}" (${img.width} × ${img.height} px)`)

@@ -11,6 +11,7 @@
 // (รายการห้องเป็น overflow-y: auto, การ์ดรอบนอกเป็น overflow: hidden,
 // หน้าต่างแชทลอยก็กล่องปิดเหมือนกัน) แผงที่กางอยู่ข้างในจึงถูกตัดหายทั้งใบ
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ArrowLeft, Ban, Bell, BellOff, CircleCheck, LogOut, Mail, Pin, PinOff, Trash2 } from "lucide-react";
 import { createPortal } from "react-dom";
 import {
   MUTE_OPTIONS,
@@ -222,13 +223,21 @@ export default function ConversationMenu({
             role="menuitem"
             onClick={() => setShowMute(false)}
           >
-            ← ย้อนกลับ
+            <ArrowLeft size={15} aria-hidden="true" /> ย้อนกลับ
           </button>
         </>
       ) : (
         <>
           <button type="button" className="conv-menu__item" role="menuitem" onClick={handlePin}>
-            {conversation.isPinned ? "📌 เลิกปักหมุด" : "📌 ปักหมุดไว้บนสุด"}
+            {conversation.isPinned ? (
+              <>
+                <PinOff size={15} aria-hidden="true" /> เลิกปักหมุด
+              </>
+            ) : (
+              <>
+                <Pin size={15} aria-hidden="true" /> ปักหมุดไว้บนสุด
+              </>
+            )}
           </button>
 
           {muted ? (
@@ -238,7 +247,7 @@ export default function ConversationMenu({
               role="menuitem"
               onClick={handleUnmute}
             >
-              🔔 เปิดการแจ้งเตือน
+              <Bell size={15} aria-hidden="true" /> เปิดการแจ้งเตือน
               <span className="conv-menu__hint">{muteLabel(conversation.mutedUntil)}</span>
             </button>
           ) : (
@@ -249,7 +258,7 @@ export default function ConversationMenu({
               aria-haspopup="true"
               onClick={() => setShowMute(true)}
             >
-              🔕 ปิดการแจ้งเตือน
+              <BellOff size={15} aria-hidden="true" /> ปิดการแจ้งเตือน
               <span className="conv-menu__chevron" aria-hidden="true">
                 ›
               </span>
@@ -257,7 +266,7 @@ export default function ConversationMenu({
           )}
 
           <button type="button" className="conv-menu__item" role="menuitem" onClick={handleUnread}>
-            ✉️ ทำเครื่องหมายว่ายังไม่อ่าน
+            <Mail size={15} aria-hidden="true" /> ทำเครื่องหมายว่ายังไม่อ่าน
           </button>
 
           <button
@@ -266,7 +275,7 @@ export default function ConversationMenu({
             role="menuitem"
             onClick={handleClear}
           >
-            🗑 ลบแชท
+            <Trash2 size={15} aria-hidden="true" /> ลบแชท
           </button>
 
           {/* บล็อกได้เฉพาะห้องคู่ — ในกลุ่มยังมีคนอื่นอยู่ด้วย การบล็อก
@@ -278,7 +287,15 @@ export default function ConversationMenu({
               role="menuitem"
               onClick={handleBlock}
             >
-              {conversation.blockedByMe ? "✅ เลิกบล็อกผู้ใช้นี้" : "🚫 บล็อกผู้ใช้นี้"}
+              {conversation.blockedByMe ? (
+                <>
+                  <CircleCheck size={15} aria-hidden="true" /> เลิกบล็อกผู้ใช้นี้
+                </>
+              ) : (
+                <>
+                  <Ban size={15} aria-hidden="true" /> บล็อกผู้ใช้นี้
+                </>
+              )}
             </button>
           )}
 
@@ -289,7 +306,7 @@ export default function ConversationMenu({
               role="menuitem"
               onClick={handleLeave}
             >
-              🚪 ออกจากกลุ่ม
+              <LogOut size={15} aria-hidden="true" /> ออกจากกลุ่ม
             </button>
           )}
         </>

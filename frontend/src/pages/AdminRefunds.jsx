@@ -1,5 +1,6 @@
 // คิวคำขอคืนเงินของแอดมิน — ตรวจสอบ อนุมัติ/ปฏิเสธ แนบสลิปโอนคืน และแก้นโยบาย
 import { useRef, useState } from "react";
+import { Check, Paperclip, RefreshCw, Search } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pagination, Pill, StatCard } from "../components/DashboardWidgets";
 import { useAdminRefundStats, useAdminRefunds } from "../hooks/useAdmin";
@@ -146,7 +147,13 @@ function ReviewPanel({
           disabled={viewingPaymentSlip}
           onClick={() => onViewPaymentSlip(refund)}
         >
-          {viewingPaymentSlip ? "กำลังเปิด..." : "🔍 ตรวจสอบการชำระเงินเดิม"}
+          {viewingPaymentSlip ? (
+            "กำลังเปิด..."
+          ) : (
+            <>
+              <Search size={15} aria-hidden="true" /> ตรวจสอบการชำระเงินเดิม
+            </>
+          )}
         </button>
         {refund.payment_proof_slip_path && (
           <button
@@ -155,7 +162,13 @@ function ReviewPanel({
             disabled={viewingCustomerProof}
             onClick={() => onViewCustomerProof(refund)}
           >
-            {viewingCustomerProof ? "กำลังเปิด..." : "📎 ดูสลิปที่ลูกค้าแนบ (จ่ายผ่าน QR)"}
+            {viewingCustomerProof ? (
+              "กำลังเปิด..."
+            ) : (
+              <>
+                <Paperclip size={15} aria-hidden="true" /> ดูสลิปที่ลูกค้าแนบ (จ่ายผ่าน QR)
+              </>
+            )}
           </button>
         )}
       </div>
@@ -210,7 +223,13 @@ function ReviewPanel({
               onApprove(refund, override);
             }}
           >
-            {busy ? "กำลังบันทึก..." : "✓ อนุมัติคำขอ"}
+            {busy ? (
+              "กำลังบันทึก..."
+            ) : (
+              <>
+                <Check size={15} aria-hidden="true" /> อนุมัติคำขอ
+              </>
+            )}
           </button>
           <button
             type="button"
@@ -242,7 +261,13 @@ function ReviewPanel({
             disabled={busy}
             onClick={() => fileInputRef.current?.click()}
           >
-            {busy ? "กำลังอัปโหลด..." : "📎 แนบสลิปโอนคืน"}
+            {busy ? (
+              "กำลังอัปโหลด..."
+            ) : (
+              <>
+                <Paperclip size={15} aria-hidden="true" /> แนบสลิปโอนคืน
+              </>
+            )}
           </button>
           <button
             type="button"
@@ -266,7 +291,7 @@ function ReviewPanel({
               className="dash-btn admin-refunds__attachment"
               onClick={() => onViewSlip(refund)}
             >
-              📎 ดูสลิปโอนคืน
+              <Paperclip size={15} aria-hidden="true" /> ดูสลิปโอนคืน
             </button>
           )}
         </>
@@ -623,7 +648,7 @@ export default function AdminRefunds() {
             className="dash-btn admin-refunds__refresh"
             onClick={() => setReloadKey((k) => k + 1)}
           >
-            ↻ รีเฟรชรายการ
+            <RefreshCw size={14} aria-hidden="true" /> รีเฟรชรายการ
           </button>
         </div>
       }

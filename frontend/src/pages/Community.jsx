@@ -2,6 +2,7 @@
 //
 // โพสต์หมวด "รีวิว" ไม่อยู่ในฟีดนี้ (แยกไปหน้า CommunityReviews)
 import { Fragment, useEffect, useMemo, useState } from "react";
+import { Image as ImageIcon, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import CreatePostDialog from "../components/CreatePostDialog";
@@ -267,7 +268,7 @@ export default function Community() {
                 เหลือไว้เป็นทางเข้า จะได้ยังหาเจอจากหน้าชุมชนเหมือนเดิม */}
             <Link className="cm__reviews-link cm__side-block--reviews" to="/community/reviews">
               <span className="cm__reviews-link-star" aria-hidden="true">
-                ★
+                <Star size={19} fill="currentColor" strokeWidth={0} />
               </span>
               <span className="cm__reviews-link-text">
                 <strong>รีวิวสนาม</strong>
@@ -341,7 +342,7 @@ export default function Community() {
                 className="cm__composer-photo-btn"
                 onClick={() => setComposer({ openFilePicker: true })}
               >
-                🖼️ <span>รูปภาพ/วิดีโอ</span>
+                <ImageIcon size={17} aria-hidden="true" /> <span>รูปภาพ/วิดีโอ</span>
               </button>
 
               {error && <p className="cm__error">{error}</p>}

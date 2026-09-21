@@ -1,5 +1,6 @@
 // ขั้นที่ 3 ของการจอง — เลือกวันจากปฏิทินและช่วงเวลา (เลือกได้หลายช่วงถ้าต่อกัน)
 import { useMemo, useState } from "react";
+import { Building2 } from "lucide-react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import AlertDialog from "../components/AlertDialog";
@@ -474,7 +475,7 @@ export default function BookingSchedule() {
           ของรางวัลใน RewardDetail */}
       {confirming && firstSlot && (
         <AlertDialog
-          icon="🏟"
+          icon={<Building2 size={26} aria-hidden="true" />}
           title="ยืนยันการจอง"
           description="ระบบจะกันช่วงเวลานี้ไว้ให้ทันทีแล้วพาไปหน้าชำระเงิน ถ้าไม่ชำระภายในเวลาที่กำหนด ช่วงเวลาจะถูกปล่อยคืนให้คนอื่นจองต่อ"
           facts={[

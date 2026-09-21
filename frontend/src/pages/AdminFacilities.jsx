@@ -1,5 +1,6 @@
 // จัดการกีฬาและสนาม — เพิ่ม/แก้/ลบ จัดลำดับ และตั้งค่าหน้าสิ่งอำนวยความสะดวก
 import { useEffect, useState } from "react";
+import { Check, X } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Switch } from "../components/DashboardWidgets";
 import { useAdminAmenities, useFacilitiesPageSettings } from "../hooks/useAmenities";
@@ -342,7 +343,7 @@ function AmenityEditPanel({
                 disabled={factBusy}
                 onClick={() => saveEditFact(fact)}
               >
-                ✓
+                <Check size={15} aria-hidden="true" />
               </button>
               <button
                 type="button"
@@ -350,7 +351,7 @@ function AmenityEditPanel({
                 aria-label="ยกเลิกการแก้ไข"
                 onClick={() => setEditingFactId(null)}
               >
-                ✕
+                <X size={15} aria-hidden="true" />
               </button>
             </>
           ) : confirmRemoveFactId === fact.id ? (
@@ -394,7 +395,7 @@ function AmenityEditPanel({
                 aria-label="ลบข้อมูล"
                 onClick={() => setConfirmRemoveFactId(fact.id)}
               >
-                ✕
+                <X size={15} aria-hidden="true" />
               </button>
             </>
           )}

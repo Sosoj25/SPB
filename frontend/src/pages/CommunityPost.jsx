@@ -1,5 +1,6 @@
 // หน้ารายละเอียดโพสต์ — เนื้อโพสต์เต็ม แกลเลอรีรูป และคอมเมนต์พร้อมการตอบกลับ
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Bookmark, Flag, Heart, MessageCircle, Pencil, Star, Trash2, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import ClampText from "../components/ClampText";
@@ -248,7 +249,8 @@ export default function CommunityPost() {
 
       <main className="cm-post__main">
         <button type="button" className="cm-back" onClick={() => navigate(backTo)}>
-          {backTo === "/community" ? "← กลับสู่ชุมชน" : "← กลับไปหน้ารีวิวสนาม"}
+          <ArrowLeft size={15} aria-hidden="true" />{" "}
+          {backTo === "/community" ? "กลับสู่ชุมชน" : "กลับไปหน้ารีวิวสนาม"}
         </button>
 
         {loading && !post && <p className="cm__empty">กำลังโหลดโพสต์...</p>}
@@ -278,7 +280,13 @@ export default function CommunityPost() {
                 </div>
                 <span className="cm__post-tags">
                   <span className={`cm-chip ${review ? "cm-chip--review" : ""}`}>
-                    {review ? "★ รีวิวสนาม" : post.category}
+                    {review ? (
+                      <>
+                        <Star size={14} fill="currentColor" strokeWidth={0} aria-hidden="true" /> รีวิวสนาม
+                      </>
+                    ) : (
+                      post.category
+                    )}
                   </span>
 
                   {/* เมนู ⋯ — เจ้าของได้แก้ไข/ลบ คนอื่นได้ส่งข้อความ/รายงาน
@@ -310,7 +318,7 @@ export default function CommunityPost() {
                                   setEditingOpen(true);
                                 }}
                               >
-                                ✎ แก้ไขโพสต์
+                                <Pencil size={15} aria-hidden="true" /> แก้ไขโพสต์
                               </button>
                             )}
                             <button
@@ -319,7 +327,7 @@ export default function CommunityPost() {
                               role="menuitem"
                               onClick={handleDeletePost}
                             >
-                              🗑 ลบโพสต์
+                              <Trash2 size={15} aria-hidden="true" /> ลบโพสต์
                             </button>
                           </>
                         ) : (
@@ -330,7 +338,7 @@ export default function CommunityPost() {
                               role="menuitem"
                               onClick={handleMessage}
                             >
-                              💬 ส่งข้อความ
+                              <MessageCircle size={15} aria-hidden="true" /> ส่งข้อความ
                             </button>
                             <button
                               type="button"
@@ -341,7 +349,7 @@ export default function CommunityPost() {
                                 setReportTarget({ postId: post.id });
                               }}
                             >
-                              ⚑ รายงาน
+                              <Flag size={15} aria-hidden="true" /> รายงาน
                             </button>
                           </>
                         )}
@@ -370,13 +378,11 @@ export default function CommunityPost() {
                   className={`cm-action ${post.isLiked ? "cm-action--on" : ""}`}
                   onClick={handleLike}
                 >
-                  <span className="cm-action__icon" aria-hidden="true">
-                    {post.isLiked ? "♥" : "♡"}
-                  </span>{" "}
+                  <Heart size={17} aria-hidden="true" fill={post.isLiked ? "currentColor" : "none"} />{" "}
                   ถูกใจ {post.likeCount}
                 </button>
                 <span className="cm-action">
-                  <span className="cm-action__icon" aria-hidden="true">💬</span> ความคิดเห็น{" "}
+                  <MessageCircle size={17} aria-hidden="true" /> ความคิดเห็น{" "}
                   {post.commentCount}
                 </span>
                 <button
@@ -384,7 +390,7 @@ export default function CommunityPost() {
                   className={`cm-action ${post.isBookmarked ? "cm-action--on" : ""}`}
                   onClick={handleBookmark}
                 >
-                  <span className="cm-action__icon" aria-hidden="true">🔖</span>{" "}
+                  <Bookmark size={17} aria-hidden="true" fill={post.isBookmarked ? "currentColor" : "none"} />{" "}
                   {post.isBookmarked ? "บันทึกแล้ว" : "บันทึก"}
                 </button>
               </div>
@@ -401,7 +407,7 @@ export default function CommunityPost() {
                   <div className="cm-post__reply-banner">
                     กำลังตอบกลับ <strong>{replyTo.author}</strong>
                     <button type="button" onClick={() => setReplyTo(null)} aria-label="ยกเลิกการตอบกลับ">
-                      ✕
+                      <X size={15} aria-hidden="true" />
                     </button>
                   </div>
                 )}

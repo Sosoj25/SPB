@@ -4,6 +4,18 @@
 // ?code=... มาจากหน้า RewardDetail หลังแลกสำเร็จ ใช้ไฮไลต์คูปองใบที่เพิ่งได้
 // ไม่ให้ต้องไล่หาเองในรายการที่ยาวขึ้นเรื่อย ๆ
 import { useEffect, useMemo, useState } from "react";
+import {
+  ArrowLeft,
+  Building2,
+  Camera,
+  Check,
+  Copy,
+  Package,
+  QrCode,
+  ReceiptText,
+  RefreshCw,
+  Truck,
+} from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import RewardMedia from "../components/RewardMedia";
@@ -81,7 +93,15 @@ function CopyCode({ code }) {
 
   return (
     <button type="button" className="reward-history__copy" onClick={handleCopy}>
-      {copied ? "✓ คัดลอกแล้ว" : "⧉ คัดลอกรหัส"}
+      {copied ? (
+        <>
+          <Check size={15} aria-hidden="true" /> คัดลอกแล้ว
+        </>
+      ) : (
+        <>
+          <Copy size={15} aria-hidden="true" /> คัดลอกรหัส
+        </>
+      )}
     </button>
   );
 }
@@ -238,7 +258,17 @@ function ShippingPanel({ item, onConfirmed }) {
 
               <label className="reward-track__proof-pick">
                 <input type="file" accept="image/*" onChange={handlePickProof} />
-                <span>{proofFile ? "🔁 เปลี่ยนรูป" : "📷 เลือกรูป"}</span>
+                <span>
+                  {proofFile ? (
+                    <>
+                      <RefreshCw size={15} aria-hidden="true" /> เปลี่ยนรูป
+                    </>
+                  ) : (
+                    <>
+                      <Camera size={15} aria-hidden="true" /> เลือกรูป
+                    </>
+                  )}
+                </span>
               </label>
 
               {proofPreview && (
@@ -257,7 +287,13 @@ function ShippingPanel({ item, onConfirmed }) {
             disabled={confirming}
             onClick={handleConfirm}
           >
-            {confirming ? "กำลังยืนยัน..." : "✓ ยืนยันว่าได้รับของรางวัลแล้ว"}
+            {confirming ? (
+              "กำลังยืนยัน..."
+            ) : (
+              <>
+                <Check size={15} aria-hidden="true" /> ยืนยันว่าได้รับของรางวัลแล้ว
+              </>
+            )}
           </button>
         </div>
       )}
@@ -307,7 +343,7 @@ export default function RewardHistory() {
             /rewards ตรง ๆ แทน navigate(-1) เพราะทางหลังจะเด้งกลับไปหน้ารายละเอียด
             ของใบที่เพิ่งแลก ซึ่งไม่ใช่ที่ที่ผู้ใช้ตั้งใจจะกลับไป */}
         <Link to="/rewards" className="reward-history__back">
-          <span aria-hidden="true">←</span> กลับสู่หน้าแลกรางวัล
+          <ArrowLeft size={15} aria-hidden="true" /> กลับสู่หน้าแลกรางวัล
         </Link>
 
         <h1 className="reward-history__title">ประวัติการแลกรางวัล</h1>
@@ -384,7 +420,8 @@ export default function RewardHistory() {
 
                     {awaitingReceipt && (
                       <p className="reward-history__await">
-                        📦 {isPickupRedemption(item) ? "พร้อมให้รับที่สนามแล้ว" : "ส่งถึงแล้ว"} —
+                        <Package size={15} aria-hidden="true" />{" "}
+                        {isPickupRedemption(item) ? "พร้อมให้รับที่สนามแล้ว" : "ส่งถึงแล้ว"} —
                         กรุณากดยืนยันการรับของเพื่อปิดรายการนี้
                       </p>
                     )}
@@ -411,7 +448,15 @@ export default function RewardHistory() {
                         aria-haspopup="dialog"
                         onClick={() => setPassItem(item)}
                       >
-                        {shipped ? "🧾 รายละเอียดการแลก" : "▦ แสดง QR รับของรางวัล"}
+                        {shipped ? (
+                          <>
+                            <ReceiptText size={15} aria-hidden="true" /> รายละเอียดการแลก
+                          </>
+                        ) : (
+                          <>
+                            <QrCode size={15} aria-hidden="true" /> แสดง QR รับของรางวัล
+                          </>
+                        )}
                       </button>
                     )}
 
@@ -431,13 +476,21 @@ export default function RewardHistory() {
                         aria-expanded={openId === item.id}
                         onClick={() => setOpenId(openId === item.id ? null : item.id)}
                       >
-                        {openId === item.id
-                          ? "ซ่อนสถานะ"
-                          : awaitingReceipt
-                            ? "✓ ยืนยันรับของ"
-                            : isPickupRedemption(item)
-                              ? "🏟 สถานะการรับของ"
-                              : "📦 ติดตามการจัดส่ง"}
+                        {openId === item.id ? (
+                          "ซ่อนสถานะ"
+                        ) : awaitingReceipt ? (
+                          <>
+                            <Check size={15} aria-hidden="true" /> ยืนยันรับของ
+                          </>
+                        ) : isPickupRedemption(item) ? (
+                          <>
+                            <Building2 size={15} aria-hidden="true" /> สถานะการรับของ
+                          </>
+                        ) : (
+                          <>
+                            <Truck size={15} aria-hidden="true" /> ติดตามการจัดส่ง
+                          </>
+                        )}
                       </button>
                     )}
                   </div>

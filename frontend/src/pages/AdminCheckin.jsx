@@ -1,5 +1,6 @@
 // หน้าเคาน์เตอร์รับลูกค้าประจำวัน — เช็คอิน/เช็คเอาต์ พิมพ์ใบเสร็จ และตัดคูปอง
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, Printer, RefreshCw, TriangleAlert } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pill, StatCard } from "../components/DashboardWidgets";
 import CouponRedeemBox from "../components/CouponRedeemBox";
@@ -325,9 +326,11 @@ export default function AdminCheckin() {
       headerExtra={
         <div className="admin-checkin__header-actions">
           <Pill onClick={() => setPrintTarget({ entry: sampleEntry(), isSample: true })}>
-            🖨 ตั้งค่าการพิมพ์
+            <Printer size={15} aria-hidden="true" /> ตั้งค่าการพิมพ์
           </Pill>
-          <Pill onClick={handleRefresh}>↻ รีเฟรชรายการ</Pill>
+          <Pill onClick={handleRefresh}>
+            <RefreshCw size={14} aria-hidden="true" /> รีเฟรชรายการ
+          </Pill>
         </div>
       }
     >
@@ -442,7 +445,9 @@ export default function AdminCheckin() {
                       </Pill>
                     )}
                     {entry.checkedInAt && (
-                      <Pill onClick={() => openPrint(entry)}>🖨 ใบเสร็จ</Pill>
+                      <Pill onClick={() => openPrint(entry)}>
+                        <Printer size={14} aria-hidden="true" /> ใบเสร็จ
+                      </Pill>
                     )}
                     {entry.checkedInAt && !entry.checkedOutAt && (
                       <>
@@ -542,7 +547,13 @@ export default function AdminCheckin() {
                     disabled={busyId === selectedEntry.id}
                     onClick={handleConfirmCheckin}
                   >
-                    {busyId === selectedEntry.id ? "กำลังเช็คอิน..." : "✓ ยืนยันเช็คอิน"}
+                    {busyId === selectedEntry.id ? (
+                      "กำลังเช็คอิน..."
+                    ) : (
+                      <>
+                        <Check size={15} aria-hidden="true" /> ยืนยันเช็คอิน
+                      </>
+                    )}
                   </button>
                 )}
                 {selectedEntry.checkedInAt && !selectedEntry.checkedOutAt && (
@@ -563,7 +574,7 @@ export default function AdminCheckin() {
                   className="admin-checkin__confirm-print"
                   onClick={() => openPrint(selectedEntry)}
                 >
-                  🖨 พิมพ์ใบเสร็จ
+                  <Printer size={15} aria-hidden="true" /> พิมพ์ใบเสร็จ
                 </button>
                 <button
                   type="button"
@@ -590,14 +601,18 @@ export default function AdminCheckin() {
                     {entry.sportName} · {entry.facilityName}
                   </p>
                 </div>
-                <Badge tone="success">✓</Badge>
+                <Badge tone="success">
+                      <Check size={13} aria-hidden="true" />
+                    </Badge>
               </div>
             ))}
           </section>
 
           {lateEntries.length > 0 && (
             <section className="admin-checkin__alert">
-              <p className="admin-checkin__alert-title">⚠ เลยเวลานัด {lateEntries.length} รายการ</p>
+              <p className="admin-checkin__alert-title">
+                <TriangleAlert size={15} aria-hidden="true" /> เลยเวลานัด {lateEntries.length} รายการ
+              </p>
               <p className="admin-checkin__alert-body">
                 {lateEntries[0].customerName} ({lateEntries[0].sportName}{" "}
                 {toHhMm(lateEntries[0].startTime)})

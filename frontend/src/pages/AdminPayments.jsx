@@ -1,5 +1,6 @@
 // คิวตรวจสอบการชำระเงินของแอดมิน — ดูสลิป อนุมัติ หรือปฏิเสธพร้อมเหตุผล
 import { useState } from "react";
+import { Check, Search, X } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pagination, Pill, StatCard } from "../components/DashboardWidgets";
 import { useAdminPaymentStats, useAdminPayments } from "../hooks/useAdmin";
@@ -65,7 +66,7 @@ function PaymentReferenceModal({ payment, onClose }) {
         <div className="dash-modal__header">
           <h2>อ้างอิงพร้อมเพย์ {payment.bookings?.booking_code ?? ""}</h2>
           <button type="button" className="dash-modal__close" onClick={onClose} aria-label="ปิด">
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 
@@ -138,7 +139,7 @@ function SlipReviewModal({
         <div className="dash-modal__header">
           <h2>ตรวจสลิป {payment.bookings?.booking_code ?? ""}</h2>
           <button type="button" className="dash-modal__close" onClick={onClose} aria-label="ปิด">
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 
@@ -195,7 +196,7 @@ function SlipReviewModal({
               title="เปิดรูปสลิปขนาดเต็มในแท็บใหม่"
               onClick={onReviewed}
             >
-              🔍 ขยายรูปเต็มขนาด
+              <Search size={15} aria-hidden="true" /> ขยายรูปเต็มขนาด
             </a>
           )}
           {waiting && (
@@ -416,7 +417,15 @@ export default function AdminPayments() {
                                 }`}
                                 onClick={() => openSlip(payment)}
                               >
-                                {locked ? "🔍 ดูสลิป" : "✓ ดูสลิปแล้ว"}
+                                {locked ? (
+                                  <>
+                                    <Search size={14} aria-hidden="true" /> ดูสลิป
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check size={14} aria-hidden="true" /> ดูสลิปแล้ว
+                                  </>
+                                )}
                               </button>
                             )}
                             {payment.gateway === "plernpay" && (

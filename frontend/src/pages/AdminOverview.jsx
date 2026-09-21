@@ -1,5 +1,6 @@
 // แดชบอร์ดหน้าแรกของแอดมิน — ตัวเลขวันนี้ กราฟรายได้ และรายการจองล่าสุด
 import { useState } from "react";
+import { CircleCheckBig, Clock, Gift, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pill, StatCard } from "../components/DashboardWidgets";
@@ -87,10 +88,10 @@ const REVENUE_SCALES = [
 const RECENT_BOOKINGS_LIMIT = 5;
 
 const QUICK_LINKS = [
-  { icon: "🏃", label: "รับลูกค้า Walk-in", to: "/admin/walk-in" },
-  { icon: "✓", label: "เช็คอิน", to: "/admin/checkin" },
-  { icon: "🕘", label: "ตารางเวลา", to: "/admin/schedule" },
-  { icon: "🎁", label: "จัดการรางวัล", to: "/admin/rewards" },
+  { Icon: UserPlus, label: "รับลูกค้า Walk-in", to: "/admin/walk-in" },
+  { Icon: CircleCheckBig, label: "เช็คอิน", to: "/admin/checkin" },
+  { Icon: Clock, label: "ตารางเวลา", to: "/admin/schedule" },
+  { Icon: Gift, label: "จัดการรางวัล", to: "/admin/rewards" },
 ];
 
 // รวมคิวที่แอดมินต้องมาตัดสินใจเอง ใช้ hook ชุดเดียวกับกระดิ่งแจ้งเตือนใน
@@ -386,7 +387,7 @@ export default function AdminOverview() {
                   {QUICK_LINKS.map((link) => (
                     <Link key={link.to} to={link.to} className="admin-quick__item">
                       <span className="admin-quick__icon" aria-hidden="true">
-                        {link.icon}
+                        <link.Icon size={20} />
                       </span>
                       <span>{link.label}</span>
                     </Link>

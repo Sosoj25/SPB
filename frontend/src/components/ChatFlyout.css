@@ -144,6 +144,13 @@
   color: var(--color-heading);
 }
 
+/* ป้ายสถานะห้อง (ปักหมุด / ปิดเสียง) แทรกอยู่ในบรรทัดชื่อห้อง จางกว่าชื่อ
+   เพราะเป็นข้อมูลรอง ไม่ใช่สิ่งที่ตาต้องอ่านก่อน */
+.chat-flyout__item-flag {
+  margin-inline-end: 0.25rem;
+  color: var(--color-muted-purple);
+}
+
 .chat-flyout__item-preview {
   overflow: hidden;
   text-overflow: ellipsis;

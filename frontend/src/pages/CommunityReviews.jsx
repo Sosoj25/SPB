@@ -6,6 +6,7 @@
 // โพสต์หมวดนี้ระบบสร้างให้เองตอนผู้ใช้ส่งรีวิวจากหน้าใบเสร็จ (submit_review()
 // ใน 0080) หน้านี้จึงไม่มีกล่องเขียนโพสต์ — มีแต่ตัวกรอง คะแนนรวม และรายการ
 import { useEffect, useState } from "react";
+import { Star, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import PostCard from "../components/PostCard";
@@ -138,15 +139,16 @@ export default function CommunityReviews() {
                 aria-label={`คะแนนเฉลี่ย ${stats.average.toFixed(1)} จาก 5 ดาว`}
               >
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <span
+                  <Star
                     key={star}
+                    size={22}
+                    fill="currentColor"
+                    strokeWidth={0}
                     className={`cmr__avg-star ${
                       star <= Math.round(stats.average) ? "cmr__avg-star--on" : ""
                     }`}
                     aria-hidden="true"
-                  >
-                    ★
-                  </span>
+                  />
                 ))}
               </span>
               <p className="cmr__count">จาก {stats.total.toLocaleString("th-TH")} รีวิว</p>
@@ -165,7 +167,9 @@ export default function CommunityReviews() {
                     onClick={() => changeRating(star)}
                     aria-pressed={rating === star}
                   >
-                    <span className="cmr__bar-label">{star} ★</span>
+                    <span className="cmr__bar-label">
+                      {star} <Star size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+                    </span>
                     <span className="cmr__bar-track">
                       <span
                         className="cmr__bar-fill"
@@ -207,7 +211,8 @@ export default function CommunityReviews() {
                   className="cm-chip cm__filter cmr__clear"
                   onClick={() => changeRating(rating)}
                 >
-                  {rating} ★ ✕
+                  {rating} <Star size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" />{" "}
+                  <X size={13} aria-hidden="true" />
                 </button>
               )}
             </div>

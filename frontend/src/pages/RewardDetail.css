@@ -249,6 +249,9 @@
 }
 
 .reward-detail__warn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0;
   padding: 1.1rem 1.35rem;
   border-radius: 18px;

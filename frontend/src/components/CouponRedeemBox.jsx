@@ -7,6 +7,7 @@
 // วางไว้ในหน้าเช็คอินเพราะเป็นหน้าที่เจ้าหน้าที่หน้าเคาน์เตอร์เปิดค้างไว้อยู่แล้ว
 // ทุกวัน ไม่ต้องสลับหน้าไปมาตอนลูกค้ายื่นรหัสให้
 import { useState } from "react";
+import { Ticket } from "lucide-react";
 import { markCouponUsed } from "../lib/rewards";
 import { errorMessage } from "../lib/errors";
 import "./CouponRedeemBox.css";
@@ -41,7 +42,9 @@ export default function CouponRedeemBox() {
 
   return (
     <section className="dash-card coupon-redeem">
-      <h2 className="coupon-redeem__title">🎟 ตัดคูปองหน้างาน</h2>
+      <h2 className="coupon-redeem__title">
+        <Ticket size={18} aria-hidden="true" /> ตัดคูปองหน้างาน
+      </h2>
       <p className="coupon-redeem__hint">
         สำหรับคูปองสิทธิพิเศษหรือของที่ลูกค้ามารับเองที่สนาม — คูปองส่วนลดค่าสนาม
         ลูกค้าใช้เองได้ตอนชำระเงิน ไม่ต้องตัดที่นี่

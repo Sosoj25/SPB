@@ -11,6 +11,9 @@
 }
 
 .coupon__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0;
   font-weight: 700;
   font-size: 1rem;
@@ -124,6 +127,9 @@
 }
 
 .coupon__applied-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0 0 0.2rem;
   font-weight: 700;
   font-size: 1rem;

@@ -4,6 +4,7 @@
 // ค่าที่ตั้งไว้ถูกเก็บลง localStorage ของเครื่องนั้น เพราะเป็นค่าของ
 // "เครื่องพิมพ์ที่เคาน์เตอร์นี้" ไม่ใช่ค่าที่ใช้ร่วมกันทั้งระบบ
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Printer, TriangleAlert, X } from "lucide-react";
 import {
   CLAMPS,
   DEFAULT_PRINT_SETTINGS,
@@ -252,7 +253,7 @@ export default function ReceiptPrintDialog({ entry, isSample = false, onClose })
             onClick={onClose}
             aria-label="ปิด"
           >
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </header>
 
@@ -289,7 +290,8 @@ export default function ReceiptPrintDialog({ entry, isSample = false, onClose })
 
             {overflowNotes.length > 0 && (
               <p className="receipt-print-dialog__warn">
-                ⚠ {overflowNotes.join(" และ ")} ส่วนที่ล้นจะถูกตัดทิ้งตอนพิมพ์ —
+                <TriangleAlert size={15} aria-hidden="true" /> {overflowNotes.join(" และ ")}{" "}
+                ส่วนที่ล้นจะถูกตัดทิ้งตอนพิมพ์ —
                 ขยายกระดาษ ลดขนาดตัวอักษร ลดช่องว่าง หรือปิดข้อมูลบางส่วน
               </p>
             )}
@@ -477,7 +479,13 @@ export default function ReceiptPrintDialog({ entry, isSample = false, onClose })
             disabled={printing}
             autoFocus
           >
-            {printing ? "กำลังส่งไปเครื่องพิมพ์..." : isSample ? "🖨 พิมพ์ทดสอบ" : "🖨 พิมพ์ใบเสร็จ"}
+            {printing ? (
+              "กำลังส่งไปเครื่องพิมพ์..."
+            ) : (
+              <>
+                <Printer size={15} aria-hidden="true" /> {isSample ? "พิมพ์ทดสอบ" : "พิมพ์ใบเสร็จ"}
+              </>
+            )}
           </button>
         </footer>
       </div>

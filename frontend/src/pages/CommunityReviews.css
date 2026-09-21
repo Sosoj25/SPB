@@ -130,8 +130,16 @@
 }
 
 .cmr__bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
   font-weight: 700;
   white-space: nowrap;
+}
+
+/* ทองเฉพาะดาว ตัวเลขข้างหน้าคงสีข้อความปกติ */
+.cmr__bar-label .lucide {
+  color: var(--color-gold);
 }
 
 .cmr__bar-track {
@@ -166,6 +174,9 @@
 
 /* ชิปบอกว่ากำลังกรองกี่ดาวอยู่ กดเพื่อเอาออก — โทนทองให้ต่างจากชิปแท็บม่วง */
 .cmr__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   background: var(--color-warning-bg);
   font-family: inherit;
   color: var(--color-warning-text);

@@ -1,5 +1,6 @@
 // หน้าต่างแชทลอยหนึ่งห้อง — ตัวจัดการว่าจะเปิดกี่ห้องอยู่ที่ ChatDock
 import { useEffect, useRef, useState } from "react";
+import { BellOff, Image as ImageIcon, Send, Smile, Trash2 } from "lucide-react";
 import ConversationMenu from "./ConversationMenu";
 import { useAuth } from "../context/useAuth";
 import { useConversationMessages } from "../hooks/useMessages";
@@ -201,7 +202,7 @@ export default function ChatPopup({
           {conversation.name}
           {isMuted(conversation.mutedUntil) && (
             <span className="chat-popup__muted" title="ปิดการแจ้งเตือนอยู่">
-              🔕
+              <BellOff size={13} aria-hidden="true" />
             </span>
           )}
         </span>
@@ -257,7 +258,7 @@ export default function ChatPopup({
                   aria-label="ลบข้อความนี้"
                   onClick={() => handleDeleteMessage(message)}
                 >
-                  🗑
+                  <Trash2 size={14} aria-hidden="true" />
                 </button>
               )}
 
@@ -314,7 +315,7 @@ export default function ChatPopup({
           disabled={sendingImage}
           onClick={() => fileRef.current?.click()}
         >
-          {sendingImage ? "…" : "🖼"}
+          {sendingImage ? "…" : <ImageIcon size={18} aria-hidden="true" />}
         </button>
         <input
           ref={fileRef}
@@ -331,7 +332,7 @@ export default function ChatPopup({
           aria-expanded={showEmoji}
           onClick={() => setShowEmoji((value) => !value)}
         >
-          😊
+          <Smile size={18} aria-hidden="true" />
         </button>
 
         <input
@@ -353,7 +354,7 @@ export default function ChatPopup({
           onClick={handleSend}
           disabled={!draft.trim()}
         >
-          ➤
+          <Send size={17} aria-hidden="true" />
         </button>
       </div>
       )}

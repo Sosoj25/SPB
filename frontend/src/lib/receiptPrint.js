@@ -445,7 +445,7 @@ function cardStyles(settings) {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       width: ${widthMm}mm;
-      font-family: "Sarabun", "Noto Sans Thai", "Leelawadee UI", Tahoma, system-ui, sans-serif;
+      font-family: "IBM Plex Sans Thai", "Leelawadee UI", Tahoma, system-ui, sans-serif;
       color: var(--ink);
       background: #fff;
       -webkit-print-color-adjust: exact;
@@ -580,7 +580,7 @@ function cardStyles(settings) {
 const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
-  href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600&family=Sarabun:wght@400;600&display=swap"
+  href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@400;600&display=swap"
   rel="stylesheet"
 />`;
 

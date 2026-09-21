@@ -1,5 +1,6 @@
 // หน้าตอบเรื่องที่ลูกค้าติดต่อเข้ามา — คิวด้านซ้าย เธรดสนทนาด้านขวา
 import { useEffect, useRef, useState } from "react";
+import { RefreshCw, Settings, X } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pagination, Pill, SearchBox } from "../components/DashboardWidgets";
 import {
@@ -264,7 +265,7 @@ function ContactSettingsDialog({ settings, onClose, onSaved }) {
         <div className="dash-modal__header">
           <h2>ข้อมูลติดต่อบนหน้าติดต่อเรา</h2>
           <button type="button" className="dash-modal__close" aria-label="ปิด" onClick={onClose}>
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 
@@ -359,10 +360,10 @@ export default function AdminSupport() {
             disabled={settingsLoading}
             onClick={() => setSettingsOpen(true)}
           >
-            ⚙ ข้อมูลติดต่อ
+            <Settings size={15} aria-hidden="true" /> ข้อมูลติดต่อ
           </button>
           <button type="button" className="dash-btn" onClick={refresh}>
-            ↻ รีเฟรชรายการ
+            <RefreshCw size={14} aria-hidden="true" /> รีเฟรชรายการ
           </button>
         </div>
       }

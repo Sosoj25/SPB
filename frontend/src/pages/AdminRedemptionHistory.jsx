@@ -1,5 +1,6 @@
 // ประวัติการแลกรางวัลทั้งระบบ
 import { useState } from "react";
+import { RefreshCw } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import RewardMedia from "../components/RewardMedia";
 import { Badge, Pagination, Pill, SearchBox, StatCard } from "../components/DashboardWidgets";
@@ -93,7 +94,7 @@ export default function AdminRedemptionHistory() {
           className="dash-btn"
           onClick={() => setReloadKey((key) => key + 1)}
         >
-          ↻ รีเฟรชรายการ
+          <RefreshCw size={14} aria-hidden="true" /> รีเฟรชรายการ
         </button>
       }
     >

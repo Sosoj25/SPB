@@ -2,7 +2,7 @@
    color-mix เจือจาง ไม่ใช้บล็อกสีทึบเต็มพื้นที่ ให้ยังรู้สึกเป็นเว็บเดียวกัน */
 .facilities {
   --editorial-serif: "Noto Serif Thai", var(--font-main);
-  --editorial-sans: "Sarabun", var(--font-main);
+  --editorial-sans: var(--font-main);
   --editorial-text: #1a1a1c;
   --editorial-muted: #6b6b73;
   --editorial-rule: #e3e3e5;
@@ -355,6 +355,9 @@
 }
 
 .facilities__stat-value {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
   font-family: var(--editorial-serif);
   font-weight: 600;
   font-size: 2.1rem;

@@ -1,5 +1,6 @@
 // หน้าสแกนรับของรางวัลที่เคาน์เตอร์ — ค้นรหัส ดูรายละเอียด แล้วกดยืนยันตัดสิทธิ์
 import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge } from "../components/DashboardWidgets";
 import RewardMedia from "../components/RewardMedia";
@@ -291,7 +292,13 @@ export default function AdminRewardScan() {
                       disabled={completing}
                       onClick={handleConfirmPickup}
                     >
-                      {completing ? "กำลังยืนยัน..." : "✓ ยืนยันมอบของรางวัลแล้ว"}
+                      {completing ? (
+                        "กำลังยืนยัน..."
+                      ) : (
+                        <>
+                          <Check size={15} aria-hidden="true" /> ยืนยันมอบของรางวัลแล้ว
+                        </>
+                      )}
                     </button>
                   </>
                 ) : (
@@ -325,7 +332,9 @@ export default function AdminRewardScan() {
                   <p className="admin-reward-scan__recent-name">{item.customerName}</p>
                   <p className="admin-reward-scan__recent-detail">{item.rewardName}</p>
                 </div>
-                <Badge tone="success">✓</Badge>
+                <Badge tone="success">
+                  <Check size={13} aria-hidden="true" />
+                </Badge>
               </div>
             ))}
           </section>

@@ -1,5 +1,6 @@
 // จัดการชุมชน — คิวรายงาน โพสต์ ความคิดเห็น หมวดหมู่ และสมาชิกที่ถูกรายงาน
 import { useEffect, useState } from "react";
+import { Bell, Flag, Heart, Lock, MessageCircle, Pencil, Pin, TriangleAlert, X } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pagination, Pill, SearchBox } from "../components/DashboardWidgets";
 import TextPromptDialog from "../components/TextPromptDialog";
@@ -276,7 +277,8 @@ export default function AdminCommunity() {
       {liveReports > 0 && (
         <div className="dash-message admin-cm__live" role="status">
           <span>
-            🔔 มีรายงานใหม่เข้ามา {liveReports} รายการระหว่างที่คุณเปิดหน้านี้อยู่
+            <Bell size={15} aria-hidden="true" /> มีรายงานใหม่เข้ามา {liveReports}{" "}
+            รายการระหว่างที่คุณเปิดหน้านี้อยู่
           </span>
           <button type="button" className="dash-btn" onClick={refresh}>
             โหลดคิวใหม่
@@ -333,22 +335,32 @@ export default function AdminCommunity() {
 
                   <div className="admin-cm__post-tags">
                     {post.reportCount > 0 && (
-                      <span className="admin-cm__flag">⚑ ถูกรายงาน {post.reportCount}</span>
+                      <span className="admin-cm__flag">
+                          <Flag size={13} aria-hidden="true" /> ถูกรายงาน {post.reportCount}
+                        </span>
                     )}
                     {post.status === "hidden" && (
                       <Badge tone="warning">
                         {post.hiddenByAdmin ? "แอดมินซ่อน" : "เจ้าของซ่อน"}
                       </Badge>
                     )}
-                    {post.isPinned && <Badge tone="tint">📌 ปักหมุด</Badge>}
+                    {post.isPinned && (
+                      <Badge tone="tint">
+                        <Pin size={12} aria-hidden="true" /> ปักหมุด
+                      </Badge>
+                    )}
                   </div>
                 </header>
 
                 <p className="admin-cm__post-body">{post.content}</p>
 
                 <footer className="admin-cm__post-foot">
-                  <span className="admin-cm__stat">♡ {post.likeCount}</span>
-                  <span className="admin-cm__stat">💬 {post.commentCount}</span>
+                  <span className="admin-cm__stat">
+                    <Heart size={14} aria-hidden="true" /> {post.likeCount}
+                  </span>
+                  <span className="admin-cm__stat">
+                    <MessageCircle size={14} aria-hidden="true" /> {post.commentCount}
+                  </span>
 
                   <div className="admin-cm__post-actions">
                     <button
@@ -413,7 +425,9 @@ export default function AdminCommunity() {
 
                   <div className="admin-cm__post-tags">
                     {comment.reportCount > 0 && (
-                      <span className="admin-cm__flag">⚑ ถูกรายงาน {comment.reportCount}</span>
+                      <span className="admin-cm__flag">
+                          <Flag size={13} aria-hidden="true" /> ถูกรายงาน {comment.reportCount}
+                        </span>
                     )}
                   </div>
                 </header>
@@ -457,7 +471,7 @@ export default function AdminCommunity() {
         <aside className="admin-cm__side">
           <section className="dash-card admin-cm__panel admin-cm__panel--alert">
             <h2 className="admin-cm__panel-title">
-              ⚠ รอตรวจสอบ {stats.pendingReports} รายการ
+              <TriangleAlert size={15} aria-hidden="true" /> รอตรวจสอบ {stats.pendingReports} รายการ
             </h2>
 
             {/* แยกตามหมวดของเหตุผล — เรื่อง "หลอกลวง/ฉ้อโกง" ต้องรีบกว่าเรื่อง
@@ -592,7 +606,7 @@ export default function AdminCommunity() {
                     className="admin-cm__category-system"
                     title="หมวดของระบบ ใช้โพสต์รีวิวอัตโนมัติ จึงลบหรือเปลี่ยนชื่อไม่ได้"
                   >
-                    🔒 ระบบ
+                    <Lock size={13} aria-hidden="true" /> ระบบ
                   </span>
                 ) : (
                   <>
@@ -603,7 +617,7 @@ export default function AdminCommunity() {
                       disabled={busyId === `cat-${category.id}`}
                       onClick={() => setCategoryDialog({ mode: "rename", category })}
                     >
-                      ✎
+                      <Pencil size={15} aria-hidden="true" />
                     </button>
                     <button
                       type="button"
@@ -612,7 +626,7 @@ export default function AdminCommunity() {
                       disabled={busyId === `cat-${category.id}`}
                       onClick={() => handleDeleteCategory(category)}
                     >
-                      ✕
+                      <X size={15} aria-hidden="true" />
                     </button>
                   </>
                 )}

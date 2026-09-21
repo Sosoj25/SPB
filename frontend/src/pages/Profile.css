@@ -105,6 +105,9 @@
 }
 
 .profile__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   background: var(--color-tint-light);
   color: var(--color-heading);
   font-weight: 700;

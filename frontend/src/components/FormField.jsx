@@ -1,5 +1,6 @@
 // ช่องกรอกข้อมูลพร้อมป้ายกำกับ — readOnly ใช้กับค่าที่ระบบล็อกไว้ไม่ให้แก้
 import "./FormField.css";
+import { Lock } from "lucide-react";
 
 export default function FormField({
   label,
@@ -19,7 +20,9 @@ export default function FormField({
       <span className="form-field__label">
         {label}
         {readOnly && (
-          <span className="form-field__lock">🔒 {lockedHint || "แก้ไขไม่ได้"}</span>
+          <span className="form-field__lock">
+            <Lock size={13} aria-hidden="true" /> {lockedHint || "แก้ไขไม่ได้"}
+          </span>
         )}
       </span>
       <input

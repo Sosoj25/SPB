@@ -1,5 +1,6 @@
 // หน้าโปรไฟล์ของผู้ใช้ — ประวัติการจอง การแจ้งเตือน และข้อมูลบัญชี (แยกเป็นแท็บ)
 import { useState } from "react";
+import { Bell, CalendarDays, Check, Lock, Trophy, User } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import { useAuth } from "../context/useAuth";
@@ -30,10 +31,10 @@ import { bgField } from "../assets/images";
 import "./Profile.css";
 
 const SIDEBAR_NAV = [
-  { key: "info", icon: "👤", label: "ข้อมูลส่วนตัว" },
-  { key: "history", icon: "🗓", label: "ประวัติการจอง" },
-  { key: "security", icon: "🔒", label: "ความปลอดภัย" },
-  { key: "notifications", icon: "🔔", label: "การแจ้งเตือน" },
+  { key: "info", Icon: User, label: "ข้อมูลส่วนตัว" },
+  { key: "history", Icon: CalendarDays, label: "ประวัติการจอง" },
+  { key: "security", Icon: Lock, label: "ความปลอดภัย" },
+  { key: "notifications", Icon: Bell, label: "การแจ้งเตือน" },
 ];
 
 function InfoPanel({ user, profile }) {
@@ -422,16 +423,24 @@ export default function Profile() {
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="profile__avatar-img" />
                 ) : (
-                  "👤"
+                  <User size={52} strokeWidth={1.5} />
                 )}
               </div>
               <h2 className="profile__name">{displayName}</h2>
               <p className="profile__email">{user?.email}</p>
 
               <div className="profile__badges">
-                <span className="profile__badge">🏆 {points.toLocaleString()} แต้ม</span>
                 <span className="profile__badge">
-                  {isVerified ? "✓ ยืนยันแล้ว" : "ยังไม่ยืนยันอีเมล"}
+                  <Trophy size={14} aria-hidden="true" /> {points.toLocaleString()} แต้ม
+                </span>
+                <span className="profile__badge">
+                  {isVerified ? (
+                    <>
+                      <Check size={14} aria-hidden="true" /> ยืนยันแล้ว
+                    </>
+                  ) : (
+                    "ยังไม่ยืนยันอีเมล"
+                  )}
                 </span>
               </div>
 
@@ -445,7 +454,7 @@ export default function Profile() {
                     }`}
                     onClick={() => setActiveTab(item.key)}
                   >
-                    <span aria-hidden="true">{item.icon}</span>
+                    <item.Icon size={18} aria-hidden="true" />
                     {item.label}
                   </button>
                 ))}

@@ -1,6 +1,30 @@
 // โครงหน้าหลังบ้าน — แถบเมนูข้าง แถบหัว กระดิ่งคิวงาน และลิ้นชักเมนูบนจอแคบ
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Bell,
+  Building2,
+  CalendarDays,
+  CircleCheckBig,
+  Clock,
+  CreditCard,
+  Gift,
+  History,
+  LayoutDashboard,
+  LayoutGrid,
+  Mail,
+  MessagesSquare,
+  Newspaper,
+  Package,
+  ScanLine,
+  Settings,
+  Tag,
+  Undo2,
+  UserPlus,
+  Users,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useAuth } from "../context/useAuth";
 import { useAdminQueueCounts } from "../hooks/useAdmin";
 import { useAlertSoundSetting, useAlertSounds } from "../hooks/useAlertSounds";
@@ -16,43 +40,43 @@ import "./DashboardLayout.css";
 const ADMIN_NAV = [
   {
     items: [
-      { icon: "▤", label: "ภาพรวม", to: "/admin/overview" },
-      { icon: "🗓", label: "การจองทั้งหมด", to: "/admin/bookings" },
-      { icon: "🏃", label: "รับลูกค้า Walk-in", to: "/admin/walk-in" },
-      { icon: "✓", label: "เช็คอิน", to: "/admin/checkin" },
-      { icon: "🏟", label: "จัดการสิ่งอำนวยความสะดวก", to: "/admin/facilities" },
-      { icon: "💰", label: "จัดการสนาม", to: "/admin/pricing" },
-      { icon: "🕘", label: "ตารางเวลา", to: "/admin/schedule" },
+      { Icon: LayoutDashboard, label: "ภาพรวม", to: "/admin/overview" },
+      { Icon: CalendarDays, label: "การจองทั้งหมด", to: "/admin/bookings" },
+      { Icon: UserPlus, label: "รับลูกค้า Walk-in", to: "/admin/walk-in" },
+      { Icon: CircleCheckBig, label: "เช็คอิน", to: "/admin/checkin" },
+      { Icon: Building2, label: "จัดการสิ่งอำนวยความสะดวก", to: "/admin/facilities" },
+      { Icon: Tag, label: "จัดการสนาม", to: "/admin/pricing" },
+      { Icon: Clock, label: "ตารางเวลา", to: "/admin/schedule" },
     ],
   },
   {
     section: "การเงิน",
     items: [
-      { icon: "฿", label: "รายการชำระเงิน", to: "/admin/payments", badge: "payments" },
-      { icon: "↩", label: "จัดการคำขอคืนเงิน", to: "/admin/refunds", badge: "refunds" },
-      { icon: "⚙", label: "ตั้งค่าการรับชำระเงิน", to: "/admin/payments/settings" },
+      { Icon: CreditCard, label: "รายการชำระเงิน", to: "/admin/payments", badge: "payments" },
+      { Icon: Undo2, label: "จัดการคำขอคืนเงิน", to: "/admin/refunds", badge: "refunds" },
+      { Icon: Settings, label: "ตั้งค่าการรับชำระเงิน", to: "/admin/payments/settings" },
     ],
   },
   {
     section: "ของรางวัล",
     items: [
-      { icon: "🎁", label: "จัดการรางวัล", to: "/admin/rewards" },
+      { Icon: Gift, label: "จัดการรางวัล", to: "/admin/rewards" },
       {
-        icon: "📦",
+        Icon: Package,
         label: "คำขอแลกรางวัล",
         to: "/admin/reward-requests",
         badge: "rewardRequests",
       },
-      { icon: "📷", label: "สแกนรับของรางวัล", to: "/admin/reward-scan" },
-      { icon: "🧾", label: "ประวัติการแลกรางวัล", to: "/admin/reward-history" },
+      { Icon: ScanLine, label: "สแกนรับของรางวัล", to: "/admin/reward-scan" },
+      { Icon: History, label: "ประวัติการแลกรางวัล", to: "/admin/reward-history" },
     ],
   },
   {
     section: "อื่นๆ",
     items: [
-      { icon: "✉", label: "ข้อความติดต่อ", to: "/admin/support", badge: "support" },
-      { icon: "💬", label: "ชุมชน", to: "/admin/community", badge: "reports" },
-      { icon: "📰", label: "ข่าวสาร", to: "/admin/news" },
+      { Icon: Mail, label: "ข้อความติดต่อ", to: "/admin/support", badge: "support" },
+      { Icon: MessagesSquare, label: "ชุมชน", to: "/admin/community", badge: "reports" },
+      { Icon: Newspaper, label: "ข่าวสาร", to: "/admin/news" },
     ],
   },
 ];
@@ -60,8 +84,8 @@ const ADMIN_NAV = [
 const SUPERADMIN_NAV = [
   {
     items: [
-      { icon: "▦", label: "ภาพรวมระบบ", to: "/superadmin/overview" },
-      { icon: "👤", label: "ผู้ใช้และสิทธิ์", to: "/superadmin/users" },
+      { Icon: LayoutGrid, label: "ภาพรวมระบบ", to: "/superadmin/overview" },
+      { Icon: Users, label: "ผู้ใช้และสิทธิ์", to: "/superadmin/users" },
     ],
   },
 ];
@@ -148,7 +172,7 @@ function NotificationBell({ counts }) {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        🔔 {total}
+        <Bell size={18} aria-hidden="true" /> {total}
       </button>
 
       {open && (
@@ -287,7 +311,7 @@ export default function DashboardLayout({
                       item.to === activePath ? "dash__nav-item--active" : ""
                     }`}
                   >
-                    <span aria-hidden="true">{item.icon}</span>
+                    <item.Icon size={20} aria-hidden="true" />
                     <span className="dash__nav-text">{item.label}</span>
                     <QueueBadge count={item.badge ? counts[item.badge] : 0} />
                   </Link>
@@ -352,7 +376,7 @@ export default function DashboardLayout({
             title={soundOn ? "ปิดเสียงแจ้งเตือน" : "เปิดเสียงแจ้งเตือน"}
             onClick={toggleSound}
           >
-            {soundOn ? "🔊" : "🔇"}
+            {soundOn ? <Volume2 size={18} aria-hidden="true" /> : <VolumeX size={18} aria-hidden="true" />}
           </button>
 
           <NotificationBell counts={counts} />

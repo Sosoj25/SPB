@@ -315,7 +315,9 @@
 }
 
 .admin-quick__icon {
-  font-size: 1.3rem;
+  display: grid;
+  place-items: center;
+  color: var(--color-primary);
 }
 
 /* ===========================================================================

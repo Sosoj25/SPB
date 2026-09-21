@@ -2,6 +2,7 @@
 // ตอบกลับที่ /admin/support ในเธรดเดียวกัน ทั้งสองฝั่งเขียนผ่าน RPC security
 // definer เท่านั้น (ตาราง support_tickets เปิดแค่ select ให้เจ้าของกับแอดมิน)
 import { supabase } from "./supabase";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import { escapeSearchTerm } from "./searchTerm";
 
 // หัวข้อติดต่อ — ต้องตรงกับ support_tickets_category_check ใน 0096 เป๊ะ ๆ
@@ -321,21 +322,21 @@ export function buildContactChannels(settings) {
 
   return [
     {
-      icon: "📞",
+      Icon: Phone,
       label: "โทรศัพท์",
       value: settings.phone,
       hint: settings.phoneHint,
       href: `tel:${phoneDigits}`,
     },
     {
-      icon: "✉️",
+      Icon: Mail,
       label: "อีเมล",
       value: settings.email,
       hint: settings.emailHint,
       href: `mailto:${settings.email}`,
     },
     {
-      icon: "💬",
+      Icon: MessageCircle,
       label: "LINE Official",
       value: settings.lineId,
       hint: settings.lineHint,

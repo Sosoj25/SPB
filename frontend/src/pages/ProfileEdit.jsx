@@ -1,5 +1,6 @@
 // หน้าแก้ไขโปรไฟล์ — ข้อมูลส่วนตัว กีฬาที่เล่น และรูปโปรไฟล์
 import { useRef, useState } from "react";
+import { User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import FormField from "../components/FormField";
@@ -201,7 +202,7 @@ export default function ProfileEdit() {
                     {avatarPreview ? (
                       <img src={avatarPreview} alt="" className="profile__avatar-img" />
                     ) : (
-                      "👤"
+                      <User size={52} strokeWidth={1.5} />
                     )}
                   </div>
                   <button

@@ -1,5 +1,6 @@
 // โปรไฟล์ชุมชนของผู้ใช้คนหนึ่ง — โพสต์ ผู้ติดตาม และข้อมูลแนะนำตัว
 import { useState } from "react";
+import { ArrowLeft, Building2, Check, Clock, MapPin, Medal, MessageCircle, PartyPopper, Plus, StickyNote } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import CreatePostDialog from "../components/CreatePostDialog";
@@ -140,7 +141,7 @@ export default function CommunityProfile() {
 
       <main className="cmp__main">
         <button type="button" className="cm-back" onClick={() => navigate("/community")}>
-          ← กลับสู่ชุมชน
+          <ArrowLeft size={15} aria-hidden="true" /> กลับสู่ชุมชน
         </button>
 
         {loading && !profile && <p className="cm__empty">กำลังโหลดโปรไฟล์...</p>}
@@ -192,10 +193,18 @@ export default function CommunityProfile() {
                   ) : (
                     <>
                       <button type="button" className="cmp__follow" onClick={handleFollow}>
-                        {profile.isFollowing ? "✓ กำลังติดตาม" : "+ ติดตาม"}
+                        {profile.isFollowing ? (
+                          <>
+                            <Check size={15} aria-hidden="true" /> กำลังติดตาม
+                          </>
+                        ) : (
+                          <>
+                            <Plus size={15} aria-hidden="true" /> ติดตาม
+                          </>
+                        )}
                       </button>
                       <button type="button" className="cmp__dm" onClick={handleMessage}>
-                        💬 ส่งข้อความ
+                        <MessageCircle size={15} aria-hidden="true" /> ส่งข้อความ
                       </button>
                     </>
                   )}
@@ -266,7 +275,7 @@ export default function CommunityProfile() {
                   <>
                     <div className="cm-card cmp__about-card">
                       <h3 className="cmp__about-title">
-                        <span aria-hidden="true">📝</span> แนะนำตัว
+                        <StickyNote size={16} aria-hidden="true" /> แนะนำตัว
                       </h3>
 
                       {profile.bio ? (
@@ -293,7 +302,7 @@ export default function CommunityProfile() {
 
                     <div className="cm-card cmp__about-card">
                       <h3 className="cmp__about-title">
-                        <span aria-hidden="true">🏅</span> กีฬาที่เล่น
+                        <Medal size={16} aria-hidden="true" /> กีฬาที่เล่น
                       </h3>
 
                       {profile.sports.length > 0 ? (
@@ -313,7 +322,7 @@ export default function CommunityProfile() {
                     {profile.joinedAt && (
                       <div className="cm-card cmp__about-highlight">
                         <span className="cmp__about-highlight-icon" aria-hidden="true">
-                          🎉
+                          <PartyPopper size={20} aria-hidden="true" />
                         </span>
                         <div>
                           <p className="cmp__about-highlight-title">
@@ -351,15 +360,15 @@ export default function CommunityProfile() {
                   <h2 className="cmp__panel-title">ข้อมูลทั่วไป</h2>
 
                   {[
-                    { icon: "📍", label: "พื้นที่", value: profile.area },
-                    { icon: "🏟️", label: "สนามประจำ", value: profile.homeVenue },
-                    { icon: "🕐", label: "เวลาที่สะดวก", value: profile.availableTime },
+                    { Icon: MapPin, label: "พื้นที่", value: profile.area },
+                    { Icon: Building2, label: "สนามประจำ", value: profile.homeVenue },
+                    { Icon: Clock, label: "เวลาที่สะดวก", value: profile.availableTime },
                   ]
                     .filter((item) => item.value)
                     .map((item) => (
                       <div key={item.label} className="cmp__info">
                         <p className="cmp__info-label">
-                          <span aria-hidden="true">{item.icon}</span> {item.label}
+                          <item.Icon size={15} aria-hidden="true" /> {item.label}
                         </p>
                         <p className="cmp__info-value">{item.value}</p>
                       </div>

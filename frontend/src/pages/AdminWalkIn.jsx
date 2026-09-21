@@ -1,5 +1,6 @@
 // หน้ารับลูกค้า Walk-in ที่เคาน์เตอร์ — จองแทนลูกค้าและรับเงินจบในครั้งเดียว
 import { useState } from "react";
+import { Check } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Pill, SearchBox } from "../components/DashboardWidgets";
 import {
@@ -363,7 +364,9 @@ export default function AdminWalkIn() {
           <section className="dash-card walkin__summary">
             {successBooking ? (
               <>
-                <h2>✓ สร้างรายการสำเร็จ</h2>
+                <h2>
+                  <Check size={20} aria-hidden="true" /> สร้างรายการสำเร็จ
+                </h2>
                 <p className="walkin__summary-code">รหัสการจอง {successBooking.booking_code}</p>
                 <p className="walkin__summary-hint">
                   ระบบออกใบเสร็จและเพิ่มรายการนี้เข้าตารางเวลาสนามแล้ว
@@ -425,7 +428,13 @@ export default function AdminWalkIn() {
                   disabled={!canConfirm}
                   onClick={handleConfirm}
                 >
-                  {submitting ? "กำลังบันทึก..." : "✓ ยืนยันการจองและรับชำระเงิน"}
+                  {submitting ? (
+                    "กำลังบันทึก..."
+                  ) : (
+                    <>
+                      <Check size={15} aria-hidden="true" /> ยืนยันการจองและรับชำระเงิน
+                    </>
+                  )}
                 </button>
 
                 <p className="walkin__summary-hint">

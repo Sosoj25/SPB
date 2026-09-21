@@ -1,5 +1,6 @@
 // คิวจัดส่งของรางวัล — ของที่ต้องส่งจริงหรือให้มารับที่สนาม
 import { useState } from "react";
+import { Image as ImageIcon, RefreshCw } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import RewardMedia from "../components/RewardMedia";
 import { Badge, Pagination, Pill, StatCard } from "../components/DashboardWidgets";
@@ -242,7 +243,13 @@ function ShippingPanel({ request, busy, onUpdate, onCancel }) {
                   disabled={proofBusy}
                   onClick={showProof}
                 >
-                  {proofBusy ? "กำลังเปิดรูป..." : "🖼 ดูรูปที่ลูกค้าแนบ"}
+                  {proofBusy ? (
+                    "กำลังเปิดรูป..."
+                  ) : (
+                    <>
+                      <ImageIcon size={15} aria-hidden="true" /> ดูรูปที่ลูกค้าแนบ
+                    </>
+                  )}
                 </button>
               )}
               {proofError && <p className="dash-message dash-message--error">{proofError}</p>}
@@ -367,7 +374,7 @@ export default function AdminRewardRequests() {
             {exporting ? "กำลังรวบรวม..." : "ส่งออกรายการจัดส่ง"}
           </button>
           <button type="button" className="dash-btn admin-requests__refresh" onClick={reload}>
-            ↻ รีเฟรชรายการ
+            <RefreshCw size={14} aria-hidden="true" /> รีเฟรชรายการ
           </button>
         </div>
       }

@@ -436,6 +436,9 @@
 }
 
 .admin-checkin__alert-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   margin: 0;
   font-weight: 700;
   font-size: 1.2rem;

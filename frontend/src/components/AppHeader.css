@@ -392,6 +392,9 @@
 }
 
 .app-menu__points {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   margin: 2px 0 0;
   font-size: 0.85rem;
   color: var(--color-muted-purple);

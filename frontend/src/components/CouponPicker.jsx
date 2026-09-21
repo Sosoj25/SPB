@@ -3,6 +3,7 @@
 // การผูก/ถอนคูปองทำที่ฝั่ง server (applyBookingCoupon/removeBookingCoupon)
 // ยอดที่โชว์จึงเป็นยอดที่คิดจริง ไม่ใช่การลบเลขฝั่งหน้าเว็บ
 import { useState } from "react";
+import { Check, Ticket } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUsableCoupons } from "../hooks/useRewards";
 import {
@@ -57,7 +58,9 @@ export default function CouponPicker({ booking, userId, onChanged }) {
       <section className="coupon">
         <div className="coupon__applied">
           <div>
-            <p className="coupon__applied-title">✓ ใช้คูปองแล้ว</p>
+            <p className="coupon__applied-title">
+            <Check size={15} aria-hidden="true" /> ใช้คูปองแล้ว
+          </p>
             <p className="coupon__applied-note">
               ลดไปทั้งหมด {formatBaht(booking.discount_amount)} จากยอดเดิม{" "}
               {formatBaht(booking.original_amount)}
@@ -85,7 +88,9 @@ export default function CouponPicker({ booking, userId, onChanged }) {
 
   return (
     <section className="coupon">
-      <p className="coupon__title">🎟 ใช้คูปองส่วนลด</p>
+      <p className="coupon__title">
+        <Ticket size={16} aria-hidden="true" /> ใช้คูปองส่วนลด
+      </p>
 
       {loading && <p className="coupon__empty">กำลังโหลดคูปองของคุณ...</p>}
 

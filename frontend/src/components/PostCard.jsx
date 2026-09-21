@@ -5,6 +5,7 @@
 // เจ้าของโปรไฟล์เสมอ (โพสต์ทุกอันในหน้านั้นเป็นของคนเดียวกันอยู่แล้ว) ส่วน
 // ฟีดรวมอยากใช้ post.author/post.authorAvatar ของแต่ละโพสต์
 import { useState } from "react";
+import { Bookmark, Flag, Heart, MessageCircle, Pencil, Pin, Star, Trash2 } from "lucide-react";
 import ClampText from "./ClampText";
 import PostImageGrid from "./PostImageGrid";
 import ReviewPostBody from "./ReviewPostBody";
@@ -51,9 +52,17 @@ export default function PostCard({
         </div>
 
         <span className="cm__post-tags">
-          {post.isPinned && <span className="cm-chip cm-chip--sm">📌 ปักหมุด</span>}
+          {post.isPinned && <span className="cm-chip cm-chip--sm">
+              <Pin size={13} aria-hidden="true" /> ปักหมุด
+            </span>}
           <span className={`cm-chip ${review ? "cm-chip--review" : ""}`}>
-            {review ? "★ รีวิวสนาม" : post.category}
+            {review ? (
+              <>
+                <Star size={14} fill="currentColor" strokeWidth={0} aria-hidden="true" /> รีวิวสนาม
+              </>
+            ) : (
+              post.category
+            )}
           </span>
 
           {/* เมนู ⋯ — เจ้าของได้แก้ไข/ลบ คนอื่นได้รายงาน */}
@@ -84,7 +93,7 @@ export default function PostCard({
                           onEdit(post);
                         }}
                       >
-                        ✎ แก้ไขโพสต์
+                        <Pencil size={15} aria-hidden="true" /> แก้ไขโพสต์
                       </button>
                     )}
                     <button
@@ -96,7 +105,7 @@ export default function PostCard({
                         onDelete(post);
                       }}
                     >
-                      🗑 ลบโพสต์
+                      <Trash2 size={15} aria-hidden="true" /> ลบโพสต์
                     </button>
                   </>
                 ) : (
@@ -109,7 +118,7 @@ export default function PostCard({
                       onReport(post);
                     }}
                   >
-                    ⚑ รายงานโพสต์
+                    <Flag size={15} aria-hidden="true" /> รายงานโพสต์
                   </button>
                 )}
               </span>
@@ -138,13 +147,15 @@ export default function PostCard({
             onLike(post);
           }}
         >
-          <span className="cm-action__icon" aria-hidden="true">
-            {post.isLiked ? "♥" : "♡"}
-          </span>{" "}
+          <Heart
+            size={17}
+            aria-hidden="true"
+            fill={post.isLiked ? "currentColor" : "none"}
+          />{" "}
           ถูกใจ {post.likeCount}
         </button>
         <span className="cm-action">
-          <span className="cm-action__icon" aria-hidden="true">💬</span> ความคิดเห็น{" "}
+          <MessageCircle size={17} aria-hidden="true" /> ความคิดเห็น{" "}
           {post.commentCount}
         </span>
         <button
@@ -155,7 +166,11 @@ export default function PostCard({
             onBookmark(post);
           }}
         >
-          <span className="cm-action__icon" aria-hidden="true">🔖</span>{" "}
+          <Bookmark
+            size={17}
+            aria-hidden="true"
+            fill={post.isBookmarked ? "currentColor" : "none"}
+          />{" "}
           {post.isBookmarked ? "บันทึกแล้ว" : "บันทึก"}
         </button>
       </div>

@@ -5,6 +5,7 @@
 // แต้มมาจาก profile ใน AuthContext (โหลดพร้อม session อยู่แล้ว) ไม่ยิงคิวรี
 // เพิ่ม — หลังกดแลกสำเร็จหน้า RewardDetail จะสั่ง refreshProfile() ให้เลขตรง
 import { useMemo, useState } from "react";
+import { Trophy } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import RewardMedia from "../components/RewardMedia";
@@ -56,7 +57,9 @@ function RewardCard({ reward, points }) {
         <p className="reward-card__desc">{reward.description}</p>
 
         <div className="reward-card__footer">
-          <span className="reward-card__points">🏆 {formatPoints(reward.pointsRequired)} แต้ม</span>
+          <span className="reward-card__points">
+            <Trophy size={14} aria-hidden="true" /> {formatPoints(reward.pointsRequired)} แต้ม
+          </span>
           <span className="reward-card__rule" aria-hidden="true" />
 
           {disabled ? (

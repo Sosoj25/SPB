@@ -139,10 +139,10 @@
   color: var(--color-primary);
 }
 
-/* 📌 / 🔕 / 🚫 ต่อท้ายชื่อห้อง */
+/* ป้ายสถานะห้อง (ปักหมุด / ปิดเสียง / บล็อก) ต่อท้ายชื่อห้อง */
 .msg__thread-flag {
   margin: 0 0.25rem;
-  font-size: 0.8rem;
+  color: var(--color-muted-purple);
 }
 
 .msg__thread-text {
@@ -262,6 +262,9 @@
 /* ป้ายบอกว่าห้องนี้ปิดเสียงอยู่ บนหัวห้อง — ปุ่ม "ออกจากกลุ่ม" เดิมย้ายไป
    อยู่ในเมนู ⋯ รวมกับคำสั่งจัดการห้องอื่น ๆ แล้ว (ConversationMenu) */
 .msg__chat-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.25rem 0.65rem;
   border-radius: var(--radius-pill);
   background: var(--color-neutral-bg);
@@ -481,6 +484,9 @@
 }
 
 .msg__tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   width: 2.25rem;
   height: 2.25rem;
@@ -567,6 +573,9 @@
 /* ปุ่มลบข้างฟองของตัวเอง — ซ่อนไว้จนกว่าจะชี้ที่แถวนั้น ไม่งั้นถังขยะเรียง
    เป็นตับข้างทุกฟองจนอ่านบทสนทนาไม่รู้เรื่อง */
 .msg__bubble-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   align-self: center;
   flex: none;
   padding: 0.2rem 0.35rem;

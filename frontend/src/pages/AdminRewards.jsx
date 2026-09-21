@@ -1,5 +1,6 @@
 // คลังของรางวัล — เพิ่ม/แก้ไขของรางวัล ตั้งอัตราแต้ม และปรับแต้มลูกค้ารายคน
 import { useMemo, useRef, useState } from "react";
+import { Settings, TriangleAlert } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
 import RewardMedia from "../components/RewardMedia";
@@ -624,7 +625,7 @@ export default function AdminRewards() {
             className="dash-btn"
             onClick={() => setEditing("settings")}
           >
-            ⚙ ตั้งค่าแต้ม (
+            <Settings size={15} aria-hidden="true" /> ตั้งค่าแต้ม (
             {settings
               ? `${settings.bahtPerPoint} บาท = 1 แต้ม${
                   settings.reviewPointsEnabled && settings.reviewPoints > 0
@@ -831,7 +832,7 @@ export default function AdminRewards() {
           {lowStock.length > 0 && (
             <aside className="admin-rewards__alert">
               <p className="admin-rewards__alert-title">
-                ⚠ ใกล้หมดสต๊อก {lowStock.length} รายการ
+                <TriangleAlert size={15} aria-hidden="true" /> ใกล้หมดสต๊อก {lowStock.length} รายการ
               </p>
               <p className="admin-rewards__alert-body">
                 {lowStock

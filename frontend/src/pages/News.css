@@ -483,6 +483,9 @@
    เงาสีทองเข้มด้านล่าง + ไอคอนดาวหน้าข้อความ ช่วยให้เด่นขึ้นมาจากรูปโดยไม่
    ต้องดันพ้นกรอบออกไป */
 .news__card-featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   position: absolute;
   top: 0.65rem;
   left: 0.65rem;

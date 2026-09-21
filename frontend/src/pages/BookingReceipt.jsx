@@ -1,6 +1,7 @@
 // ใบเสร็จ/รายละเอียดการจองหนึ่งรายการ — ปลายทางของทุกลิงก์แจ้งเตือนที่ชี้มาที่
 // การจอง และเป็นที่เดียวที่ลูกค้าเขียนรีวิว ขอคืนเงิน และบันทึกใบเสร็จเป็นรูป
 import { useEffect, useRef, useState } from "react";
+import { Check, Paperclip, Star, X } from "lucide-react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import { useAuth } from "../context/useAuth";
@@ -389,7 +390,13 @@ export default function BookingReceipt() {
                 }`}
                 aria-hidden="true"
               >
-                {isCancelled ? "✕" : isPaid ? "✓" : "!"}
+                {isCancelled ? (
+                  <X size={34} strokeWidth={3} />
+                ) : isPaid ? (
+                  <Check size={34} strokeWidth={3} />
+                ) : (
+                  "!"
+                )}
               </div>
               <h1 className="booking__title">
                 {isCancelled
@@ -574,7 +581,7 @@ export default function BookingReceipt() {
                         }`}
                         onClick={() => setReviewRating(star)}
                       >
-                        ★
+                        <Star size={28} fill="currentColor" strokeWidth={0} />
                       </button>
                     ))}
                   </div>
@@ -639,7 +646,7 @@ export default function BookingReceipt() {
                         star <= review.rating ? "booking-review__star--filled" : ""
                       }`}
                     >
-                      ★
+                      <Star size={20} fill="currentColor" strokeWidth={0} />
                     </span>
                   ))}
                 </div>
@@ -731,7 +738,13 @@ export default function BookingReceipt() {
                         disabled={viewingSlip}
                         onClick={handleViewRefundSlip}
                       >
-                        {viewingSlip ? "กำลังเปิด..." : "📎 ดูสลิปโอนคืน"}
+                        {viewingSlip ? (
+                          "กำลังเปิด..."
+                        ) : (
+                          <>
+                            <Paperclip size={15} aria-hidden="true" /> ดูสลิปโอนคืน
+                          </>
+                        )}
                       </button>
                     )}
                   </>

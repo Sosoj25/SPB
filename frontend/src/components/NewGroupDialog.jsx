@@ -1,6 +1,7 @@
 // กล่องสร้างกลุ่มแชทใหม่ — ค้นหาคนด้วย usePeopleSearch ตัวเดียวกับที่ฟีด
 // ชุมชนใช้ค้นหาคน แล้วสะสมรายชื่อที่เลือกไว้เป็น chip ก่อนยิงสร้างจริงทีเดียว
 import { useState } from "react";
+import { X } from "lucide-react";
 import { usePeopleSearch } from "../hooks/useCommunity";
 import { createGroupConversation } from "../lib/messages";
 import { errorMessage } from "../lib/errors";
@@ -95,7 +96,7 @@ export default function NewGroupDialog({ onClose, onCreated }) {
                   aria-label={`เอา ${person.name} ออก`}
                   onClick={() => removePerson(person.id)}
                 >
-                  ✕
+                  <X size={14} aria-hidden="true" />
                 </button>
               </span>
             ))}

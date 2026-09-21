@@ -51,7 +51,7 @@
   --shadow-card: 0 8px 26px rgba(43, 10, 99, 0.14);
   --radius-lg: 25px;
   --radius-pill: 200px;
-  --font-main: "Inter", "Noto Sans Thai", system-ui, -apple-system, sans-serif;
+  --font-main: "IBM Plex Sans Thai", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
 }
 
 * {
@@ -177,6 +177,47 @@ canvas {
   max-width: 100%;
 }
 
+/* ไอคอนทั้งแอปมาจาก lucide ชุดเดียว (ไลบรารีติดคลาส .lucide ให้ทุกตัวเอง)
+   สองบรรทัดนี้แก้ปัญหาที่เจอซ้ำทุกที่ที่วางไอคอนคู่ข้อความ จะได้ไม่ต้องไล่
+   ตั้งทีละจุด:
+     - <svg> ไหลตาม baseline เหมือนตัวอักษร ถ้าไม่ดันลงนิดหนึ่งจะลอยสูงกว่า
+       บรรทัดข้อความที่อยู่ข้าง ๆ
+     - พอไปอยู่ในกล่อง flex ที่พื้นที่ไม่พอ ไอคอนจะโดนบีบจนเบี้ยวก่อนข้อความ
+       เสมอ เพราะ flex ย่อของที่ย่อได้ก่อน */
+.lucide {
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+
+/* เอฟเฟกต์จาง-เลื่อนขึ้นตอนเนื้อหาเข้ามาในจอ ใช้คู่กับ hook useReveal
+   เฉพาะหน้าสาธารณะ
+
+   ซ่อนของได้ก็ต่อเมื่อ .reveal-root ถูกติดโดย JS แล้วเท่านั้น จงใจไม่ซ่อนจาก
+   [data-reveal] ตรง ๆ เพราะถ้าสคริปต์ไม่ทำงาน (โหลดพลาด/บล็อก) หน้าต้องแสดง
+   เนื้อหาตามปกติ ไม่ใช่กลายเป็นหน้าว่างที่ไม่มีอะไรมาปลดให้ */
+.reveal-root [data-reveal] {
+  opacity: 0;
+  /* ใช้ property translate ไม่ใช่ transform: translateY() เพราะการ์ดกับปุ่ม
+     หลายที่ในแอปยก transform ตอน hover อยู่แล้ว ถ้า reveal จองช่อง transform
+     ไปด้วย กฎ .is-revealed จะมี specificity สูงกว่า :hover แล้วทับจนเมาส์ชี้
+     แล้วไม่ขยับ — translate เป็นคนละช่องกัน ทั้งสองอย่างจึงอยู่ด้วยกันได้ */
+  translate: 0 18px;
+  /* เส้นโค้งเดียวกับเมนูใน AppHeader.css — ออกตัวเร็วแล้วค่อย ๆ นิ่ง เพื่อให้
+     จังหวะการเคลื่อนไหวทั้งแอปเป็นชุดเดียวกัน ไม่ใช่ต่างคนต่างตั้ง */
+  transition:
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, translate;
+}
+
+.reveal-root [data-reveal].is-revealed {
+  opacity: 1;
+  translate: none;
+  /* ปลด will-change ทิ้งหลังเล่นจบ ไม่งั้นเบราว์เซอร์กันเลเยอร์ GPU ไว้ให้ทุก
+     ชิ้นที่เคยจางเข้ามาค้างไว้ทั้งหน้า */
+  will-change: auto;
+}
+
 /* ===========================================================================
    Responsive - ทุกบล็อก @media ของไฟล์นี้รวมอยู่ท้ายไฟล์ที่เดียว เรียงจาก
    จอกว้างไปจอแคบ
@@ -227,5 +268,15 @@ canvas {
   select,
   textarea {
     font-size: max(16px, 1rem);
+  }
+}
+
+/* ผู้ใช้ที่ตั้งค่าลดการเคลื่อนไหวต้องเห็นเนื้อหาเต็มตั้งแต่แรก — บล็อกนี้อยู่
+   ท้ายสุดของไฟล์เพราะต้องทับกฎ .reveal-root ข้างบนให้ได้ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-root [data-reveal] {
+    opacity: 1;
+    translate: none;
+    transition: none;
   }
 }

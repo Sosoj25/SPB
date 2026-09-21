@@ -1,6 +1,7 @@
 // กล่องครอบตัดรูปก่อนอัปโหลด — เลือกอัตราส่วน ลากเลื่อน ซูม แล้วตัดออกมา
 // เป็น JPEG ผ่าน canvas
 import { useLayoutEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 import "./ImageCropModal.css";
 
 const RATIOS = [
@@ -169,7 +170,7 @@ export default function ImageCropModal({ imageUrl, onCancel, onConfirm }) {
         <div className="dash-modal__header">
           <h2>ครอบตัดรูป</h2>
           <button type="button" className="dash-modal__close" onClick={onCancel} aria-label="ปิด">
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </div>
 

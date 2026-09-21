@@ -1,6 +1,7 @@
 // แถบหัวเว็บฝั่งลูกค้า — เมนูหลัก กระดิ่งแจ้งเตือน ปุ่มแชท และเมนูผู้ใช้
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Bell, Trophy, Volume2, VolumeX } from "lucide-react";
 import ChatFlyout from "./ChatFlyout";
 import { useAuth } from "../context/useAuth";
 import { useAlertSoundSetting } from "../hooks/useAlertSounds";
@@ -184,7 +185,7 @@ function NotificationBell({ userId }) {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        🔔
+        <Bell size={20} aria-hidden="true" />
         {totalUnread > 0 && <span className="app-header__bell-badge">{totalUnread}</span>}
       </button>
 
@@ -436,7 +437,9 @@ export default function AppHeader() {
               )}
               <div>
                 <p className="app-menu__name">{displayName}</p>
-                <p className="app-menu__points">🏆 คะแนนสะสม {points.toLocaleString()}</p>
+                <p className="app-menu__points">
+                  <Trophy size={15} aria-hidden="true" /> คะแนนสะสม {points.toLocaleString()}
+                </p>
               </div>
             </div>
 
@@ -482,7 +485,8 @@ export default function AppHeader() {
               onClick={toggleSound}
             >
               <span className="app-menu__item-title">
-                <span aria-hidden="true">{soundOn ? "🔊" : "🔇"}</span> เสียงแจ้งเตือน
+                {soundOn ? <Volume2 size={17} aria-hidden="true" /> : <VolumeX size={17} aria-hidden="true" />}{" "}
+                เสียงแจ้งเตือน
               </span>
               <span
                 className={`app-menu__switch ${soundOn ? "app-menu__switch--on" : ""}`}

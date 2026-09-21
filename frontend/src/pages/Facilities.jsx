@@ -1,6 +1,8 @@
 // หน้าสิ่งอำนวยความสะดวก (/facilities) — ข้อมูลคลับ สิ่งอำนวยความสะดวก
 // และตัวเลขสถิติจริงของระบบ
 import AppHeader from "../components/AppHeader";
+import useReveal from "../hooks/useReveal";
+import { Star } from "lucide-react";
 import founderPhoto from "../assets/facilities/founder.png";
 import { usePublicAmenities, useFacilitiesPageSettings } from "../hooks/useAmenities";
 import { usePlatformStats } from "../hooks/useStats";
@@ -22,7 +24,12 @@ function statCards(stats) {
     // ระหว่างที่ยังไม่มีรีวิว ใช้ยอดจองสะสมทั้งหมดแทน
     stats.reviewsCount > 0
       ? {
-          value: `${stats.avgRating.toFixed(1)}★`,
+          value: (
+            <>
+              {stats.avgRating.toFixed(1)}
+              <Star size={20} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+            </>
+          ),
           label: `คะแนนเฉลี่ยจาก ${numberFormat.format(stats.reviewsCount)} รีวิว`,
         }
       : { value: numberFormat.format(stats.bookingsTotal), label: "การจองทั้งหมด" },
@@ -30,6 +37,7 @@ function statCards(stats) {
 }
 
 export default function Facilities() {
+  const revealRef = useReveal();
   const { amenities, loading } = usePublicAmenities();
   const { settings } = useFacilitiesPageSettings();
   const { stats } = usePlatformStats();
@@ -38,8 +46,8 @@ export default function Facilities() {
     <div className="facilities">
       <AppHeader />
 
-      <main className="facilities__main">
-        <section className="facilities__masthead">
+      <main className="facilities__main" ref={revealRef}>
+        <section className="facilities__masthead" data-reveal>
           <p className="facilities__eyebrow">{settings?.eyebrow || "THE CLUB"}</p>
           <h1 className="facilities__title">{settings?.heading || "สิ่งอำนวยความสะดวก"}</h1>
           <p className="facilities__intro">{settings?.intro}</p>
@@ -53,7 +61,7 @@ export default function Facilities() {
 
         {amenities.length > 0 && (
           <>
-            <section className="facilities__index">
+            <section className="facilities__index" data-reveal>
               {amenities.map((item, index) => (
                 <div key={item.id} className="facilities__index-item" data-category={item.category}>
                   <p className="facilities__index-no">{String(index + 1).padStart(2, "0")}</p>
@@ -70,6 +78,7 @@ export default function Facilities() {
                 key={item.id}
                 className={`facilities__feature ${index % 2 === 1 ? "facilities__feature--reverse" : ""}`}
                 data-category={item.category}
+                data-reveal
               >
                 <div className="facilities__feature-photo">
                   {item.imageUrl ? (
@@ -105,7 +114,7 @@ export default function Facilities() {
 
         <div className="facilities__rule facilities__rule--strong" />
 
-        <section className="facilities__founder">
+        <section className="facilities__founder" data-reveal>
           <p className="facilities__section-label">ผู้ก่อตั้ง</p>
           <div className="facilities__founder-grid">
             <div className="facilities__founder-photo">
@@ -136,7 +145,7 @@ export default function Facilities() {
           <>
             <div className="facilities__rule facilities__rule--strong" />
 
-            <section className="facilities__stats">
+            <section className="facilities__stats" data-reveal>
               {statCards(stats).map((stat) => (
                 <div key={stat.label} className="facilities__stat">
                   <p className="facilities__stat-value">{stat.value}</p>

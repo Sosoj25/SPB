@@ -1,5 +1,6 @@
 // หน้าแรกหลังล็อกอิน — การ์ดการจองรายการถัดไป ตัวเลขสถิติ และทางลัดไปจองสนาม
 import { Link } from "react-router-dom";
+import { Building2, CalendarDays, Clock, Star } from "lucide-react";
 import AppHeader from "../components/AppHeader";
 import { useNextBooking } from "../hooks/useBookings";
 import { usePlatformStats } from "../hooks/useStats";
@@ -12,6 +13,7 @@ import {
   formatTimeRange,
 } from "../lib/bookings";
 import { bgField, playIcon } from "../assets/images";
+import useReveal from "../hooks/useReveal";
 import "./Home.css";
 
 const numberFormat = new Intl.NumberFormat("th-TH");
@@ -31,7 +33,15 @@ function statCards(stats) {
     // ดาวเฉลี่ยโชว์ได้ต่อเมื่อมีรีวิวจริงเท่านั้น ไม่งั้นก็กลับไปเป็น
     // ตัวเลขที่แต่งขึ้นแบบเดิม — ระหว่างที่ยังไม่มี ใช้จำนวนกีฬาแทน
     stats.reviewsCount > 0
-      ? { value: `${stats.avgRating.toFixed(1)}★`, label: `จาก ${numberFormat.format(stats.reviewsCount)} รีวิว` }
+      ? {
+          value: (
+            <>
+              {stats.avgRating.toFixed(1)}
+              <Star size={20} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+            </>
+          ),
+          label: `จาก ${numberFormat.format(stats.reviewsCount)} รีวิว`,
+        }
       : { value: numberFormat.format(stats.sports), label: "ประเภทกีฬา" },
   ];
 }
@@ -43,7 +53,7 @@ function PlatformStats() {
   if (!stats) return null;
 
   return (
-    <div className="home__stats">
+    <div className="home__stats" data-reveal data-reveal-delay="4">
       {statCards(stats).map((stat) => (
         <div key={stat.label} className="home__stat">
           <p className="home__stat-value">{stat.value}</p>
@@ -98,7 +108,7 @@ function NextBookingCard() {
 
       <p className="home__booking-status">
         <span className="home__booking-countdown">
-          <span aria-hidden="true">🕘</span> {describeCountdown(booking.booking_date)}
+          <Clock size={16} aria-hidden="true" /> {describeCountdown(booking.booking_date)}
         </span>
         <span
           className={`home__payment-badge home__payment-badge--${describePaymentTone(booking)}`}
@@ -120,27 +130,31 @@ function NextBookingCard() {
 }
 
 export default function Home() {
+  const revealRef = useReveal();
+
   return (
     <div className="home" style={{ backgroundImage: `url(${bgField})` }}>
       <AppHeader />
 
-      <main className="home__main">
+      <main className="home__main" ref={revealRef}>
         <div className="home__hero">
           <div className="home__copy">
-            <span className="home__badge">🏟 จองสนามกีฬาออนไลน์ 24 ชม.</span>
+            <span className="home__badge" data-reveal>
+              <Building2 size={16} aria-hidden="true" /> จองสนามกีฬาออนไลน์ 24 ชม.
+            </span>
 
-            <h1 className="home__title">
+            <h1 className="home__title" data-reveal data-reveal-delay="1">
               จองสนามกีฬาง่ายๆ
               <br />
               กับ SPORTSBOOKING
             </h1>
 
-            <p className="home__desc">
+            <p className="home__desc" data-reveal data-reveal-delay="2">
               ค้นหาสนามใกล้คุณ เช็กเวลาว่างแบบเรียลไทม์ และจองได้ในไม่กี่คลิก
               พร้อมสะสมแต้มแลกของรางวัล
             </p>
 
-            <div className="home__actions">
+            <div className="home__actions" data-reveal data-reveal-delay="3">
               <Link to="/booking/sport" className="home__cta">
                 จองเลยตอนนี้
                 <img src={playIcon} alt="" className="home__cta-icon" />
@@ -153,9 +167,9 @@ export default function Home() {
             <PlatformStats />
           </div>
 
-          <div className="home__booking">
+          <div className="home__booking" data-reveal data-reveal-delay="1">
             <div className="home__booking-header">
-              <span aria-hidden="true">🗓</span>
+              <CalendarDays size={22} aria-hidden="true" />
               <h2>การจองของคุณ</h2>
             </div>
 

@@ -249,6 +249,9 @@
 /* ใบที่ส่งถึงบ้าน: เปิดกล่องเดียวกันแต่เป็นรายละเอียดการแลก ไม่ใช่ QR รับของ
    จึงไม่ต้องเด่นเท่าปุ่มหลักของใบที่ต้องไปรับเอง */
 .reward-history__detail-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.5rem 1.15rem;
   border-radius: var(--radius-pill);
   background: var(--color-tint-light);
@@ -268,6 +271,9 @@
    ทำเป็นปุ่มทึบสีหลักปุ่มเดียวของแถว เพราะนี่คือสิ่งที่ลูกค้าต้องกดจริงตอนยืน
    อยู่หน้าเคาน์เตอร์ ส่วนคัดลอกรหัส/ดูสถานะเป็นทางเลือกรอง */
 .reward-history__qr-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.5rem 1.15rem;
   border-radius: var(--radius-pill);
   background: var(--color-primary);
@@ -293,6 +299,9 @@
 /* ---------- ติดตามการจัดส่งของรางวัล (0055) ---------- */
 
 .reward-history__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.35rem 0.9rem;
   border-radius: var(--radius-pill);
   background: var(--color-tint-light);

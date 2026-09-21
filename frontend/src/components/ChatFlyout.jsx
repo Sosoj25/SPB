@@ -1,6 +1,7 @@
-// แผงรายชื่อห้องแชทที่กางจากปุ่ม 💬 บนแถบหัวเว็บ — กดห้องแล้วสั่งให้
+// แผงรายชื่อห้องแชทที่กางจากปุ่มแชทบนแถบหัวเว็บ — กดห้องแล้วสั่งให้
 // ChatDock เปิดหน้าต่างแชทลอยให้ (ผ่าน ChatPopupProvider)
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BellOff, Expand, MessageCircle, Pin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useChatPopup } from "../context/useChatPopup";
 import { useConversations } from "../hooks/useMessages";
@@ -74,7 +75,7 @@ export default function ChatFlyout({ userId }) {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        💬
+        <MessageCircle size={20} aria-hidden="true" />
         {totalUnread > 0 && <span className="app-header__bell-badge">{totalUnread}</span>}
       </button>
 
@@ -91,7 +92,7 @@ export default function ChatFlyout({ userId }) {
                 navigate("/messages");
               }}
             >
-              ⛶
+              <Expand size={16} aria-hidden="true" />
             </button>
           </div>
 
@@ -145,10 +146,12 @@ export default function ChatFlyout({ userId }) {
 
                 <span className="chat-flyout__item-text">
                   <span className="chat-flyout__item-name">
-                    {conversation.isPinned && <span title="ปักหมุดไว้">📌 </span>}
+                    {conversation.isPinned && (
+                      <Pin size={13} aria-hidden="true" className="chat-flyout__item-flag" />
+                    )}
                     {conversation.name}
                     {isMuted(conversation.mutedUntil) && (
-                      <span title="ปิดการแจ้งเตือนอยู่"> 🔕</span>
+                      <BellOff size={13} aria-hidden="true" className="chat-flyout__item-flag" />
                     )}
                   </span>
                   <span className="chat-flyout__item-preview">

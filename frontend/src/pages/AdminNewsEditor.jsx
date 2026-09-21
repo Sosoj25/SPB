@@ -3,6 +3,7 @@
 // ปุ่มจัดรูปแบบบน toolbar แทรก syntax ที่ lib/newsContent.jsx เป็นคนแปลงกลับ
 // ตอนแสดงผล ทั้งสองไฟล์ต้องรู้จัก syntax ชุดเดียวกันเสมอ
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
 import { Badge, Switch } from "../components/DashboardWidgets";
@@ -414,7 +415,7 @@ function NewsEditorForm({ newsId, news, profile, navigate }) {
                   onClick={() => removeTag(tag)}
                   title="คลิกเพื่อลบ"
                 >
-                  {tag} ✕
+                  {tag} <X size={13} aria-hidden="true" />
                 </button>
               ))}
               <button type="button" className="admin-editor__tag-add" onClick={addTag}>

@@ -267,6 +267,9 @@
 }
 
 .dash__bell-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   background: var(--color-tint-light);
   color: var(--color-heading);
   font-weight: 700;

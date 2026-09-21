@@ -3,6 +3,7 @@
 // การจองถูกกันสิทธิ์ไว้ชั่วคราวเท่านั้น (BOOKING_HOLD_MINUTES) หน้านี้จึงมี
 // นาฬิกานับถอยหลังทั้งของ QR และของตัวการจองเอง
 import { useEffect, useRef, useState } from "react";
+import { Lock } from "lucide-react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BookingSteps from "../components/BookingSteps";
@@ -364,7 +365,8 @@ export default function BookingPayment() {
               holdSecondsLeft <= HOLD_WARNING_SECONDS ? "booking-hold-banner--urgent" : ""
             }`}
           >
-            🔒 เราเก็บช่วงเวลานี้ไว้ให้คุณแล้ว กรุณาชำระเงินภายใน {BOOKING_HOLD_MINUTES} นาที
+            <Lock size={15} aria-hidden="true" /> เราเก็บช่วงเวลานี้ไว้ให้คุณแล้ว
+            กรุณาชำระเงินภายใน {BOOKING_HOLD_MINUTES} นาที
             (เหลือเวลา {formatQrCountdown(holdSecondsLeft)} นาที)
           </p>
         )}
@@ -681,7 +683,8 @@ export default function BookingPayment() {
 
               {isPendingUnpaid && (
                 <p className="booking-note">
-                  🔒 เหลือเวลาชำระเงินอีก {formatQrCountdown(holdSecondsLeft)} นาที
+                  <Lock size={15} aria-hidden="true" /> เหลือเวลาชำระเงินอีก{" "}
+                  {formatQrCountdown(holdSecondsLeft)} นาที
                   มิฉะนั้นระบบจะปล่อยช่วงเวลานี้ให้ผู้อื่นจองต่อ
                 </p>
               )}

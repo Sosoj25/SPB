@@ -11,6 +11,7 @@
 // รูปแรก ระหว่างรอโหลดใช้ coverImage ไปพลาง ๆ กันโพสต์ที่มีรูปเดียวดูเหมือน
 // ไม่มีรูปตอนเพิ่งเปิดโมดัล
 import { useEffect, useRef, useState } from "react";
+import { Image as ImageIcon } from "lucide-react";
 import { MAX_POST_IMAGES, createPost, fetchPostImages, updateOwnPost } from "../lib/community";
 import { assertImageFile } from "../lib/uploads";
 import { errorMessage } from "../lib/errors";
@@ -263,7 +264,7 @@ export default function CreatePostDialog({
               disabled={totalImageCount >= MAX_POST_IMAGES}
               onClick={() => fileRef.current?.click()}
             >
-              🖼️
+              <ImageIcon size={18} aria-hidden="true" />
             </button>
             <input
               ref={fileRef}

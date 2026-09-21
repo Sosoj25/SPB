@@ -132,10 +132,6 @@ button.cm-action {
   color: #b02a5b;
 }
 
-.cm-action__icon {
-  font-size: 1rem;
-}
-
 /* กล่องรูปสี่เหลี่ยมสีม่วงอ่อนสมัยที่ยังไม่มีรูปจริง — ตอนนี้ไม่มีไฟล์ไหน
    ใช้คลาสนี้แล้ว รูปในโพสต์ใช้ .post-grid (PostImageGrid.css) แทน */
 .cm-photo {
@@ -541,6 +537,9 @@ button.cm-action {
 }
 
 .cm__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.6rem 0.75rem;
   border-radius: 10px;
   background: none;
@@ -657,12 +656,11 @@ button.cm-action {
 }
 
 .cm-review__venue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
   font-size: 0.88rem;
   color: var(--color-muted-purple);
-}
-
-.cm-review__venue::before {
-  content: "📍 ";
 }
 
 /* คำติชมอ้างแบบ blockquote — แยกเสียงของผู้รีวิวออกจากข้อมูลคะแนนด้านบน */

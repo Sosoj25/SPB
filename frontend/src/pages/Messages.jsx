@@ -3,6 +3,7 @@
 // เวอร์ชันย่อของหน้านี้คือ ChatPopup ที่ลอยอยู่มุมจอ ฟีเจอร์ที่มีแค่ที่นี่คือ
 // การตอบกลับข้อความ การสร้างกลุ่ม และการจัดการคนที่บล็อกไว้
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Ban, BellOff, Image as ImageIcon, Pin, Smile, Trash2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import BlockedUsersDialog from "../components/BlockedUsersDialog";
@@ -40,7 +41,7 @@ import "./Community.css";
 import "./Messages.css";
 
 // ป้ายสถานะออนไลน์/ออฟไลน์ — จุดสีเขียวเมื่อออนไลน์ วงสีเทาพร้อมเวลาที่ผ่านมา
-// เมื่อออฟไลน์ (🟢 ออนไลน์ / ⚪ ใช้งานล่าสุด 5 นาทีที่แล้ว)
+// เมื่อออฟไลน์ (จุดเขียว = ออนไลน์ / จุดเทา = ใช้งานล่าสุด 5 นาทีที่แล้ว)
 function PresenceDot({ lastSeenAt, showLabel = false }) {
   const state = presenceState(lastSeenAt);
 
@@ -434,18 +435,18 @@ export default function Messages() {
                       <span className="msg__thread-name">
                         {thread.isPinned && (
                           <span className="msg__thread-flag" title="ปักหมุดไว้">
-                            📌
+                            <Pin size={13} aria-hidden="true" />
                           </span>
                         )}
                         {thread.name}
                         {isMuted(thread.mutedUntil) && (
                           <span className="msg__thread-flag" title="ปิดการแจ้งเตือนอยู่">
-                            🔕
+                            <BellOff size={13} aria-hidden="true" />
                           </span>
                         )}
                         {thread.blockedByMe && (
                           <span className="msg__thread-flag" title="คุณบล็อกผู้ใช้นี้อยู่">
-                            🚫
+                            <Ban size={13} aria-hidden="true" />
                           </span>
                         )}
                       </span>
@@ -541,7 +542,7 @@ export default function Messages() {
                   <div className="msg__chat-links">
                     {isMuted(active.mutedUntil) && (
                       <span className="msg__chat-flag" title={muteLabel(active.mutedUntil)}>
-                        🔕 ปิดเสียงอยู่
+                        <BellOff size={13} aria-hidden="true" /> ปิดเสียงอยู่
                       </span>
                     )}
                     {/* ห้องที่ยังไม่ถูกสร้างจริง (?to=) ยังไม่มีอะไรให้ตั้งค่า —
@@ -591,7 +592,7 @@ export default function Messages() {
                               aria-label="ลบข้อความนี้"
                               onClick={() => handleDeleteMessage(message)}
                             >
-                              🗑
+                              <Trash2 size={14} aria-hidden="true" />
                             </button>
                           )}
 
@@ -665,7 +666,7 @@ export default function Messages() {
                     disabled={sendingImage}
                     onClick={() => fileRef.current?.click()}
                   >
-                    {sendingImage ? "…" : "🖼"}
+                    {sendingImage ? "…" : <ImageIcon size={18} aria-hidden="true" />}
                   </button>
                   <input
                     ref={fileRef}
@@ -682,7 +683,7 @@ export default function Messages() {
                     aria-expanded={showEmoji}
                     onClick={() => setShowEmoji((value) => !value)}
                   >
-                    😊
+                    <Smile size={18} aria-hidden="true" />
                   </button>
 
                   <input

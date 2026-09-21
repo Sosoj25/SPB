@@ -12,6 +12,7 @@
 // QR จึงมีแต่จะพาลูกค้าไปต่อคิวแล้วโดนปฏิเสธ) แต่ยังมีรหัสอ้างอิง ที่อยู่ผู้รับ
 // และเลขพัสดุครบ เพราะนั่นคือสิ่งที่ลูกค้าต้องใช้ตอนถามเจ้าหน้าที่เรื่องของ
 import { useEffect, useState } from "react";
+import { Check, Copy, TriangleAlert, Truck, X } from "lucide-react";
 import RewardMedia from "./RewardMedia";
 import { generateQrDataUrl } from "../lib/qr";
 import {
@@ -185,7 +186,7 @@ export default function RewardPassDialog({ item, onClose }) {
             aria-label={shipped ? "ปิดรายละเอียดการแลก" : "ปิดบัตรรับของรางวัล"}
             autoFocus
           >
-            ✕
+            <X size={16} aria-hidden="true" />
           </button>
         </header>
 
@@ -193,7 +194,7 @@ export default function RewardPassDialog({ item, onClose }) {
           {shipped ? (
             <div className="reward-pass__ship">
               <span className="reward-pass__ship-icon" aria-hidden="true">
-                🚚
+                <Truck size={28} aria-hidden="true" />
               </span>
               <p className="reward-pass__ship-status">{fulfillmentLabel(item.fulfillmentStatus)}</p>
               <p className="reward-pass__ship-text">
@@ -221,7 +222,15 @@ export default function RewardPassDialog({ item, onClose }) {
 
           <div className="reward-pass__actions">
             <button type="button" className="reward-pass__action" onClick={handleCopy}>
-              {copied ? "✓ คัดลอกแล้ว" : "⧉ คัดลอกรหัส"}
+              {copied ? (
+                <>
+                  <Check size={15} aria-hidden="true" /> คัดลอกแล้ว
+                </>
+              ) : (
+                <>
+                  <Copy size={15} aria-hidden="true" /> คัดลอกรหัส
+                </>
+              )}
             </button>
             {!shipped && dataUrl && (
               // เก็บ QR ไว้ในคลังรูปได้ เผื่อหน้างานเน็ตไม่มีหรือเข้าเว็บไม่ได้
@@ -237,7 +246,7 @@ export default function RewardPassDialog({ item, onClose }) {
 
           {expiringSoon && (
             <p className="reward-pass__warn">
-              ⚠ เหลือเวลาใช้อีก {left === 0 ? "วันนี้วันสุดท้าย" : `${left} วัน`} · หมดอายุ{" "}
+              <TriangleAlert size={14} aria-hidden="true" /> เหลือเวลาใช้อีก {left === 0 ? "วันนี้วันสุดท้าย" : `${left} วัน`} · หมดอายุ{" "}
               {formatRewardDate(item.expiresAt)}
             </p>
           )}

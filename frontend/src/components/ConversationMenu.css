@@ -67,9 +67,11 @@
   color: var(--color-muted-purple);
 }
 
+/* ไอคอนนำหน้าคำสั่งต้องจัดกลางกับข้อความ ไม่ใช่ baseline — <svg> ไม่มี
+   baseline ของตัวเอง มันจะไปเกาะขอบล่างแล้วลอยสูงกว่าบรรทัด */
 .conv-menu__item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.4rem;
   padding: 0.55rem 0.75rem;
   border: none;

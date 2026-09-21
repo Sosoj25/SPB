@@ -1,5 +1,7 @@
 // หน้าติดต่อเรา — ช่องทางติดต่อ คำถามที่พบบ่อย และเธรดส่งเรื่องถึงเจ้าหน้าที่
 import { useEffect, useState } from "react";
+import useReveal from "../hooks/useReveal";
+import { MapPin } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import { useAuth } from "../context/useAuth";
@@ -215,6 +217,7 @@ function TicketThread({ ticket, userId, unreadCount = 0, defaultOpen = false, on
 }
 
 export default function Contact() {
+  const revealRef = useReveal();
   const { user, profile } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [form, setForm] = useState(EMPTY_FORM);
@@ -294,15 +297,15 @@ export default function Contact() {
     <div className="contact">
       <AppHeader />
 
-      <main className="contact__main">
-        <header className="contact__masthead">
+      <main className="contact__main" ref={revealRef}>
+        <header className="contact__masthead" data-reveal>
           <h1 className="contact__title">ติดต่อเรา</h1>
           <p className="contact__intro">มีคำถามหรือพบปัญหา? ทีมงานของเราพร้อมช่วยเหลือคุณ</p>
         </header>
 
         <div className="contact__grid">
           <div className="contact__col">
-            <section className="contact-card contact-form">
+            <section className="contact-card contact-form" data-reveal>
               <h2 className="contact-card__title">ส่งข้อความถึงเรา</h2>
 
               <form className="contact-form__body" onSubmit={handleSubmit}>
@@ -411,7 +414,7 @@ export default function Contact() {
               </form>
             </section>
 
-            <section className="contact-card contact-history">
+            <section className="contact-card contact-history" data-reveal>
               <h2 className="contact-card__title">เรื่องที่คุณส่งมา</h2>
 
               {ticketsLoading && <p className="contact-history__empty">กำลังโหลด...</p>}
@@ -443,7 +446,7 @@ export default function Contact() {
             {/* ทั้งการ์ดหายไปเลยถ้าแอดมินลบข้อมูลติดต่อออกหมด — หัวข้อเปล่า ๆ
                 ที่ไม่มีช่องทางอยู่ข้างใต้ไม่ได้ช่วยอะไรผู้ใช้ */}
             {channels.length > 0 && (
-            <section className="contact-card contact-channels">
+            <section className="contact-card contact-channels" data-reveal>
               <h2 className="contact-card__title contact-card__title--sm">ช่องทางติดต่อด่วน</h2>
 
               {channels.map((channel) => (
@@ -455,7 +458,7 @@ export default function Contact() {
                   rel="noreferrer"
                 >
                   <span className="contact-channel__icon" aria-hidden="true">
-                    {channel.icon}
+                    <channel.Icon size={22} />
                   </span>
                   <span className="contact-channel__text">
                     <span className="contact-channel__label">{channel.label}</span>
@@ -468,7 +471,7 @@ export default function Contact() {
             )}
 
             {contactSettings.officeAddress && (
-              <section className="contact-card">
+              <section className="contact-card" data-reveal>
                 <h2 className="contact-card__title contact-card__title--sm">ที่ตั้งสำนักงาน</h2>
                 {mapUrl && (
                   <a
@@ -479,7 +482,7 @@ export default function Contact() {
                     aria-label="เปิดที่ตั้งสำนักงานในแผนที่"
                   >
                     <span className="contact-map__pin" aria-hidden="true">
-                      📍
+                      <MapPin size={26} />
                     </span>
                     <span className="contact-map__cta">เปิดในแผนที่</span>
                   </a>
@@ -488,7 +491,7 @@ export default function Contact() {
               </section>
             )}
 
-            <section className="contact-card contact-faq">
+            <section className="contact-card contact-faq" data-reveal>
               <h2 className="contact-card__title contact-card__title--sm">คำถามที่พบบ่อย</h2>
               {buildFaq(policy).map((item) => (
                 <FaqItem key={item.q} item={item} />
